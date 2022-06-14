@@ -143,8 +143,7 @@ class OptionsMenu extends FlxSubState
 				// new OffsetMenu("Get a note offset based off of your inputs!"),
 				new DFJKOption(),
 				new Judgement("Create a custom judgement preset"),
-				new CustomizeGameplay("Drag and drop gameplay modules to your prefered positions!"),
-				new NoteSplashes("Toggle The NoteSplashes!")
+				new CustomizeGameplay("Drag and drop gameplay modules to your prefered positions!")
 			]),
 			new OptionCata(345, 40, "Appearance", [
 				new NoteskinOption("Change your current noteskin"),
@@ -164,6 +163,7 @@ class OptionsMenu extends FlxSubState
 				new RainbowFPSOption("Make the FPS Counter flicker through rainbow colors."),
 				new BorderFps("Draw a border around the FPS Text (Consumes a lot of CPU Resources)"),
 				new CpuStrums("Toggle the CPU's strumline lighting up when it hits a note."),
+				new Note Cocks("Toggle The NoteSplashes!")
 			]),
 			new OptionCata(640, 40, "Misc", [
 
