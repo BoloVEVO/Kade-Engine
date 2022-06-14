@@ -566,6 +566,40 @@ class ShitMsOption extends Option
 	}
 }
 
+class NoteSplashes extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		if (OptionsMenu.isInPause)
+            description = "This option cannot be toggled in the pause menu.";
+		else
+		    description = desc;
+	}
+	
+	public override function left():Bool
+	{
+		if (OptionsMenu.isInPause)
+			return false;
+		FlxG.save.data.noteSplashes = !FlxG.save.data.noteSplashes;
+		display = updateDisplay();
+		return true;
+	}
+	
+	public override function right():Bool
+	{
+		if (OptionsMenu.isInPause)
+			return false;
+		left();
+		return true;
+	}
+	
+	private override function updateDisplay():String
+	{
+		return "noteSplashes: < " + (!FlxG.save.data.noteSplashes ? "off" : "on") + " >";
+	}
+}
+
 class RoundAccuracy extends Option
 {
 	public function new(desc:String)
