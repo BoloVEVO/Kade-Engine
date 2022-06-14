@@ -596,7 +596,7 @@ class NoteCocks extends Option
 	
 	private override function updateDisplay():String
 	{
-		return "noteSplashes: < " + (!FlxG.save.data.noteSplashes ? "off" : "on") + " >";
+		return "Note Splashes: < " + (!FlxG.save.data.noteSplashes ? "off" : "on") + " >";
 	}
 }
 
