@@ -566,7 +566,7 @@ class ShitMsOption extends Option
 	}
 }
 
-class Note Cocks extends Option
+class NoteCocks extends Option
 {
 	public function new(desc:String)
 	{
