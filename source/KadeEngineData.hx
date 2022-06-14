@@ -207,6 +207,9 @@ class KadeEngineData
 
 		if (FlxG.save.data.mirror == null)
 			FlxG.save.data.mirror = false;
+		
+		if (FlxG.save.data.noteSplashes == null)
+			FlxG.save.data.noteSplashes = false;
 
 		// Gonna make this an option on another PR
 		if (FlxG.save.data.overrideNoteskins == null)
