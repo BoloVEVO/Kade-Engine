@@ -4312,62 +4312,6 @@ class PlayState extends MusicBeatState
 
 	var timeShown = 0;
 	var currentTimingShown:FlxText = null;
-			
-        public function NoteSplashesSpawn(daNote:Note):Void
-	{
-		var sploosh:FlxSprite = new FlxSprite(daNote.x, playerStrums.members[daNote.noteData].y);
-		
-		if (FlxG.save.data.noteSplashes)
-		{
-		    if (SONG.noteStyle == 'normal')
-			{
-				var tex:flixel.graphics.frames.FlxAtlasFrames = Paths.getSparrowAtlas('noteSplashes', 'shared');
-				sploosh.frames = tex;
-				sploosh.animation.addByPrefix('splash 0 0', 'note splash 1 purple', 24, false);
-				sploosh.animation.addByPrefix('splash 0 1', 'note splash 1  blue', 24, false);
-				sploosh.animation.addByPrefix('splash 0 2', 'note splash 1 green', 24, false);
-				sploosh.animation.addByPrefix('splash 0 3', 'note splash 1 red', 24, false);
-				sploosh.animation.addByPrefix('splash 1 0', 'note splash 2 purple', 24, false);
-				sploosh.animation.addByPrefix('splash 1 1', 'note splash 2 blue', 24, false);
-				sploosh.animation.addByPrefix('splash 1 2', 'note splash 2 green', 24, false);
-				sploosh.animation.addByPrefix('splash 1 3', 'note splash 2 red', 24, false);
-
-				add(sploosh);
-				sploosh.cameras = [camHUD];
-				sploosh.animation.play('splash ' + FlxG.random.int(0, 1) + " " + daNote.noteData);
-				sploosh.alpha = 0.6;
-				sploosh.offset.x += 90;
-				sploosh.offset.y += 80; //lets stick to eight not nine
-				sploosh.animation.finishCallback = function(name) sploosh.kill();
-
-				sploosh.update(0);
-			}
-
-			if (SONG.noteStyle == 'pixel')
-			{
-				var tex:flixel.graphics.frames.FlxAtlasFrames = Paths.getSparrowAtlas('weeb/pixelUI/noteSplashes-pixels', 'week6');
-				sploosh.frames = tex;
-				sploosh.animation.addByPrefix('splash 0 0', 'note splash 1 purple', 24, false);
-				sploosh.animation.addByPrefix('splash 0 1', 'note splash 1  blue', 24, false);
-				sploosh.animation.addByPrefix('splash 0 2', 'note splash 1 green', 24, false);
-				sploosh.animation.addByPrefix('splash 0 3', 'note splash 1 red', 24, false);
-				sploosh.animation.addByPrefix('splash 1 0', 'note splash 2 purple', 24, false);
-				sploosh.animation.addByPrefix('splash 1 1', 'note splash 2 blue', 24, false);
-				sploosh.animation.addByPrefix('splash 1 2', 'note splash 2 green', 24, false);
-				sploosh.animation.addByPrefix('splash 1 3', 'note splash 2 red', 24, false);
-		
-				add(sploosh);
-				sploosh.cameras = [camHUD];
-				sploosh.animation.play('splash ' + FlxG.random.int(0, 1) + " " + daNote.noteData);
-				sploosh.alpha = 0.6;
-				sploosh.offset.x += 90;
-				sploosh.offset.y += 80;
-				sploosh.animation.finishCallback = function(name) sploosh.kill();
-
-				sploosh.update(0);
-			}
-		}
-	}
 
 	private function popUpScore(daNote:Note):Void
 	{
@@ -4444,11 +4388,6 @@ class PlayState extends MusicBeatState
 				if (FlxG.save.data.accuracyMod == 0)
 					totalNotesHit += 1;
 				sicks++;
-		}
-		
-		if (daRating == 'sick')
-		{
-		    NoteSplashesSpawn(daNote);
 		}
 
 		if (songMultiplier >= 1.05)
