@@ -395,7 +395,10 @@ class PlayState extends MusicBeatState
 		Paths.clearStoredMemory();
 		FlxG.mouse.visible = false;
 		instance = this;
-
+		
+		tweenManager = new FlxTweenManager();
+		timerManager = new FlxTimerManager();
+		
 		// grab variables here too or else its gonna break stuff later on
 		GameplayCustomizeState.freeplayNoteStyle = SONG.noteStyle;
 		previousRate = songMultiplier - 0.05;
