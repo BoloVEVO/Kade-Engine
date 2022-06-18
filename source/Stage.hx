@@ -731,7 +731,7 @@ class Stage extends MusicBeatState
 					{
 						if (!array.contains(bg))
 						{
-							var tween = FlxTween.tween(bg, {alpha: 0}, tweenDuration, {
+							var tween = PlayState.instance.createTween(bg, {alpha: 0}, tweenDuration, {
 								onComplete: function(tween:FlxTween):Void
 								{
 									bg.visible = false;
@@ -742,7 +742,7 @@ class Stage extends MusicBeatState
 					for (bg in array)
 					{
 						bg.visible = true;
-						FlxTween.tween(bg, {alpha: 1}, tweenDuration);
+						PlayState.instance.createTween(bg, {alpha: 1}, tweenDuration);
 					}
 				}
 				else
@@ -946,7 +946,7 @@ class Stage extends MusicBeatState
 			swagBacks['fastCar'].visible = true;
 			swagBacks['fastCar'].velocity.x = (FlxG.random.int(170, 220) / FlxG.elapsed) * 3;
 			fastCarCanDrive = false;
-			new FlxTimer().start(2, function(tmr:FlxTimer)
+			PlayState.instance.createTimer(2, function(tmr:FlxTimer)
 			{
 				resetFastCar();
 			});

@@ -464,7 +464,7 @@ class LuaNote extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(note, {x: xp, y: yp}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(note, {x: xp, y: yp}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 		return 0;
 	}
 
@@ -490,7 +490,7 @@ class LuaNote extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(note, {modAngle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(note, {modAngle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -516,7 +516,7 @@ class LuaNote extends LuaClass
 			LuaL.error(state, "Failure to tween (couldn't find note " + time + ")");
 			return 0;
 		}
-		FlxTween.tween(note, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(note, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -818,7 +818,7 @@ class LuaReceptor extends LuaClass
 		}
 		if (yp == receptor.y)
 		{
-			receptorTween = FlxTween.tween(receptor, {x: xp}, time, {
+			receptorTween = PlayState.instance.createTween(receptor, {x: xp}, time, {
 				ease: ModchartState.getFlxEaseByString(ease),
 				onUpdate: function(tw)
 				{
@@ -831,7 +831,7 @@ class LuaReceptor extends LuaClass
 			});
 		}
 		else
-			receptorTween = FlxTween.tween(receptor, {x: xp, y: yp}, time, {
+			receptorTween = PlayState.instance.createTween(receptor, {x: xp, y: yp}, time, {
 				ease: ModchartState.getFlxEaseByString(ease),
 				onUpdate: function(tw)
 				{
@@ -867,7 +867,7 @@ class LuaReceptor extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(receptor, {modAngle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(receptor, {modAngle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -892,7 +892,7 @@ class LuaReceptor extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(receptor, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(receptor, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -917,7 +917,7 @@ class LuaReceptor extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(receptor.scale, {x: nscaleX, y: nscaleY}, time, {
+		PlayState.instance.createTween(receptor.scale, {x: nscaleX, y: nscaleY}, time, {
 			ease: ModchartState.getFlxEaseByString(ease),
 			onUpdate: function(twn)
 			{
@@ -1141,7 +1141,7 @@ class LuaCamera extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(camera, {zoom: nzoom}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(camera, {zoom: nzoom}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1176,7 +1176,7 @@ class LuaCamera extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(camera, {x: xp, y: yp}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(camera, {x: xp, y: yp}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1207,7 +1207,7 @@ class LuaCamera extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(camera, {modAngle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(camera, {modAngle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1238,7 +1238,7 @@ class LuaCamera extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(camera, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(camera, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1486,7 +1486,7 @@ class LuaCharacter extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(char, {x: xp, y: yp}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(char, {x: xp, y: yp}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1517,7 +1517,7 @@ class LuaCharacter extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(char, {angle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(char, {angle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1548,7 +1548,7 @@ class LuaCharacter extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(char, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(char, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1837,7 +1837,7 @@ class LuaSprite extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(sprite, {x: xp, y: yp}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(sprite, {x: xp, y: yp}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1868,7 +1868,7 @@ class LuaSprite extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(sprite, {angle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(sprite, {angle: nangle}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -1899,7 +1899,7 @@ class LuaSprite extends LuaClass
 			return 0;
 		}
 
-		FlxTween.tween(sprite, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
+		PlayState.instance.createTween(sprite, {alpha: nalpha}, time, {ease: ModchartState.getFlxEaseByString(ease)});
 
 		return 0;
 	}
@@ -2077,7 +2077,7 @@ class LuaWindow extends LuaClass
 		var time = LuaL.checknumber(state, 4);
 		var ease = LuaL.checkstring(state, 5);
 
-		FlxTween.tween(Application.current.window, {x: xp, y: yp}, time, {
+		PlayState.instance.createTween(Application.current.window, {x: xp, y: yp}, time, {
 			ease: ModchartState.getFlxEaseByString(ease)
 		});
 
