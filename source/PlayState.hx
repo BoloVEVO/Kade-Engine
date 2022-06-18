@@ -368,9 +368,18 @@ class PlayState extends MusicBeatState
 	var camLerp = #if !html5 0.04 * (30 / (cast(Lib.current.getChildAt(0), Main))
 		.getFPS()) * songMultiplier; #else 0.09 * (30 / (cast(Lib.current.getChildAt(0), Main)).getFPS()) * songMultiplier; #end
 
-	public function createTween(Object:Dynamic, Values:Dynamic, Duration:Float = 1, ?Options:TweenOptions):FlxTween
+	public function createTween(Object:Dynamic, Values:Dynamic, Duration:Float, ?Options:TweenOptions):FlxTween
 	{
-		return tweenManager.tween(Object, Values, Duration, Options);
+		var tween:FlxTween = tweenManager.tween(Object, Values, Duration, Options);
+		tween.manager = tweenManager;
+		return tween;
+	}
+
+	public function createTweenNum(FromValue:Float, ToValue:Float, Duration:Float = 1, ?Options:TweenOptions, ?TweenFunction:Float->Void):FlxTween
+	{
+		var tween:FlxTween = tweenManager.num(FromValue, ToValue, Duration, Options, TweenFunction);
+		tween.manager = tweenManager;
+		return tween;
 	}
 
 	public function createTimer(Time:Float = 1, ?OnComplete:FlxTimer->Void, Loops:Int = 1):FlxTimer
@@ -6187,7 +6196,7 @@ class PlayState extends MusicBeatState
 		{
 			FlxG.camera.zoom += 0.06;
 
-			FlxTween.num(FlxG.camera.zoom, FlxG.camera.zoom - 0.06, 0.5 / songMultiplier, {ease: FlxEase.elasticOut}, updateCamZoom.bind(FlxG.camera));
+			createTweenNum(FlxG.camera.zoom, FlxG.camera.zoom - 0.06, 0.5 / songMultiplier, {ease: FlxEase.elasticOut}, updateCamZoom.bind(FlxG.camera));
 		}
 	}
 
@@ -6218,7 +6227,7 @@ class PlayState extends MusicBeatState
 	{
 		isTweeningThisShit = true;
 		if (isDad)
-			FlxTween.num(FlxG.camera.zoom, FlxG.camera.zoom + 0.3, (Conductor.stepCrochet * 4 / 1000) / songMultiplier, {
+			createTweenNum(FlxG.camera.zoom, FlxG.camera.zoom + 0.3, (Conductor.stepCrochet * 4 / 1000) / songMultiplier, {
 				ease: FlxEase.smootherStepInOut,
 				onComplete: function(twn)
 				{
@@ -6226,7 +6235,7 @@ class PlayState extends MusicBeatState
 				}
 			}, updateCamZoom.bind(FlxG.camera));
 		else
-			FlxTween.num(FlxG.camera.zoom, FlxG.camera.zoom - 0.3, (Conductor.stepCrochet * 4 / 1000) / songMultiplier, {
+			createTweenNum(FlxG.camera.zoom, FlxG.camera.zoom - 0.3, (Conductor.stepCrochet * 4 / 1000) / songMultiplier, {
 				ease: FlxEase.smootherStepInOut,
 				onComplete: function(twn)
 				{
