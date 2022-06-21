@@ -63,7 +63,10 @@ class Paths
 		// trace(gottenPath);
 		if (!currentTrackedSounds.exists(gottenPath))
 		{
-			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(getPath('$path/$key.$SOUND_EXT', SOUND, library)));
+			var folder:String = '';
+			if(path == 'songs') folder = 'songs:';
+
+			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(folder + getPath('$path/$key.$SOUND_EXT', SOUND, library)));
 		}
 
 		localTrackedAssets.push(gottenPath);
@@ -189,14 +192,7 @@ class Paths
 			case 'm.i.l.f':
 				songLowercase = 'milf';
 		}
-		var file;
-		#if PRELOAD_ALL
-		file = loadSound('songs', songLowercase, 'songs');
-		#else
-		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
-		#end
-
-		return file;
+		return loadSound('songs', songLowercase, 'songs');
 	}
 
 	inline static public function inst(song:String):Any
@@ -211,13 +207,7 @@ class Paths
 			case 'm.i.l.f':
 				songLowercase = 'milf';
 		}
-		var file;
-		#if PRELOAD_ALL
-		file = loadSound('songs', songLowercase, 'songs');
-		#else
-		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
-		#end
-		return file;
+		return loadSound('songs', songLowercase, 'songs');
 	}
 
 	/*static public function listSongsToCache()
@@ -289,8 +279,7 @@ class Paths
 
 	public static var dumpExclusions:Array<String> = [
 		'assets/music/freakyMenu.$SOUND_EXT',
-		'assets/shared/music/breakfast.$SOUND_EXT',
-		'assets/shared/music/tea-time.$SOUND_EXT',
+		'assets/shared/music/breakfast.$SOUND_EXT'
 	];
 
 	/// haya I love you for the base cache dump I took to the max
@@ -342,9 +331,8 @@ class Paths
 				Debug.logTrace('Cleared and removed $counterAssets cached assets.');
 			}
 		}
-		#if PRELOAD_ALL
-		// clear all sounds that are cached
 
+		// clear all sounds that are cached
 		for (key in currentTrackedSounds.keys())
 		{
 			if (!localTrackedAssets.contains(key) && !dumpExclusions.contains(key) && key != null)
@@ -358,17 +346,13 @@ class Paths
 		}
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
-
 		openfl.Assets.cache.clear("songs");
-		#end
 	}
 
 	inline static public function fileExists(key:String, type:AssetType, ?library:String)
 	{
 		if (OpenFlAssets.exists(getPath(key, type)))
-		{
 			return true;
-		}
 		return false;
 	}
 
