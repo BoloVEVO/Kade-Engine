@@ -44,7 +44,7 @@ import Shaders;
 #if FEATURE_DISCORD
 import Discord.DiscordClient;
 #end
-#if FEATURE_LUA
+#if FEATURE_LUAMODCHART
 import LuaClass;
 #end
 #if FEATURE_WEBM
