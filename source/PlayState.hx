@@ -1,73 +1,27 @@
 package;
 
-import openfl.display.Preloader.DefaultPreloader;
-import haxe.io.Float32Array.Float32ArrayData;
-import flixel.system.replay.MouseRecord;
-import haxe.display.Display.EnumFieldOriginKind;
-import polymod.backends.PolymodAssetLibrary;
 import flixel.util.FlxSpriteUtil;
-#if FEATURE_MP4VIDEOS
-import vlc.MP4Handler;
-#end
-#if FEATURE_LUAMODCHART
-import LuaClass;
-#end
 import lime.media.openal.AL;
 import Song.Event;
 import openfl.media.Sound;
-#if FEATURE_STEPMANIA
-import smTools.SMFile;
-#end
-#if FEATURE_FILESYSTEM
-import sys.io.File;
-import Sys;
-import sys.FileSystem;
-#end
-import openfl.ui.KeyLocation;
-import openfl.events.Event;
-import openfl.system.System;
-import haxe.EnumTools;
-import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import Replay.Ana;
 import Replay.Analysis;
 import openfl.utils.Assets as OpenFlAssets;
-#if FEATURE_WEBM
-import webm.WebmPlayer;
-#end
 import flixel.input.keyboard.FlxKey;
-import haxe.Exception;
-import openfl.geom.Matrix;
 import openfl.display.BitmapData;
-import openfl.utils.AssetType;
-import lime.graphics.Image;
 import flixel.graphics.FlxGraphic;
-import openfl.utils.AssetManifest;
-import openfl.utils.AssetLibrary;
-import lime.app.Application;
-import lime.media.AudioContext;
-import lime.media.AudioManager;
-import openfl.utils.Future;
 import openfl.Lib;
 import Section.SwagSection;
 import Options;
 import Song.SongData;
-import WiggleEffect.WiggleEffectType;
 import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
-import flixel.FlxGame;
 import flixel.FlxObject;
 import flixel.FlxSprite;
-import flixel.FlxState;
-import flixel.FlxSubState;
-import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.effects.FlxTrail;
-import flixel.addons.effects.FlxTrailArea;
-import flixel.addons.effects.chainable.FlxEffectSprite;
-import flixel.addons.effects.chainable.FlxWaveEffect;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.graphics.atlas.FlxAtlas;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
@@ -77,25 +31,35 @@ import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
-import AtlasFrameMaker;
 import flixel.ui.FlxBar;
-import flixel.util.FlxCollision;
 import flixel.util.FlxColor;
-import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
-import haxe.Json;
-import openfl.display.BlendMode;
-import openfl.display.StageQuality;
+import flixel.util.FlxSort;
+import flixel.FlxSubState;
 import openfl.filters.ShaderFilter;
-import flixel.util.FlxDestroyUtil;
+import openfl.filters.BitmapFilter;
+import AtlasFrameMaker;
+import Shaders;
 #if FEATURE_DISCORD
 import Discord.DiscordClient;
 #end
-// HAXESCRIPT MODCHARTS AS MODDING+
-import hscript.Expr;
-import hscript.Parser;
-import hscript.Interp;
+#if FEATURE_LUA
+import LuaClass;
+#end
+#if FEATURE_WEBM
+import webm.WebmPlayer;
+#end
+#if FEATURE_MP4VIDEOS
+import vlc.MP4Handler;
+#end
+#if FEATURE_STEPMANIA
+import smTools.SMFile;
+#end
+#if FEATURE_FILESYSTEM
+import sys.io.File;
+import sys.FileSystem;
+#end
 
 using StringTools;
 
@@ -223,13 +187,15 @@ class PlayState extends MusicBeatState
 
 	public var iconP1:HealthIcon; // making these public again because i may be stupid
 	public var iconP2:HealthIcon; // what could go wrong?
+
 	public var camHUD:FlxCamera;
-	public var camSustains:FlxCamera;
-	public var camNotes:FlxCamera;
-
+	public var camHUDShaders:Array<ShaderEffect> = [];
 	public var camGame:FlxCamera;
-
+	public var camGameShaders:Array<ShaderEffect> = [];
 	public var mainCam:FlxCamera;
+	public var mainCamShaders:Array<ShaderEffect> = [];
+
+	public var shaderUpdates:Array<Float->Void> = [];
 
 	public var cannotDie = false;
 
@@ -507,7 +473,7 @@ class PlayState extends MusicBeatState
 		executeModchart = false; // FORCE disable for non cpp targets
 		#end
 
-		Debug.logInfo('Searching for mod chart? ($executeModchart) at ${Paths.lua('songs/${PlayState.SONG.songId}/modchart')}');
+		Debug.logInfo('Searching for mod chart? ($executeModchart) at ' + Paths.lua('songs/${PlayState.SONG.songId}/modchart'));
 
 		/*if (executeModchart)
 			songMultiplier = 1; */
@@ -561,22 +527,14 @@ class PlayState extends MusicBeatState
 		camGame = new FlxCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
-		camSustains = new FlxCamera();
-		camSustains.bgColor.alpha = 0;
-		camNotes = new FlxCamera();
-		camNotes.bgColor.alpha = 0;
 		mainCam = new FlxCamera();
 		mainCam.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camHUD);
-		FlxG.cameras.add(camSustains);
-		FlxG.cameras.add(camNotes);
 		FlxG.cameras.add(mainCam);
 
 		camHUD.zoom = PlayStateChangeables.zoom;
-		camSustains.zoom = PlayStateChangeables.zoom;
-		camNotes.zoom = PlayStateChangeables.zoom;
 
 		FlxCamera.defaultCameras = [camGame];
 
@@ -1101,8 +1059,6 @@ class PlayState extends MusicBeatState
 			var window = new LuaWindow();
 			new LuaCamera(FlxG.camera, "camGame").Register(ModchartState.lua);
 			new LuaCamera(camHUD, "camHUD").Register(ModchartState.lua);
-			new LuaCamera(camSustains, "camSustains").Register(ModchartState.lua);
-			new LuaCamera(camNotes, "camNotes").Register(ModchartState.lua);
 			new LuaCamera(mainCam, "mainCam").Register(ModchartState.lua);
 			new LuaCharacter(dad, "dad").Register(ModchartState.lua);
 			new LuaCharacter(gf, "gf").Register(ModchartState.lua);
@@ -1406,6 +1362,8 @@ class PlayState extends MusicBeatState
 
 		super.create();
 
+		Paths.clearUnusedMemory();
+
 		if (FlxG.save.data.distractions && FlxG.save.data.background && !FlxG.save.data.optimize)
 		{
 			if (gfCheck == 'pico-speaker' && Stage.curStage == 'tank')
@@ -1567,6 +1525,50 @@ class PlayState extends MusicBeatState
 				remove(black);
 			}
 		});
+	}
+
+	public function addShaderToCamera(camera:String, effect:ShaderEffect)
+	{
+		switch(camera.toLowerCase()) 
+		{
+			case 'camhud' | 'hud':
+				camHUDShaders.push(effect);
+				var newCamEffects:Array<BitmapFilter>=[];
+				for(i in camHUDShaders)
+					newCamEffects.push(new ShaderFilter(i.shader));
+				camHUD.setFilters(newCamEffects);
+			case 'camgame' | 'game':
+				camGameShaders.push(effect);
+				var newCamEffects:Array<BitmapFilter>=[];
+				for(i in camGameShaders)
+					newCamEffects.push(new ShaderFilter(i.shader));
+				camGame.setFilters(newCamEffects);
+			case 'cammain' | 'main':
+				mainCamShaders.push(effect);
+				var newCamEffects:Array<BitmapFilter>=[];
+				for(i in mainCamShaders)
+					newCamEffects.push(new ShaderFilter(i.shader));
+				mainCam.setFilters(newCamEffects);
+		}
+	}
+
+	public function clearShaderFromCamera(camera:String)
+	{
+		switch(camera.toLowerCase())
+		{
+			case 'camhud' | 'hud':
+				camHUDShaders = [];
+				var newCamEffects:Array<BitmapFilter> = [];
+				camHUD.setFilters(newCamEffects);
+			case 'camgame' | 'game':
+				camGameShaders = [];
+				var newCamEffects:Array<BitmapFilter> = [];
+				camGame.setFilters(newCamEffects);
+			case 'cammain' | 'main':
+				mainCamShaders = [];
+				var newCamEffects:Array<BitmapFilter> = [];
+				mainCam.setFilters(newCamEffects);
+		}
 	}
 
 	var startTimer:FlxTimer;
@@ -2677,10 +2679,7 @@ class PlayState extends MusicBeatState
 				}
 				#end
 
-				if (!dunceNote.isSustainNote)
-					dunceNote.cameras = [camNotes];
-				else
-					dunceNote.cameras = [camSustains];
+				dunceNote.cameras = [camHUD];
 
 				unspawnNotes.remove(dunceNote);
 				currentLuaIndex++;
@@ -2889,15 +2888,6 @@ class PlayState extends MusicBeatState
 				if (i <= playerStrums.length)
 					playerStrums.members[i].visible = p2;
 			}
-
-			camNotes.zoom = camHUD.zoom;
-			camNotes.x = camHUD.x;
-			camNotes.y = camHUD.y;
-			camNotes.angle = camHUD.angle;
-			camSustains.zoom = camHUD.zoom;
-			camSustains.x = camHUD.x;
-			camSustains.y = camHUD.y;
-			camSustains.angle = camHUD.angle;
 		}
 		#end
 
@@ -3514,9 +3504,6 @@ class PlayState extends MusicBeatState
 
 			FlxG.camera.zoom = FlxMath.lerp(Stage.camZoom, FlxG.camera.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125 * bpmRatio * songMultiplier), 0, 1));
 			camHUD.zoom = FlxMath.lerp(FlxG.save.data.zoom, camHUD.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125 * bpmRatio * songMultiplier), 0, 1));
-
-			camNotes.zoom = camHUD.zoom;
-			camSustains.zoom = camHUD.zoom;
 		}
 
 		FlxG.watch.addQuick("curBPM", Conductor.bpm);
@@ -4115,6 +4102,9 @@ class PlayState extends MusicBeatState
 		#end
 
 		super.update(elapsed);
+
+		for (i in shaderUpdates)
+			i(elapsed);
 	}
 
 	public function getSectionByTime(ms:Float):SwagSection
@@ -6250,14 +6240,6 @@ class PlayState extends MusicBeatState
 		camHUD.zoom += 0.06;
 
 		createTween(camHUD, {zoom: camHUD.zoom - 0.06}, 0.5 / songMultiplier, {
-			ease: FlxEase.elasticOut
-		});
-
-		createTween(camNotes, {zoom: camHUD.zoom - 0.06}, 0.5 / songMultiplier, {
-			ease: FlxEase.elasticOut
-		});
-
-		createTween(camSustains, {zoom: camHUD.zoom - 0.06}, 0.5 / songMultiplier, {
 			ease: FlxEase.elasticOut
 		});
 
