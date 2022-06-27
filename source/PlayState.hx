@@ -1328,8 +1328,127 @@ class PlayState extends MusicBeatState
 					schoolIntro(doof);
 				case 'thorns':
 					schoolIntro(doof);
-
-				case 'ugh', 'guns', 'stress':
+				case 'ugh':
+						dad.alpha = 0;
+						healthBarBG.alpha = 0;
+						healthBar.alpha = 0;
+						iconP1.alpha = 0;
+						iconP2.alpha = 0;
+						scoreTxt.alpha = 0;
+	
+						var wellWell:FlxSprite;
+						wellWell = new FlxSprite(dad.x,dad.y);
+						wellWell.frames = Paths.getSparrowAtlas('TANK_TALK_1','shared');
+						wellWell.animation.addByPrefix('idle',"TANK TALK 1 P1",24,false);
+						wellWell.animation.play('idle');
+						wellWell.antialiasing = true;
+						add(wellWell);
+	
+						wellWell.animation.callback = function(idle, frameNumber:Int, frameIndex:Int)
+							{
+								if (frameNumber == 107)
+									{
+										boyfriend.playAnim('singUP');
+										camFollow.x += 390;
+									}
+	
+								if (frameNumber == 1)
+									{
+										camFollow.x = 290;
+										FlxTween.tween(FlxG.camera, {zoom: Stage.camZoom = 1.1}, 2);
+										var sound:FlxSound;	
+										sound = new FlxSound().loadEmbedded(Paths.sound('cuts1'));
+										sound.play();
+										FlxG.sound.list.add(sound);
+									}						
+									
+								if (frameNumber == 311)
+									{
+										camFollow.x = 450;
+									}								
+								
+								if (frameNumber == 181)
+									{
+										camFollow.x = 390;
+									}	
+									
+							}					
+	
+							wellWell.animation.finishCallback = function(idle)
+							{
+								remove(wellWell);
+								dad.alpha = 1;
+								FlxTween.tween(FlxG.camera, {zoom: Stage.camZoom = 0.9}, 2);
+								startCountdown();
+								if (!FlxG.save.data.hideHud)
+									{
+										FlxTween.tween(scoreTxt, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+										FlxTween.tween(iconP1, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+										FlxTween.tween(iconP2, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+										FlxTween.tween(healthBar, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+										FlxTween.tween(healthBarBG, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+									}
+							}
+							case 'guns':	
+								dad.alpha = 0;
+								healthBarBG.alpha = 0;
+								healthBar.alpha = 0;
+								iconP1.alpha = 0;
+								iconP2.alpha = 0;
+								scoreTxt.alpha = 0;
+			
+								var anim2:FlxSprite;
+								anim2 = new FlxSprite(dad.x,dad.y);
+								anim2.frames = Paths.getSparrowAtlas('TANK_TALK_2','shared');
+								anim2.animation.addByPrefix('idle',"TANK TALK 2",24,false);
+								anim2.animation.play('idle');
+								anim2.antialiasing = true;
+								add(anim2);
+			
+								anim2.animation.callback = function(idle, frameNumber:Int, frameIndex:Int)
+									{
+			
+										if (frameNumber == 1)
+											{
+												camFollow.x = 340;
+												FlxTween.tween(FlxG.camera, {zoom: Stage.camZoom = 1.2}, 3);
+												var sound:FlxSound;	
+												sound = new FlxSound().loadEmbedded(Paths.sound('cuts2'));
+												sound.play();
+												FlxG.sound.list.add(sound);
+				
+											}						
+											
+										if (frameNumber == 114)
+											{
+												gf.playAnim('sad');
+												camFollow.x = 370;
+												FlxTween.tween(FlxG.camera, {zoom: Stage.camZoom = 1.3}, 0.1);
+											}								
+										
+										if (frameNumber == 233)
+											{
+												camFollow.x = 450;
+												FlxTween.tween(FlxG.camera, {zoom: Stage.camZoom = 0.9}, 2);
+											}	
+											
+									}					
+			
+									anim2.animation.finishCallback = function(idle)
+									{
+										remove(anim2);
+										dad.alpha = 1;
+										startCountdown();
+										if (!FlxG.save.data.hideHud)
+											{
+												FlxTween.tween(scoreTxt, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+												FlxTween.tween(iconP1, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+												FlxTween.tween(iconP2, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+												FlxTween.tween(healthBar, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+												FlxTween.tween(healthBarBG, {alpha: 1}, (Conductor.stepCrochet * 16 / 1000), {ease: FlxEase.quadInOut});
+											}
+									}							
+				case 'stress':
 					if (!FlxG.save.data.optimize && FlxG.save.data.background)
 						tankIntro();
 					else
