@@ -683,12 +683,9 @@ class ModchartState
 				haxeInterp.variables.set('game', PlayState.instance);
 				haxeInterp.variables.set('Paths', Paths);
 				haxeInterp.variables.set('Conductor', Conductor);
-				haxeInterp.variables.set('ClientPrefs', ClientPrefs);
 				haxeInterp.variables.set('Character', Character);
 				haxeInterp.variables.set('Alphabet', Alphabet);
 				haxeInterp.variables.set('StringTools', StringTools);
-				haxeInterp.variables.set('SUtil', SUtil);// this is more like for android because filesaving needs it
-
 				haxeInterp.variables.set('setVar', function(name:String, value:Dynamic)
 				{
 					PlayState.instance.variables.set(name, value);
@@ -710,7 +707,7 @@ class ModchartState
 					case 'Null Function Pointer', 'SReturn':
 						//nothing
 					default:
-						luaTrace(path + ":" + lastCalledFunction + " - " + e, false, false, FlxColor.RED);
+						Application.current.window.alert(path + ":" + lastCalledFunction + " - " + e, "Kade Engine Modcharts");
 				}
 			}
 		});
@@ -728,12 +725,9 @@ class ModchartState
 				haxeInterp.variables.set('game', PlayState.instance);
 				haxeInterp.variables.set('Paths', Paths);
 				haxeInterp.variables.set('Conductor', Conductor);
-				haxeInterp.variables.set('ClientPrefs', ClientPrefs);
 				haxeInterp.variables.set('Character', Character);
 				haxeInterp.variables.set('Alphabet', Alphabet);
 				haxeInterp.variables.set('StringTools', StringTools);
-				haxeInterp.variables.set('SUtil', SUtil);// this is more like for android because filesaving needs it
-
 				haxeInterp.variables.set('setVar', function(name:String, value:Dynamic)
 				{
 					PlayState.instance.variables.set(name, value);
@@ -753,7 +747,7 @@ class ModchartState
 				haxeInterp.variables.set(libName, Type.resolveClass(str + libName));
 			}
 			catch (e:Dynamic) {
-				luaTrace(path + ":" + lastCalledFunction + " - " + e, false, false, FlxColor.RED);
+				Application.current.window.alert(path + ":" + lastCalledFunction + " - " + e, "Kade Engine Modcharts");
 			}
 		});
 

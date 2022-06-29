@@ -67,6 +67,8 @@ class PlayState extends MusicBeatState
 {
 	public static var instance:PlayState = null;
 
+	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();// psych again -saw
+
 	public static var tweenManager:FlxTweenManager;
 	public static var timerManager:FlxTimerManager;
 

@@ -1,6 +1,7 @@
 package;
 
 import JSONData;
+import flixel.FlxG;
 import flixel.util.FlxDestroyUtil;
 import openfl.geom.Rectangle;
 import flixel.math.FlxPoint;
