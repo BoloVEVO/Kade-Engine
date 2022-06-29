@@ -23,8 +23,7 @@
 	<window width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" />
 
 	<!--HTML5-specific-->
-	<window if="html5" resizable="true" />
-	<window width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" if="html5" />
+	<window if="html5" width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" resizable="true" />
 
 	<!--Desktop-specific-->
 	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
@@ -43,12 +42,29 @@
 
 	<classpath name="source" />
 
-
-
 	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 
-	
+	<!-- Use defines to ensure compile-time definitions have readable context. -->
+	<!-- Allowed inputs are mobile,desktop,web,ios,android,windows,mac,linux,switch,html5,cpp,neko,flash,js -->
+
+	<!-- Defines whether the Discord client should be enabled. Only works on desktop. -->
+	<haxedef name="FEATURE_DISCORD" if="desktop" />
+	<!-- Defines whether the file system can be read/written directly. Does not work in browser. -->
+	<haxedef name="FEATURE_FILESYSTEM"  if="desktop"/>
+	<!-- Defines whether Lua Modcharts should be enabled -->
+	<haxedef name="FEATURE_LUAMODCHART" if="desktop" />
+	<!-- Defines whether Sprite WebM videos should be enabled -->
+	<haxedef name="FEATURE_WEBM" if="desktop" />
+	<!-- Defines whether StepMania files can be loaded. -->
+	<haxedef name="FEATURE_STEPMANIA" if="desktop" />
+	<!-- Defines whether the Thread class can be used. -->
+	<haxedef name="FEATURE_MULTITHREADING" if="cpp" />
+	<!-- Defines whether the mp4 videos should be enabled. -->
+	<define name="FEATURE_MP4VIDEOS" if="windows | linux" unless="32bits"/>
+	<!-- Defines whether the Mods menu will display before launching. -->
+	<haxedef name="FEATURE_MODCORE" if="desktop" />
+
 	<!-- <define name="PRELOAD_ALL" /> -->
 	<define name="PRELOAD_ALL" unless="web"/>
 	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
@@ -84,7 +100,7 @@
 	</section>
 	
 	<assets path="assets/videos" library="videos"  exclude="*.webm|*.ogg|*.txt" if="windows | linux"/>
-    <assets path="assets/videos" library="videos" exclude="*.mp4"  unless="windows | linux"/>
+	<assets path="assets/videos" library="videos" exclude="*.mp4"  unless="windows | linux"/>
 	<assets path="assets/videos" library="videos" exclude="cutscenes"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.ogg" if="web"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.mp3" unless="web"/>
@@ -132,6 +148,8 @@
 	<haxelib name="flixel-addons" />
 	<haxelib name="hscript" />
 
+	<define name="hscriptPos" />
+
 	<haxelib name="actuate" />
 	<haxelib name="extension-webm"/> <!-- Make sure to use https://github.com/KadeDev/extension-webm/ -->
 
@@ -143,6 +161,7 @@
 	<haxelib name="linc_luajit" if="desktop"/>
 	<haxelib name="hxvm-luajit" if="desktop"/>
 	<haxelib name="hxcpp-debug-server" if="desktop"/>
+	<haxelib name="hxCodec" if="FEATURE_MP4VIDEOS"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
@@ -181,10 +200,13 @@
 	<!--Disable the Flixel core debugger. Automatically gets set whenever you compile in release mode!-->
 	<haxedef name="FLX_NO_DEBUG" unless="debug" />
 
-	<haxedef name="HXCPP_GC_BIG_BLOCKS"/>
+	<haxedef name="HXCPP_GC_BIG_BLOCKS" if="cpp" />
 
 	<!--Enable this for Nape release builds for a serious peformance improvement-->
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
+	
+	<!-- Show debug traces for hxCodec -->
+	<haxedef name="HXC_DEBUG_TRACE" if="debug" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 
@@ -198,33 +220,5 @@
 	<icon path="art/icon256.png" size='256'/>
 	<icon path="art/icon512.png" size='512'/>
 	<icon path="art/iconOG.png" />
-
-	<haxeflag name="--no-traces" unless="debug" />
-
-  <!-- Use defines to ensure compile-time definitions have readable context. -->
-  <!-- Allowed inputs are mobile,desktop,web,ios,android,windows,mac,linux,switch,html5,cpp,neko,flash,js -->
-
-  <!-- Defines whether the Discord client should be enabled. Only works on desktop. -->
-  <haxedef name="FEATURE_DISCORD" if="desktop" />
-  <!-- Defines whether the file system can be read/written directly. Does not work in browser. -->
-  <haxedef name="FEATURE_FILESYSTEM"  if="desktop"/>
-  <!-- Defines whether Lua Modcharts should be enabled -->
-  <haxedef name="FEATURE_LUAMODCHART" if="desktop" />
-  <!-- Defines whether Sprite WebM videos should be enabled -->
-  <haxedef name="FEATURE_WEBM" if="desktop" />
-  <!-- Defines whether StepMania files can be loaded. -->
-  <haxedef name="FEATURE_STEPMANIA" if="desktop" />
-  <!-- Defines whether the Thread class can be used. -->
-  <haxedef name="FEATURE_MULTITHREADING" if="cpp" />
-  <!-- Defines whether the mp4 videos should be enabled. -->
-  <define name="FEATURE_MP4VIDEOS" if="windows | linux" unless="32bits"/>
-  <!-- Defines whether the Mods menu will display before launching. -->
-  <haxedef name="FEATURE_MODCORE" if="desktop" />
-  
-  <!-- hxCodec shit -->
-  <haxelib name="hxCodec" if="FEATURE_MP4VIDEOS"/>
-
- <!-- Show debug traces for hxCodec -->
-  <haxedef name="HXC_DEBUG_TRACE" if="debug" />
 
 </project>
