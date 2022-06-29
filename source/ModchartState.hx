@@ -41,8 +41,11 @@ class ModchartState
 
 	public static var shownNotes:Array<LuaNote> = [];
 
+	var lastCalledFunction:String = '';
 	function callLua(func_name:String, args:Array<Dynamic>, ?type:String):Dynamic
 	{
+		lastCalledFunction = func_name;
+
 		var result:Any = null;
 
 		Lua.getglobal(lua, func_name);
