@@ -13,35 +13,13 @@ import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.FlxFrame;
 import openfl.utils.Assets as OpenFlAssets;
-#if desktop
-import sys.FileSystem;
-import sys.io.File;
-#else
-import js.html.FileSystem;
-import js.html.File;
-#end
 
 using StringTools;
 
 class AtlasFrameMaker extends FlxFramesCollection
 {
-	// public static var widthoffset:Int = 0;
-	// public static var heightoffset:Int = 0;
-	// public static var excludeArray:Array<String>;
-
-	/**
-
-		* Creates Frames from TextureAtlas(very early and broken ok) Originally made for FNF HD by Smokey and Rozebud
-		*
-		* @param   key                 The file path.
-		* @param   _excludeArray       Use this to only create selected animations. Keep null to create all of them.
-		*
-	 */
-	public static function construct(key:String, ?library:String, ?_excludeArray:Array<String> = null, ?noAntialiasing:Bool = false):FlxFramesCollection
+	public static function construct(key:String, ?library:String, excludeArray:Array<String> = null):FlxFramesCollection
 	{
-		// widthoffset = _widthoffset;
-		// heightoffset = _heightoffset;
-
 		var frameCollection:FlxFramesCollection;
 		var frameArray:Array<Array<FlxFrame>> = [];
 
@@ -56,27 +34,20 @@ class AtlasFrameMaker extends FlxFramesCollection
 
 		var graphic:FlxGraphic = Paths.image('$key/spritemap');
 		var ss:SpriteAnimationLibrary = new SpriteAnimationLibrary(animationData, atlasData, graphic.bitmap);
-		var t:SpriteMovieClip = ss.createAnimation(noAntialiasing);
-		if (_excludeArray == null)
-		{
-			_excludeArray = t.getFrameLabels();
-			// trace('creating all anims');
-		}
-		trace('Creating: ' + _excludeArray);
+		var t:SpriteMovieClip = ss.createAnimation(FlxG.save.data.antialiasing);
 
 		frameCollection = new FlxFramesCollection(graphic, FlxFrameCollectionType.IMAGE);
-		for (x in _excludeArray)
-		{
+
+		if (excludeArray == null)
+			excludeArray = t.getFrameLabels();
+
+		for (x in excludeArray)
 			frameArray.push(getFramesArray(t, x));
-		}
 
 		for (x in frameArray)
-		{
 			for (y in x)
-			{
 				frameCollection.pushFrame(y);
-			}
-		}
+
 		return frameCollection;
 	}
 
@@ -111,15 +82,15 @@ class AtlasFrameMaker extends FlxFramesCollection
 
 		for (i in 0...bitMapArray.length)
 		{
-			var b = FlxGraphic.fromBitmapData(bitMapArray[i]);
-			var theFrame = new FlxFrame(b);
-			theFrame.parent = b;
+			var bitmap:FlxGraphic = FlxGraphic.fromBitmapData(bitMapArray[i]);
+			var theFrame:FlxFrame = new FlxFrame(bitmap);
+			theFrame.parent = bitmap;
 			theFrame.name = animation + i;
 			theFrame.sourceSize.set(frameSize.x, frameSize.y);
 			theFrame.frame = new FlxRect(0, 0, bitMapArray[i].width, bitMapArray[i].height);
 			daFramez.push(theFrame);
-			// trace(daFramez);
 		}
+
 		return daFramez;
 	}
 }

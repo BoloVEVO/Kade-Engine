@@ -87,6 +87,7 @@ class TitleState extends MusicBeatState
 		if (FlxG.save.data.volUpBind == null)
 			FlxG.save.data.volUpBind = "NUMPADPLUS";
 
+		FlxG.game.focusLostFramerate = 60;
 		FlxG.sound.muteKeys = [FlxKey.fromString(Std.string(FlxG.save.data.muteBind))];
 		FlxG.sound.volumeDownKeys = [FlxKey.fromString(Std.string(FlxG.save.data.volDownBind))];
 		FlxG.sound.volumeUpKeys = [FlxKey.fromString(Std.string(FlxG.save.data.volUpBind))];
