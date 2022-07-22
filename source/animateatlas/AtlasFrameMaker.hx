@@ -47,7 +47,7 @@ class AtlasFrameMaker extends FlxFramesCollection
 
 		Debug.logTrace('Creating Graphic for: ' + key);
 
-		var graphic:FlxGraphic = Paths.image('${key}/spritemap', library, false);
+		var graphic:FlxGraphic = Paths.image('${key}/spritemap', library);
 		var ss:SpriteAnimationLibrary = new SpriteAnimationLibrary(animationData, atlasData, graphic.bitmap);
 		var t:SpriteMovieClip = ss.createAnimation();
 
@@ -101,8 +101,6 @@ class AtlasFrameMaker extends FlxFramesCollection
 				var bitmapShit:BitmapData = new BitmapData(Std.int(sizeInfo.width + Math.abs(sizeInfo.x)), Std.int(sizeInfo.height + Math.abs(sizeInfo.y)),
 					true, 0);
 				bitmapShit.draw(t, null, null, null, null, true);
-				if (FlxG.save.data.gpuRender)
-					bitmapShit = convertBitmap(bitmapShit, key);
 				bitMapArray.push(bitmapShit);
 				if (firstPass)
 				{
@@ -128,15 +126,4 @@ class AtlasFrameMaker extends FlxFramesCollection
 		return daFramez;
 	}
 
-	static function convertBitmap(bitmap:BitmapData, key:String):BitmapData
-	{
-		var texture = FlxG.stage.context3D.createTexture(bitmap.width, bitmap.height, BGRA, false);
-		texture.uploadFromBitmapData(bitmap);
-		Paths.currentTrackedTextures.set(key, texture);
-		bitmap.dispose();
-		bitmap.disposeImage();
-		bitmap = null;
-		Paths.localTrackedAssets.push(key);
-		return BitmapData.fromTexture(texture);
-	}
 }

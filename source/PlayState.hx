@@ -55,10 +55,6 @@ import vlc.MP4Handler;
 #if FEATURE_STEPMANIA
 import smTools.SMFile;
 #end
-#if FEATURE_FILESYSTEM
-import sys.io.File;
-import sys.FileSystem;
-#end
 
 using StringTools;
 
@@ -375,16 +371,6 @@ class PlayState extends MusicBeatState
 		return timer.start(Time, OnComplete, Loops);
 	}
 
-	public function addObject(object:FlxBasic)
-	{
-		add(object);
-	}
-
-	public function removeObject(object:FlxBasic)
-	{
-		remove(object);
-	}
-
 	override public function create()
 	{
 		Paths.clearStoredMemory();
@@ -465,8 +451,6 @@ class PlayState extends MusicBeatState
 		// FlxG.save.data.optimize = FlxG.save.data.optimize;
 		PlayStateChangeables.zoom = FlxG.save.data.zoom;
 
-		removedVideo = false;
-
 		if (FlxG.save.data.optimize)
 		{
 			Paths.clearStoredMemory();
@@ -475,23 +459,14 @@ class PlayState extends MusicBeatState
 		#if FEATURE_LUAMODCHART
 		// TODO: Refactor this to use OpenFlAssets.
 		if (!isStoryMode)
-			executeModchart = FileSystem.exists(Paths.lua('songs/${PlayState.SONG.songId}/modchart')) && PlayStateChangeables.modchart;
+			executeModchart = OpenFlAssets.exists(Paths.lua('songs/${PlayState.SONG.songId}/modchart')) && PlayStateChangeables.modchart;
 		else
-			executeModchart = FileSystem.exists(Paths.lua('songs/${PlayState.SONG.songId}/modchart'));
+			executeModchart = OpenFlAssets.exists(Paths.lua('songs/${PlayState.SONG.songId}/modchart'));
 		if (isSM)
-			executeModchart = FileSystem.exists(pathToSm + "/modchart.lua") && PlayStateChangeables.modchart;
-		/*if (executeModchart)
-			FlxG.save.data.optimize = false; */
-		#end
-
-		#if !cpp
-		executeModchart = false; // FORCE disable for non cpp targets
+			executeModchart = OpenFlAssets.exists(pathToSm + "/modchart.lua") && PlayStateChangeables.modchart;
 		#end
 
 		Debug.logInfo('Searching for mod chart? ($executeModchart) at ' + Paths.lua('songs/${PlayState.SONG.songId}/modchart'));
-
-		/*if (executeModchart)
-			songMultiplier = 1; */
 
 		#if FEATURE_DISCORD
 		// Making difficulty text for Discord Rich Presence.
@@ -1359,10 +1334,12 @@ class PlayState extends MusicBeatState
 						#if FEATURE_MP4VIDEOS
 						startVideo('cutscenes/${SONG.songId}_cutscene');
 						#else
-						startCountdown();
+						createTimer(0.5, function(timer)
+						{
+							startCountdown();
+						});
 						#end
 					}
-
 				default:
 					createTimer(0.5, function(timer)
 					{
@@ -2011,9 +1988,6 @@ class PlayState extends MusicBeatState
 
 	function startSong():Void
 	{
-		if (useVideo)
-			BackgroundVideo.get().resume();
-
 		startingSong = false;
 		songStarted = true;
 		previousFrameTime = FlxG.game.ticks;
@@ -2044,9 +2018,6 @@ class PlayState extends MusicBeatState
 					allowedToCheer = false;
 			}
 		}
-
-		if (useVideo)
-			BackgroundVideo.get().resume();
 
 		#if FEATURE_LUAMODCHART
 		if (executeModchart)
@@ -2171,15 +2142,11 @@ class PlayState extends MusicBeatState
 			if (!isStoryMode && isSM)
 			{
 				trace("Loading " + pathToSm + "/" + sm.header.MUSIC);
-				var bytes = File.getBytes(pathToSm + "/" + sm.header.MUSIC);
+				var bytes = sys.io.File.getBytes(pathToSm + "/" + sm.header.MUSIC);
 				var sound = new Sound();
 				sound.loadCompressedDataFromByteArray(bytes.getData(), bytes.length);
 				FlxG.sound.playMusic(sound);
 			}
-			/*else
-					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.songId), 1, false);
-				#else
-				FlxG.sound.playMusic(Paths.inst(PlayState.SONG.songId), 1, false); */
 			#end
 		}
 
@@ -2491,9 +2458,6 @@ class PlayState extends MusicBeatState
 		#end
 		if (paused)
 		{
-			if (useVideo)
-				BackgroundVideo.get().pause();
-
 			if (FlxG.sound.music.playing)
 				FlxG.sound.music.pause();
 
@@ -2545,9 +2509,6 @@ class PlayState extends MusicBeatState
 		}
 		else if (paused)
 		{
-			if (useVideo)
-				BackgroundVideo.get().resume();
-
 			if (FlxG.sound.music != null && !startingSong)
 			{
 				resyncVocals();
@@ -2639,14 +2600,9 @@ class PlayState extends MusicBeatState
 	var maxNPS:Int = 0;
 
 	public var stopUpdate = false;
-	public var removedVideo = false;
-
 	public var currentBPM = 0;
-
 	public var updateFrame = 0;
-
 	public var pastScrollChanges:Array<Song.Event> = [];
-
 	var currentLuaIndex = 0;
 
 	override public function update(elapsed:Float)
@@ -2850,14 +2806,6 @@ class PlayState extends MusicBeatState
 		}
 		if (PlayStateChangeables.botPlay && FlxG.keys.justPressed.ONE)
 			camHUD.visible = !camHUD.visible;
-		if (useVideo && BackgroundVideo.get() != null && !stopUpdate)
-		{
-			if (BackgroundVideo.get().ended && !removedVideo)
-			{
-				remove(videoSprite);
-				removedVideo = true;
-			}
-		}
 		#if FEATURE_LUAMODCHART
 		if (executeModchart && luaModchart != null && songStarted)
 		{
@@ -2951,41 +2899,12 @@ class PlayState extends MusicBeatState
 			else
 				openSubState(new PauseSubState());
 		}
-		if (FlxG.keys.justPressed.FIVE && songStarted)
-		{
-			if (useVideo)
-			{
-				BackgroundVideo.get().stop();
-				remove(videoSprite);
-				removedVideo = true;
-			}
-			cannotDie = true;
-			PsychTransition.nextCamera = mainCam;
-			MusicBeatState.switchState(new WaveformTestState());
-			clean();
-			PlayState.stageTesting = false;
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
-			#if FEATURE_LUAMODCHART
-			if (luaModchart != null)
-			{
-				luaModchart.die();
-				luaModchart = null;
-			}
-			#end
-		}
 		if (FlxG.keys.justPressed.SEVEN && !isStoryMode)
 		{
 			wentToChartEditor = true;
 			if (PlayStateChangeables.mirrorMode)
 				PlayStateChangeables.mirrorMode = !PlayStateChangeables.mirrorMode;
 			executeModchart = false;
-			if (useVideo)
-			{
-				BackgroundVideo.get().stop();
-				remove(videoSprite);
-				removedVideo = true;
-			}
 			cannotDie = true;
 			PsychTransition.nextCamera = mainCam;
 			MusicBeatState.switchState(new ChartingState());
@@ -3040,17 +2959,9 @@ class PlayState extends MusicBeatState
 			iconRPC = iconRPCBefore;
 			#end
 		}
-		/* if (FlxG.keys.justPressed.NINE)
-			MusicBeatState.switchState(new Charting()); */
-		#if debug
+
 		if (FlxG.keys.justPressed.SIX)
 		{
-			if (useVideo)
-			{
-				BackgroundVideo.get().stop();
-				remove(videoSprite);
-				removedVideo = true;
-			}
 			PsychTransition.nextCamera = mainCam;
 			MusicBeatState.switchState(new AnimationDebug(dad.curCharacter));
 			clean();
@@ -3069,12 +2980,6 @@ class PlayState extends MusicBeatState
 			if (FlxG.keys.justPressed.EIGHT && songStarted)
 			{
 				paused = true;
-				if (useVideo)
-				{
-					BackgroundVideo.get().stop();
-					remove(videoSprite);
-					removedVideo = true;
-				}
 				new FlxTimer().start(0.3, function(tmr:FlxTimer)
 				{
 					for (bg in Stage.toAdd)
@@ -3140,6 +3045,8 @@ class PlayState extends MusicBeatState
 			}
 			#end
 		}
+
+		#if debug
 		if (FlxG.keys.justPressed.TWO && songStarted)
 		{ // Go 10 seconds into the future, credit: Shadow Mario#9396
 			if (!usedTimeTravel && Conductor.songPosition + 10000 < FlxG.sound.music.length)
@@ -3173,6 +3080,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 		#end
+
 		if (skipActive && Conductor.songPosition >= skipTo)
 		{
 			createTween(skipText, {alpha: 0}, 0.2, {
@@ -3946,11 +3854,6 @@ class PlayState extends MusicBeatState
 		endingSong = true;
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
-		if (useVideo)
-		{
-			BackgroundVideo.get().stop();
-			PlayState.instance.remove(PlayState.instance.videoSprite);
-		}
 
 		if (!loadRep)
 			rep.SaveReplay(saveNotes, saveJudge, replayAna);
@@ -4107,23 +4010,7 @@ class PlayState extends MusicBeatState
 
 					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0], diff);
 					FlxG.sound.music.stop();
-
-					#if !FEATURE_MP4VIDEOS
-					if (storyWeek == 7 && (FlxG.save.data.optimize || !FlxG.save.data.background))
-					{
-						switch (SONG.songId)
-						{
-							case 'guns':
-								LoadingState.loadAndSwitchState(new VideoState('cutscenes/guns_cutscene', new PlayState()), true);
-							case 'stress':
-								LoadingState.loadAndSwitchState(new VideoState('cutscenes/stress_cutscene', new PlayState()), true);
-						}
-					}
-					else
-						LoadingState.loadAndSwitchState(new PlayState());
-					#else
 					LoadingState.loadAndSwitchState(new PlayState());
-					#end
 					clean();
 				}
 			}
@@ -4925,68 +4812,6 @@ class PlayState extends MusicBeatState
 				return i;
 		}
 		return -1;
-	}
-
-	public var fuckingVolume:Float = 1;
-	public var useVideo = false;
-
-	public static var webmHandler:WebmHandler;
-
-	public var playingDathing = false;
-	public var videoSprite:FlxSprite;
-
-	public function backgroundVideo(source:String) // for background videos
-	{
-		#if FEATURE_WEBM
-		useVideo = true;
-
-		var ourSource:String = "assets/videos/daWeirdVid/dontDelete.webm";
-		WebmPlayer.SKIP_STEP_LIMIT = 90;
-		var str1:String = "WEBM SHIT";
-		webmHandler = new WebmHandler();
-		webmHandler.source(ourSource);
-		webmHandler.makePlayer();
-		webmHandler.webm.name = str1;
-
-		BackgroundVideo.setWebm(webmHandler);
-
-		BackgroundVideo.get().source(source);
-		BackgroundVideo.get().clearPause();
-		if (BackgroundVideo.isWebm)
-		{
-			BackgroundVideo.get().updatePlayer();
-		}
-		BackgroundVideo.get().show();
-
-		if (BackgroundVideo.isWebm)
-		{
-			BackgroundVideo.get().restart();
-		}
-		else
-		{
-			BackgroundVideo.get().play();
-		}
-
-		var data = webmHandler.webm.bitmapData;
-
-		videoSprite = new FlxSprite(-470, -30).loadGraphic(data);
-
-		remove(gf);
-		remove(boyfriend);
-		remove(dad);
-		add(videoSprite);
-		add(gf);
-		add(boyfriend);
-		add(dad);
-
-		Debug.logInfo(videoSprite == null ? 'Webm background video is null NOOOOOOOOO' : 'Webm background video looks like ass.');
-		trace('poggers');
-
-		if (!songStarted)
-			webmHandler.pause();
-		else
-			webmHandler.resume();
-		#end
 	}
 
 	function noteMiss(direction:Int = 1, daNote:Note):Void
@@ -6325,20 +6150,8 @@ class PlayState extends MusicBeatState
 		#if FEATURE_MP4VIDEOS
 		Debug.logTrace('Playing video cutscene. Poggers');
 
-		var foundFile:Bool = false;
 		var fileName = Paths.video(name);
-		#if FEATURE_FILESYSTEM
-		if (FileSystem.exists(fileName))
-		{
-			foundFile = true;
-		}
-		#else
 		if (OpenFlAssets.exists(fileName))
-		{
-			foundFile = true;
-		}
-		#end
-		if (foundFile)
 		{
 			inCinematic = true;
 			var bg = new FlxSprite(-FlxG.width, -FlxG.height).makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
@@ -6360,6 +6173,8 @@ class PlayState extends MusicBeatState
 			FlxG.log.warn("Video not found: " + fileName);
 			startAndEnd();
 		}
+		#else
+		startAndEnd();
 		#end
 	}
 

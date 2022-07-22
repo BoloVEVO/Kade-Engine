@@ -138,8 +138,6 @@ class ChartingState extends MusicBeatState
 
 	var camFollow:FlxObject;
 
-	public var waveform:Waveform;
-
 	public static var latestChartVersion = "2";
 
 	public function new(reloadOnInit:Bool = false)
@@ -1061,7 +1059,6 @@ class ChartingState extends MusicBeatState
 		});
 
 		var characters:Array<String> = CoolUtil.coolTextFile(Paths.txt('data/characterList'));
-		var gfVersions:Array<String> = CoolUtil.coolTextFile(Paths.txt('data/gfVersionList'));
 		var stages:Array<String> = CoolUtil.coolTextFile(Paths.txt('data/stageList'));
 		var noteStyles:Array<String> = CoolUtil.coolTextFile(Paths.txt('data/noteStyleList'));
 
@@ -1081,9 +1078,9 @@ class ChartingState extends MusicBeatState
 
 		var player2Label = new FlxText(140, 80, 64, 'Player 2');
 
-		var gfVersionDropDown = new FlxUIDropDownMenu(10, 200, FlxUIDropDownMenu.makeStrIdLabelArray(gfVersions, true), function(gfVersion:String)
+		var gfVersionDropDown = new FlxUIDropDownMenu(10, 200, FlxUIDropDownMenu.makeStrIdLabelArray(characters, true), function(gfVersion:String)
 		{
-			_song.gfVersion = gfVersions[Std.parseInt(gfVersion)];
+			_song.gfVersion = characters[Std.parseInt(gfVersion)];
 		});
 		gfVersionDropDown.selectedLabel = _song.gfVersion;
 
@@ -3616,7 +3613,7 @@ class ChartingState extends MusicBeatState
 				"name": _song.songId,
 				"offset": 0,
 			}
-		});
+		}, "\t");
 		FlxG.save.flush();
 	}
 
@@ -3641,7 +3638,7 @@ class ChartingState extends MusicBeatState
 			"song": _song
 		};
 
-		var data:String = Json.stringify(json, null, " ");
+		var data:String = Json.stringify(json, "\t");
 
 		if ((data != null) && (data.length > 0))
 		{
@@ -3683,5 +3680,41 @@ class ChartingState extends MusicBeatState
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
 		FlxG.log.error("Problem saving Level data");
+	}
+}
+
+class ChartingBox extends FlxSprite
+{
+	public var connectedNote:Note;
+	public var connectedNoteData:Array<Dynamic>;
+
+	public function new(x, y, originalNote:Note)
+	{
+		super(x, y);
+		connectedNote = originalNote;
+
+		makeGraphic(40, 40, FlxColor.fromRGB(173, 216, 230));
+		alpha = 0.4;
+	}
+}
+
+class SectionRender extends FlxSprite
+{
+	public var section:SwagSection;
+	public var icon:FlxSprite;
+	public var lastUpdated:Bool;
+
+	public function new(x:Float, y:Float, GRID_SIZE:Int, ?Height:Int = 16)
+	{
+		super(x, y);
+
+		makeGraphic(GRID_SIZE * 8, GRID_SIZE * Height, 0xffe7e6e6);
+
+		var h = GRID_SIZE;
+		if (Math.floor(h) != h)
+			h = GRID_SIZE;
+
+		if (FlxG.save.data.editorBG)
+			FlxGridOverlay.overlay(this, GRID_SIZE, Std.int(h), GRID_SIZE * 8, GRID_SIZE * Height);
 	}
 }

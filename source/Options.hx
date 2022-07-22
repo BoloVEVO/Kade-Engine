@@ -1970,7 +1970,7 @@ class NoteskinOption extends Option
 	{
 		FlxG.save.data.noteskin--;
 		if (FlxG.save.data.noteskin < 0)
-			FlxG.save.data.noteskin = NoteskinHelpers.getNoteskins().length - 1;
+			FlxG.save.data.noteskin = NoteskinHelpers.noteskinArray.length - 1;
 		display = updateDisplay();
 		return true;
 	}
@@ -1978,7 +1978,7 @@ class NoteskinOption extends Option
 	public override function right():Bool
 	{
 		FlxG.save.data.noteskin++;
-		if (FlxG.save.data.noteskin > NoteskinHelpers.getNoteskins().length - 1)
+		if (FlxG.save.data.noteskin > NoteskinHelpers.noteskinArray.length - 1)
 			FlxG.save.data.noteskin = 0;
 		display = updateDisplay();
 		return true;
@@ -1986,7 +1986,7 @@ class NoteskinOption extends Option
 
 	public override function getValue():String
 	{
-		return "Current Noteskin: < " + NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin) + " >";
+		return "Current Noteskin: < " + NoteskinHelpers.noteskinArray[FlxG.save.data.noteskin] + " >";
 	}
 }
 
