@@ -232,7 +232,7 @@ class LoadingState extends MusicBeatState
 	}
 
 	#if NO_PRELOAD_ALL
-	static function isSoundLoaded(path:String):Bool
+	static function isSoundLoaded(path:Sound):Bool
 	{
 		return OpenFlAssets.cache.hasSound(path);
 	}
