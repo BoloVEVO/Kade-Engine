@@ -74,7 +74,7 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		if (FlxG.save.data.InstantRespawn || FlxG.save.data.optimize)
 		{
-			LoadingState.loadAndSwitchState(new PlayState());
+			MusicBeatState.switchState(new PlayState());
 		}
 
 		if (controls.BACK)
@@ -148,7 +148,7 @@ class GameOverSubstate extends MusicBeatSubstate
 			{
 				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()
 				{
-					LoadingState.loadAndSwitchState(new PlayState());
+					MusicBeatState.switchState(new PlayState());
 					PlayState.stageTesting = false;
 				});
 			});

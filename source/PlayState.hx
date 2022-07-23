@@ -3903,7 +3903,7 @@ class PlayState extends MusicBeatState
 			FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
 			offsetTesting = false;
 			PsychTransition.nextCamera = mainCam;
-			LoadingState.loadAndSwitchState(new OptionsMenu());
+			MusicBeatState.switchState(new OptionsMenu());
 			clean();
 			FlxG.save.data.offset = offsetTest;
 		}
@@ -4010,7 +4010,7 @@ class PlayState extends MusicBeatState
 
 					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0], diff);
 					FlxG.sound.music.stop();
-					LoadingState.loadAndSwitchState(new PlayState());
+					MusicBeatState.switchState(new PlayState());
 					clean();
 				}
 			}

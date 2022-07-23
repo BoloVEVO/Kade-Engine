@@ -1466,7 +1466,7 @@ class CustomizeGameplay extends Option
 		if (OptionsMenu.isInPause)
 			return false;
 		trace("switch");
-		LoadingState.loadAndSwitchState(new GameplayCustomizeState());
+		MusicBeatState.switchState(new GameplayCustomizeState());
 		return false;
 	}
 
@@ -1526,7 +1526,7 @@ class OffsetMenu extends Option
 		PlayState.storyWeek = 0;
 		PlayState.offsetTesting = true;
 		trace('CUR WEEK' + PlayState.storyWeek);
-		LoadingState.loadAndSwitchState(new PlayState());
+		MusicBeatState.switchState(new PlayState());
 		return false;
 	}
 

@@ -664,7 +664,7 @@ class FreeplayState extends MusicBeatState
 
 		var character = dad ? PlayState.SONG.player2 : PlayState.SONG.player1;
 
-		LoadingState.loadAndSwitchState(new AnimationDebug(character));
+		MusicBeatState.switchState(new AnimationDebug(character));
 	}
 
 	function loadSong(isCharting:Bool = false)
@@ -733,9 +733,9 @@ class FreeplayState extends MusicBeatState
 		PlayState.songMultiplier = rate;
 
 		if (isCharting)
-			LoadingState.loadAndSwitchState(new ChartingState(reloadSong));
+			MusicBeatState.switchState(new ChartingState(reloadSong));
 		else
-			LoadingState.loadAndSwitchState(new PlayState());
+			MusicBeatState.switchState(new PlayState());
 	}
 
 	function changeDiff(change:Int = 0)
