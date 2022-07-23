@@ -13,10 +13,6 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import openfl.display3D.textures.Texture;
 import openfl.display.BitmapData;
-#if FEATURE_FILESYSTEM
-import sys.FileSystem;
-import sys.io.File;
-#end
 
 using StringTools;
 
@@ -371,13 +367,9 @@ class Paths
 
 	inline static public function fileExists(key:String, type:AssetType, ?library:String)
 	{
-		#if FEATURE_FILESYSTEM
-		if (FileSystem.exists(getPath(key, type)))
-			return true;
-		#else
 		if (OpenFlAssets.exists(getPath(key, type)))
 			return true;
-		#end
+
 		return false;
 	}
 

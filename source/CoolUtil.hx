@@ -22,11 +22,7 @@ class CoolUtil
 	{
 		var daList:Array<String>;
 
-		#if FEATURE_FILESYSTEM
-		daList = File.getContent(path).trim().split('\n');
-		#else
 		daList = OpenFlAssets.getText(path).trim().split('\n');
-		#end
 
 		for (i in 0...daList.length)
 		{

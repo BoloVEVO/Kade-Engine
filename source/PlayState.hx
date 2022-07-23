@@ -4245,7 +4245,7 @@ class PlayState extends MusicBeatState
 			var pixelShitPart1:String = "";
 			var pixelShitPart2:String = '';
 			var pixelShitPart3:String = 'shared';
-			var pixelShitPart4:String = '';
+			var pixelShitPart4:String = null;
 
 			if (SONG.noteStyle == 'pixel')
 			{
@@ -6101,7 +6101,7 @@ class PlayState extends MusicBeatState
 		var pixelShitPart1:String = '';
 		var pixelShitPart2:String = '';
 		var pixelShitPart3:String = 'shared';
-		var pixelShitPart4:String = '';
+		var pixelShitPart4:String = null;
 		if (SONG.noteStyle == 'pixel')
 		{
 			pixelShitPart1 = 'weeb/pixelUI/';
