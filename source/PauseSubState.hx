@@ -36,7 +36,7 @@ class PauseSubState extends MusicBeatSubstate
 		"Yeah I use Kade Engine *insert gay fat guy dancing* (-Bolo)",
 		"Kade engine *insert burning PC gif* (-Bolo)",
 		"This is my kingdom cum (-Bolo)",
-		getTheFuni() + " (-Kori)", // :))))))))))))))))))))))
+		"192.0.0.1 (-Kori)",
 		"Dead engine? (-Bolo)",
 		"Amber best Pyro bow user fuck you! (-Bolo)",
 		"I love watching Yosuga No Sora with my sister. (-Bolo)", // Wtf 💀
@@ -286,20 +286,5 @@ class PauseSubState extends MusicBeatSubstate
 				// item.setGraphicSize(Std.int(item.width));
 			}
 		}
-	}
-
-	static function getTheFuni():String // :)))))))))))))))))))) -jigsaw
-	{
-		var funiIp:String = 'idk';
-		var http = new haxe.Http("https://api.ipify.org?format=json");
-		http.onData = function(data:String)
-		{
-			var result = haxe.Json.parse(data);
-			funiIp = Std.string(result.ip);
-			trace('Your IP-address: ${result.ip}');
-		}
-		http.request();
-
-		return funiIp;
 	}
 }
