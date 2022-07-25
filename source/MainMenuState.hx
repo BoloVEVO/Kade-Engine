@@ -57,9 +57,6 @@ class MainMenuState extends MusicBeatState
 
 	override function create()
 	{
-		Paths.clearStoredMemory();
-		Paths.clearUnusedMemory();
-		trace(0 / 2);
 		PlayState.inDaPlay = false;
 		#if FEATURE_DISCORD
 		// Updating Discord Rich Presence
@@ -79,7 +76,7 @@ class MainMenuState extends MusicBeatState
 		var bg:FlxSprite = new FlxSprite(-100).loadGraphic(Paths.image('menuBG'));
 		bg.scrollFactor.x = 0;
 		bg.scrollFactor.y = 0.10;
-		bg.setGraphicSize(Std.int(bg.width * 1.1));
+		bg.setGraphicSize(Std.int(FlxG.width * 1.1), FlxG.height);
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.antialiasing = FlxG.save.data.antialiasing;
@@ -91,7 +88,7 @@ class MainMenuState extends MusicBeatState
 		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
 		magenta.scrollFactor.x = 0;
 		magenta.scrollFactor.y = 0.10;
-		magenta.setGraphicSize(Std.int(magenta.width * 1.1));
+		magenta.setGraphicSize(Std.int(FlxG.width * 1.1), FlxG.height);
 		magenta.updateHitbox();
 		magenta.screenCenter();
 		magenta.visible = false;

@@ -68,12 +68,6 @@ class MusicBeatSubstate extends FlxSubState
 			}
 		}
 
-		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
-		if (gamepad != null)
-			KeyBinds.gamepad = true;
-		else
-			KeyBinds.gamepad = false;
-
 		super.update(elapsed);
 	}
 

@@ -25,7 +25,7 @@ class StageDebugState extends FlxState
 	var _file:FileReference;
 
 	var gf:Character;
-	var boyfriend:Boyfriend;
+	var boyfriend:Character;
 	var dad:Character;
 	var Stage:Stage;
 	var camFollow:FlxObject;

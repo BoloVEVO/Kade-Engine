@@ -128,7 +128,7 @@ class SMFile
 			notes: [],
 			eventObjects: [],
 			bpm: header.getBPM(0),
-			needsVoices: true,
+			needsVoices: false,
 			player1: 'bf',
 			player2: 'gf',
 			gfVersion: 'gf',

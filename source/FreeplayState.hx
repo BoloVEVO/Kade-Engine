@@ -86,10 +86,9 @@ class FreeplayState extends MusicBeatState
 	public static function loadDiff(diff:Int, songId:String, array:Array<SongData>)
 		array.push(Song.conversionChecks(Song.loadFromJson(songId, CoolUtil.suffixDiffsArray[diff])));
 
-	public static var list:Array<String> = [];
-
 	override function create()
-	{Paths.clearStoredMemory();
+	{
+		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
 		FlxG.mouse.visible = true;
@@ -102,14 +101,7 @@ class FreeplayState extends MusicBeatState
 			MainMenuState.freakyPlaying = true;
 		}
 
-		list = CoolUtil.coolTextFile(Paths.txt('data/freeplaySonglist'));
-
 		cached = false;
-
-		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-
-		/*for (i in 0...songs.length - 1)
-			songs[i].diffs.reverse(); */
 
 		populateSongData();
 		PlayState.inDaPlay = false;
@@ -172,6 +164,7 @@ class FreeplayState extends MusicBeatState
 		persistentUpdate = true;
 
 		// LOAD CHARACTERS
+		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = FlxG.save.data.antialiasing;
 		add(bg);
 
@@ -207,9 +200,10 @@ class FreeplayState extends MusicBeatState
 		bottomBG.alpha = 0.6;
 		add(bottomBG);
 
-		var bottomText:String = #if !mobile #if PRELOAD_ALL "  Press SPACE to listen to the Song Instrumental / Click and scroll through the songs with your MOUSE /"
-			+ #else "  Click and scroll through the songs with your MOUSE /"
-			+ #end #end
+		var bottomText:String = #if PRELOAD_ALL "Press SPACE to listen to the Song Instrumental / Click and scroll through the songs with your MOUSE /"
+			+ #else 
+			+ "Click and scroll through the songs with your MOUSE /"
+			+ #end
 		" Your offset is "
 		+ FlxG.save.data.offset
 		+ "ms "
@@ -296,14 +290,13 @@ class FreeplayState extends MusicBeatState
 	static function populateSongData()
 	{
 		cached = false;
-		list = CoolUtil.coolTextFile(Paths.txt('data/freeplaySonglist'));
 
 		songData = [];
 		songs = [];
 
-		for (i in 0...list.length)
+		for (i in 0...Data.freeplaySongArray.length)
 		{
-			var data:Array<String> = list[i].split(':');
+			var data:Array<String> = Data.freeplaySongArray[i].split(':');
 			var songId = data[0];
 			var color = data[3];
 
@@ -514,7 +507,7 @@ class FreeplayState extends MusicBeatState
 		{
 			if (FlxG.mouse.wheel != 0)
 			{
-				#if desktop
+				#if !html5
 				changeSelection(-FlxG.mouse.wheel);
 				#else
 				if (FlxG.mouse.wheel < 0) // HTML5 BRAIN'T
@@ -607,7 +600,7 @@ class FreeplayState extends MusicBeatState
 					changeDiff(1);
 			}
 
-			#if desktop
+			#if !html5
 			if (FlxG.keys.justPressed.SPACE)
 			{
 				FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0.7, true);
