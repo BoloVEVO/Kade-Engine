@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxG;
 import openfl.utils.Assets as OpenFlAssets;
 #if FEATURE_FILESYSTEM
 import sys.io.File;
@@ -82,6 +83,11 @@ class CoolUtil
 			dumbArray.push(i);
 		}
 		return dumbArray;
+	}
+
+	public static function camLerpShit(ratio:Float)
+	{
+		return FlxG.elapsed / (1 / 60) * ratio;
 	}
 
 	public static function erf(x:Float):Float

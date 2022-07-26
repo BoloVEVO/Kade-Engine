@@ -59,12 +59,7 @@ class FreeplayState extends MusicBeatState
 	var letter:String;
 	var combo:String = 'N/A';
 	var lerpaccuracy:Float = 0.00;
-
-	var intendedColor:Int;
-	var colorTween:FlxTween;
-
 	var bg:FlxSprite;
-
 	var Inst:FlxSound;
 
 	public static var openMod:Bool = false;
@@ -250,8 +245,8 @@ class FreeplayState extends MusicBeatState
 
 		if (curSelected >= songs.length)
 			curSelected = 0;
+
 		bg.color = songs[curSelected].color;
-		intendedColor = bg.color;
 
 		if (!openMod)
 		{
@@ -367,22 +362,12 @@ class FreeplayState extends MusicBeatState
 			FreeplayState.songData.set(songId, diffs);
 			trace('loaded diffs for ' + songId);
 			FreeplayState.songs.push(meta);
-
-			/*#if FFEATURE_FILESYSTEM
-				sys.thread.Thread.create(() ->
-				{
-					FlxG.sound.cache(Paths.inst(songId));
-				});
-				#else
-				FlxG.sound.cache(Paths.inst(songId));
-				#end */
 		}
 	}
 
 	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:String)
 	{
 		var meta = new FreeplaySongMetadata(songName, weekNum, songCharacter, FlxColor.fromString(color));
-
 		var diffs = [];
 		var diffsThatExist = [];
 
@@ -470,6 +455,15 @@ class FreeplayState extends MusicBeatState
 
 		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, 0.4));
 		lerpaccuracy = FlxMath.lerp(lerpaccuracy, intendedaccuracy, CoolUtil.boundTo(1 - (elapsed * 9), 0, 1) / (openfl.Lib.current.stage.frameRate / 60));
+
+		if (songs[curSelected].color != null)
+			bg.color = FlxColor.interpolate(bg.color, songs[curSelected].color, CoolUtil.camLerpShit(0.045));
+
+		if (MainMenuState.freakyPlaying == false)
+		{
+			bg.scale.x = FlxMath.lerp(bg.scale.x, 1.0, elapsed * 6);
+			bg.scale.y = FlxMath.lerp(bg.scale.y, 1.0, elapsed * 6);
+		}
 
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
@@ -647,10 +641,6 @@ class FreeplayState extends MusicBeatState
 			{
 				MusicBeatState.switchState(new MainMenuState());
 				clean();
-				if (colorTween != null)
-				{
-					colorTween.cancel();
-				}
 			}
 
 			for (item in grpSongs.members)
@@ -686,6 +676,17 @@ class FreeplayState extends MusicBeatState
 
 			for (item in grpSongs.members)
 				item.alpha = 0;
+		}
+	}
+
+	override function beatHit()
+	{
+		super.beatHit();
+
+		if (MainMenuState.freakyPlaying == false)
+		{
+			bg.scale.x = 1.015;
+			bg.scale.y = 1.015;
 		}
 	}
 
@@ -825,26 +826,6 @@ class FreeplayState extends MusicBeatState
 
 		changeDiff();
 
-		/*if (songs[curSelected].songName.toLowerCase() == "tutorial")
-			{
-				rate = 1.0;
-		}*/
-
-		var newColor:Int = songs[curSelected].color;
-		if (newColor != intendedColor)
-		{
-			if (colorTween != null)
-			{
-				colorTween.cancel();
-			}
-			intendedColor = newColor;
-			colorTween = FlxTween.color(bg, 0.5, bg.color, intendedColor, {
-				onComplete: function(twn:FlxTween)
-				{
-					colorTween = null;
-				}
-			});
-		}
 		// selector.y = (70 * curSelected) + 30;
 
 		// adjusting the highscore song name to be compatible (changeSelection)
