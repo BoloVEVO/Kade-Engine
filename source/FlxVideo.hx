@@ -5,15 +5,12 @@ import openfl.net.NetStream;
 import openfl.net.NetConnection;
 import flixel.FlxG;
 import flixel.FlxBasic;
-#if (FEATURE_MP4VIDEOS && !web)
-import vlc.MP4Handler;
-#end
 
 class FlxVideo extends FlxBasic
 {
 	public var finishCallback:Void->Void;
 
-	public function new(videoAsset:String)
+	public function new(name:String)
 	{
 		super();
 
@@ -45,10 +42,10 @@ class FlxVideo extends FlxBasic
 					finishCallback();
 			}
 		});
-		netStream.play(videoAsset);
+		netStream.play(name);
 		#elseif (FEATURE_MP4VIDEOS && !web)
-		var daVid:MP4Handler = new MP4Handler();
-		daVid.playVideo(videoAsset);
+		var daVid:VideoHandler = new VideoHandler();
+		daVid.playVideo(name);
 		daVid.finishCallback = function()
 		{
 			if (finishCallback != null)

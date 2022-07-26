@@ -1,16 +1,16 @@
 package;
 
-import flash.media.Sound;
 import flixel.FlxG;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxFramesCollection;
 import animateatlas.AtlasFrameMaker;
 import flixel.graphics.frames.FlxAtlasFrames;
 import haxe.Json;
+import openfl.display.BitmapData;
+import openfl.display3D.textures.Texture;
+import openfl.media.Sound;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
-import openfl.display3D.textures.Texture;
-import openfl.display.BitmapData;
 
 using StringTools;
 

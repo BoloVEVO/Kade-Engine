@@ -1,6 +1,5 @@
 package;
 
-import flash.media.Sound;
 import lime.app.Promise;
 import lime.app.Future;
 import flixel.FlxG;
@@ -24,11 +23,8 @@ class LoadingState extends MusicBeatState
 	var target:FlxState;
 	var stopMusic = false;
 	var callbacks:MultiCallback;
-
 	var logo:FlxSprite;
-
 	var danceLeft:Bool = false;
-
 	var loadBar:FlxSprite;
 	var targetShit:Float = 0;
 
@@ -232,7 +228,7 @@ class LoadingState extends MusicBeatState
 	}
 
 	#if NO_PRELOAD_ALL
-	static function isSoundLoaded(path:Sound):Bool
+	static function isSoundLoaded(path:String):Bool
 	{
 		return OpenFlAssets.cache.hasSound(path);
 	}
