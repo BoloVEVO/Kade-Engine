@@ -89,11 +89,10 @@
 		<library name="week6"    preload="false" />
 		<library name="week7"    preload="false" />
 		<library name="sm"    preload="false" />
-		<library name="videos"    preload="true" />
+		<library name="videos"    preload="false" />
 	</section>
 
 	<assets path="assets/videos"   library="videos"   exclude="*.mp4"  unless="FEATURE_MP4VIDEOS"/>
-
 	<assets path="assets/songs"    library="songs"    exclude="*.ogg" if="web"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.ogg" if="web"/>
@@ -110,11 +109,10 @@
 	<assets path="assets/week6"    library="week6"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/week7"    library="week7"    exclude="*.ogg" if="web"/>
 	<assets path="assets/week7"    library="week7"    exclude="*.mp3" unless="web"/>
-
 	<assets path="assets/sm"    library="sm"    exclude="*.ogg" if="web"/>
 	<assets path="assets/sm"    library="sm"    exclude="*.mp3" unless="web"/>
 
-	<assets path='example_mods' rename='mods' embed='false'/>
+	<assets path='example_mods' rename='mods' embed='false' />
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />
 	<assets path='LICENSE.md' rename='LICENSE.txt' />
 
