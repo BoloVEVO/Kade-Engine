@@ -1,5 +1,6 @@
 package;
 
+import flash.media.Sound;
 import lime.app.Promise;
 import lime.app.Future;
 import flixel.FlxG;
@@ -114,7 +115,7 @@ class LoadingState extends MusicBeatState
 		});
 	}
 
-	function checkLoadSong(path:String)
+	function checkLoadSong(path:Sound)
 	{
 		if (path != null)
 		{
@@ -231,7 +232,7 @@ class LoadingState extends MusicBeatState
 	}
 
 	#if NO_PRELOAD_ALL
-	static function isSoundLoaded(path:String):Bool
+	static function isSoundLoaded(path:Sound):Bool
 	{
 		return OpenFlAssets.cache.hasSound(path);
 	}

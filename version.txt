@@ -1,6 +1,6 @@
 1.4.2;
+
 - GPU Sprite Rendering
 - Memory leak fixes
 - More Customize Gameplay options.
 - Fixed Freeplay/Story Menu difficulties related crashes.
-
