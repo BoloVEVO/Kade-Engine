@@ -95,7 +95,12 @@ class Ratings
 		return letterRanking;
 	}
 
-	public static var timingWindows = [];
+	public static var timingWindows:Array<Dynamic> = [
+		FlxG.save.data.shitMs,
+		FlxG.save.data.badMs,
+		FlxG.save.data.goodMs,
+		FlxG.save.data.sickMs
+	];
 
 	public static function judgeNote(noteDiff:Float)
 	{

@@ -24,30 +24,37 @@ class PauseSubState extends MusicBeatSubstate
 
 	public static var goToOptions:Bool = false;
 	public static var goBack:Bool = false;
+
 	public static var menuItems:Array<String> = ['Resume', 'Restart Song', 'Options', 'Exit to menu'];
+
 	var curSelected:Int = 0;
+
 	public static var playingPause:Bool = false;
+
 	var pauseMusic:FlxSound;
+
+	var perSongOffset:FlxText;
+
 	var offsetChanged:Bool = false;
 	var startOffset:Float = PlayState.songOffset;
+
 	var bg:FlxSprite;
 
 	public static var textArray:Array<String> = [
 		"Yeah I use Kade Engine *insert gay fat guy dancing* (-Bolo)",
 		"Kade engine *insert burning PC gif* (-Bolo)",
 		"This is my kingdom cum (-Bolo)",
-		getTheFuni() + " (-Kori)", // :))))))))))))))))))))))
+		"192.0.0.1 (-Kori)",
 		"Dead engine? (-Bolo)",
 		"Amber best Pyro bow user fuck you! (-Bolo)",
 		"I love watching Yosuga No Sora with my sister. (-Bolo)", // Wtf 💀
 		"Lag issues? Don't worry we are currently mining cryptocurrencies with ur pc :D (-Bolo)",
 		"Are you really reading this thing? (-Bolo)",
-		"I fced Sex mod with only one hand! (-Bolo)", // Um im the only one who knows what Bolo did? -jigsaw
+		"I fced Sex mod with only one hand! (-Bolo)",
 		"EPIC EMBED FAIL (-Bolo)",
-		"What a nice input isn't it (-Jigsaw)",
 		"Don't take these dialogues seriously lol (-Bolo)",
 		"Fireable actually used my fork. Pog (-Bolo)",
-		"I'm not gay, I'm default :trollface: (-Bolo)",
+		"I'm not gay, I'm default :trollface: (-Bolo)", // homhopobic 😭
 		"0.01% batch (-PopCat)",
 		"Are you have the stupid? (-BombasticTom)",
 		"I am here (-Faid)",
@@ -55,10 +62,11 @@ class PauseSubState extends MusicBeatSubstate
 		"Why do I have a pic of Mario with massive tits on my phone? (-Rudy)",
 		"I mom (-NxtVithor)",
 		"Ur black in real life or ur black in discord theme (-Bolo)",
-		"Hey Psych Enigne ass kisser, do you like this? (-Jigsaw)",
 		"I'm not longer a minor :( (-Bolo)",
 		"We are gonna be using your fork as a base for myth engine (-Awoofle)",
-		"Cool ass looking shit. Imma go steal ur code and give u credit (-BeastlyGhost)"
+		"Cool ass looking shit. Imma go steal ur code and give u credit (-BeastlyGhost)",
+		"Camellia's 2.5 fork poggers. (-Bolo)",
+		"Psych Engine ass kisser. (-Jigsaw)",
 	];
 
 	public function new()
@@ -125,6 +133,14 @@ class PauseSubState extends MusicBeatSubstate
 
 		grpMenuShit = new FlxTypedGroup<Alphabet>();
 		add(grpMenuShit);
+		perSongOffset = new FlxText(0, FlxG.height - 18, FlxG.width, textArray[FlxG.random.int(0, textArray.length - 1)], 12);
+		perSongOffset.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+
+		perSongOffset.scrollFactor.set();
+
+		#if FEATURE_FILESYSTEM
+		add(perSongOffset);
+		#end
 
 		for (i in 0...menuItems.length)
 		{
@@ -139,10 +155,6 @@ class PauseSubState extends MusicBeatSubstate
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 	}
 
-	#if !mobile
-	var oldPos = FlxG.mouse.getScreenPosition();
-	#end
-
 	override function update(elapsed:Float)
 	{
 		if (pauseMusic.volume < 0.5)
@@ -150,9 +162,9 @@ class PauseSubState extends MusicBeatSubstate
 
 		super.update(elapsed);
 
-		#if !mobile
 		if (FlxG.mouse.wheel != 0)
-			#if desktop
+		{
+			#if !html5
 			changeSelection(-FlxG.mouse.wheel);
 			#else
 			if (FlxG.mouse.wheel < 0)
@@ -160,7 +172,7 @@ class PauseSubState extends MusicBeatSubstate
 			if (FlxG.mouse.wheel > 0)
 				changeSelection(-1);
 			#end
-		#end
+		}
 
 		for (i in FlxG.sound.list)
 		{
@@ -179,13 +191,12 @@ class PauseSubState extends MusicBeatSubstate
 		var rightPcontroller:Bool = false;
 		var oldOffset:Float = 0;
 
-		if (gamepad != null && KeyBinds.gamepad)
-		{
-			upPcontroller = gamepad.justPressed.DPAD_UP;
-			downPcontroller = gamepad.justPressed.DPAD_DOWN;
-			leftPcontroller = gamepad.justPressed.DPAD_LEFT;
-			rightPcontroller = gamepad.justPressed.DPAD_RIGHT;
-		}
+		var songPath = 'assets/data/songs/${PlayState.SONG.songId}/';
+
+		#if FEATURE_STEPMANIA
+		if (PlayState.isSM && !PlayState.isStoryMode)
+			songPath = PlayState.pathToSm;
+		#end
 
 		if (controls.UP_P || upPcontroller)
 		{
@@ -245,6 +256,12 @@ class PauseSubState extends MusicBeatSubstate
 					}
 			}
 		}
+
+		if (FlxG.keys.justPressed.J)
+		{
+			// for reference later!
+			// PlayerSettings.player1.controls.replaceBinding(Control.LEFT, Keys, FlxKey.J, null);
+		}
 	}
 
 	override function destroy()
@@ -286,20 +303,5 @@ class PauseSubState extends MusicBeatSubstate
 				// item.setGraphicSize(Std.int(item.width));
 			}
 		}
-	}
-
-	static function getTheFuni():String // :)))))))))))))))))))) -jigsaw
-	{
-		var funiIp:String = 'idk';
-		var http = new haxe.Http("https://api.ipify.org?format=json");
-		http.onData = function(data:String)
-		{
-			var result = haxe.Json.parse(data);
-			funiIp = Std.string(result.ip);
-			trace('Your IP-address: ${result.ip}');
-		}
-		http.request();
-
-		return funiIp;
 	}
 }

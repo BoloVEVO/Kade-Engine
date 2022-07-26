@@ -141,7 +141,6 @@ class OptionsMenu extends FlxSubState
 				new DownscrollOption("Toggle making the notes scroll down rather than up."),
 				new BotPlay("A bot plays for you!"),
 				new FPSCapOption("Change your FPS Cap."),
-
 				new ResetButtonOption("Toggle pressing R to gameover. (Use it with caution!)"),
 				new InstantRespawn("Toggle if you instantly respawn after dying."),
 				new CamZoomOption("Toggle the camera zoom in-game."),
@@ -191,8 +190,6 @@ class OptionsMenu extends FlxSubState
 				new DistractionsAndEffectsOption("Toggle stage distractions that can hinder your gameplay and save memory.")
 			]),
 			new OptionCata(50, 104, "Saves", [
-				#if desktop // new ReplayOption("View saved song replays."),
-				#end
 				new ResetModifiersOption("Reset your Gameplay modifiers. This is irreversible!"),
 				new ResetScoreOption("Reset your score on all songs and weeks. This is irreversible!"),
 				new LockWeeksOption("Reset your story mode progress. This is irreversible!"),

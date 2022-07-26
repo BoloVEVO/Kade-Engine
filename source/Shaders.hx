@@ -1,14 +1,22 @@
 package;
 
 import flixel.util.FlxColor;
-import openfl.display.ShaderParameter;
 import flixel.system.FlxAssets.FlxShader;
 import openfl.filters.ShaderFilter;
+import openfl.display.ShaderParameter;
 import flixel.FlxG;
 
-typedef ShaderEffect =
+typedef ShaderEffect = {
+  var shader:Dynamic;
+}
+
+enum WiggleEffectType
 {
-	var shader:Dynamic;
+	DREAMY;
+	WAVY;
+	HEAT_WAVE_HORIZONTAL;
+	HEAT_WAVE_VERTICAL;
+	FLAG;
 }
 
 typedef BlendModeShader =
@@ -16,35 +24,9 @@ typedef BlendModeShader =
 	var uBlendColor:ShaderParameter<Float>;
 }
 
-class BlendModeEffect extends Effect
-{
-	public var shader:BlendModeShader;
-
-	@:isVar
-	public var color(default, set):FlxColor;
-
-	public function new(shader:BlendModeShader, color:FlxColor):Void
-	{
-		shader.uBlendColor.value = [];
-		this.shader = shader;
-		this.color = color;
-	}
-
-	function set_color(color:FlxColor):FlxColor
-	{
-		shader.uBlendColor.value[0] = color.redFloat;
-		shader.uBlendColor.value[1] = color.greenFloat;
-		shader.uBlendColor.value[2] = color.blueFloat;
-		shader.uBlendColor.value[3] = color.alphaFloat;
-
-		return this.color = color;
-	}
-}
-
 class ChromaticAberrationEffect extends Effect
 {
 	public var shader:ChromaticAberrationShader;
-
 	public function new(offset:Float = 0.00)
 	{
 		shader = new ChromaticAberrationShader();
@@ -301,8 +283,8 @@ class CRTShader extends FlxShader
 	}
 }
 
-// DNB Mod lol
-class GlitchEffect extends Effect
+//DNB Mod lol
+class GlitchEffect extends Effect 
 {
 	public var shader:GlitchShader = new GlitchShader();
 
@@ -394,18 +376,9 @@ class GlitchShader extends FlxShader
 	}
 }
 
-enum WiggleEffectType
+class WiggleEffect extends Effect 
 {
-	DREAMY;
-	WAVY;
-	HEAT_WAVE_HORIZONTAL;
-	HEAT_WAVE_VERTICAL;
-	FLAG;
-}
-
-class WiggleEffect
-{
-	public var shader(default, null):WiggleShader = new WiggleShader();
+	public var shader:WiggleShader = new WiggleShader();
 	public var effectType(default, set):WiggleEffectType = DREAMY;
 	public var waveSpeed(default, set):Float = 0;
 	public var waveFrequency(default, set):Float = 0;
@@ -523,8 +496,33 @@ class WiggleShader extends FlxShader
 	}
 }
 
-// thx bbpanzu for this effect function
-class Effect
+class BlendModeEffect
+{
+	public var shader(default, null):BlendModeShader;
+
+	@:isVar
+	public var color(default, set):FlxColor;
+
+	public function new(shader:BlendModeShader, color:FlxColor):Void
+	{
+		shader.uBlendColor.value = [];
+		this.shader = shader;
+		this.color = color;
+	}
+
+	function set_color(color:FlxColor):FlxColor
+	{
+		shader.uBlendColor.value[0] = color.redFloat;
+		shader.uBlendColor.value[1] = color.greenFloat;
+		shader.uBlendColor.value[2] = color.blueFloat;
+		shader.uBlendColor.value[3] = color.alphaFloat;
+
+		return this.color = color;
+	}
+}
+
+//thx bbpanzu for this effect function
+class Effect 
 {
 	public function setValue(shader:FlxShader, variable:String, value:Float)
 	{

@@ -24,19 +24,16 @@ class StoryMenuState extends MusicBeatState
 {
 	var scoreText:FlxText;
 
-	public static function weekData():Array<Dynamic>
-	{
-		return [
-			['tutorial'],
-			['bopeebo', 'fresh', 'dadbattle'],
-			['spookeez', 'south', "monster"],
-			['pico', 'philly', "blammed"],
-			['satin-panties', "high", "milf"],
-			['cocoa', 'eggnog', 'winter-horrorland'],
-			['senpai', 'roses', 'thorns'],
-			['ugh', 'guns', 'stress']
-		];
-	}
+	public static var weekData:Array<Dynamic> = [
+		['tutorial'],
+		['bopeebo', 'fresh', 'dadbattle'],
+		['spookeez', 'south', "monster"],
+		['pico', 'philly', "blammed"],
+		['satin-panties', "high", "milf"],
+		['cocoa', 'eggnog', 'winter-horrorland'],
+		['senpai', 'roses', 'thorns'],
+		['ugh', 'guns', 'stress']
+	];
 
 	var curDifficulty:Int = 1;
 
@@ -51,16 +48,6 @@ class StoryMenuState extends MusicBeatState
 		['parents-christmas', 'bf', 'gf'],
 		['senpai', 'bf', 'gf'],
 		['tankman', 'bf', 'gf']
-	];
-
-	var weekDiffs:Array<Dynamic> = [
-		['easy', 'normal', 'hard'],
-		['easy', 'normal', 'hard'],
-		['easy', 'normal', 'hard'],
-		['easy', 'normal', 'hard'],
-		['easy', 'normal', 'hard'],
-		['easy', 'normal', 'hard'],
-		['easy', 'normal', 'hard']
 	];
 
 	var weekNames:Array<String> = CoolUtil.coolTextFile(Paths.txt('data/weekNames'));
@@ -202,7 +189,7 @@ class StoryMenuState extends MusicBeatState
 
 		trace("Line 70");
 
-		for (i in 0...weekData().length)
+		for (i in 0...weekData.length)
 		{
 			var weekThing:MenuItem = new MenuItem(0, yellowBG.y + yellowBG.height + 10, i);
 			weekThing.y += ((weekThing.height + 20) * i);
@@ -361,7 +348,6 @@ class StoryMenuState extends MusicBeatState
 					}
 				}
 
-				#if !mobile
 				if (FlxG.mouse.wheel != 0)
 				{
 					#if desktop
@@ -373,7 +359,6 @@ class StoryMenuState extends MusicBeatState
 						changeWeek(-1);
 					#end
 				}
-				#end
 
 				if (FlxG.keys.justPressed.UP)
 				{
@@ -442,7 +427,7 @@ class StoryMenuState extends MusicBeatState
 				stopspamming = true;
 			}
 
-			PlayState.storyPlaylist = weekData()[curWeek];
+			PlayState.storyPlaylist = weekData[curWeek];
 			PlayState.isStoryMode = true;
 			selectedWeek = true;
 			PlayState.songMultiplier = 1;
@@ -524,10 +509,10 @@ class StoryMenuState extends MusicBeatState
 		cleanDifficulties();
 		changeDifficulty();
 
-		if (curWeek >= weekData().length)
+		if (curWeek >= weekData.length)
 			curWeek = 0;
 		if (curWeek < 0)
-			curWeek = weekData().length - 1;
+			curWeek = weekData.length - 1;
 
 		var bullShit:Int = 0;
 
@@ -553,7 +538,7 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters.members[2].setCharacter(weekCharacters[curWeek][2]);
 
 		txtTracklist.text = "Tracks\n";
-		var stringThing:Array<String> = weekData()[curWeek];
+		var stringThing:Array<String> = weekData[curWeek];
 
 		for (i in stringThing)
 			txtTracklist.text += "\n" + i;
@@ -572,7 +557,7 @@ class StoryMenuState extends MusicBeatState
 
 	public static function unlockNextWeek(week:Int):Void
 	{
-		if (week <= weekData().length - 1 /*&& FlxG.save.data.weekUnlocked == week*/) // fuck you, unlocks all weeks
+		if (week <= weekData.length - 1 /*&& FlxG.save.data.weekUnlocked == week*/) // fuck you, unlocks all weeks
 		{
 			weekUnlocked.push(true);
 			trace('Week ' + week + ' beat (Week ' + (week + 1) + ' unlocked)');

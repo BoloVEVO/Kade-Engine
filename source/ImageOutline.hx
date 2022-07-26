@@ -3,6 +3,7 @@ import openfl.display.IBitmapDrawable;
 import openfl.display.BitmapData;
 import openfl.display.Bitmap;
 import openfl.display.DisplayObject;
+import openfl.display.PixelSnapping;
 import openfl.geom.Matrix;
 import openfl.geom.Rectangle;
 import openfl.geom.Point;
@@ -16,9 +17,7 @@ class ImageOutline
 	private static var _brush:Float = 4;
 	private static var m:Matrix;
 
-	public function new()
-	{
-	}
+	public function new() {}
 
 	/**
 	 * Renders a Bitmap display of any DisplayObject with an outline drawn around it.
@@ -48,7 +47,7 @@ class ImageOutline
 		var render:BitmapData = new BitmapData(w, h, true, 0x000000);
 		render.draw(src, m);
 
-		return new Bitmap(ImageOutline.outline(render, weight, color, alpha, antialias, threshold));
+		return new Bitmap(ImageOutline.outline(render, weight, color, alpha, antialias, threshold), PixelSnapping.AUTO, true);
 	}
 
 	/**

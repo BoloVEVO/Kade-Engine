@@ -31,6 +31,8 @@ class Character extends FlxSprite
 	public var camPos:Array<Int>;
 	public var camFollow:Array<Int>;
 
+	public var stunned:Bool = false;
+
 	public static var animationNotes:Array<Note> = [];
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
@@ -48,26 +50,7 @@ class Character extends FlxSprite
 		parseDataFile();
 
 		if (isPlayer && frames != null)
-		{
 			flipX = !flipX;
-
-			// Doesn't flip for BF, since his are already in the right place???
-			if (!curCharacter.startsWith('bf'))
-			{
-				// var animArray
-				var oldRight = animation.getByName('singRIGHT').frames;
-				animation.getByName('singRIGHT').frames = animation.getByName('singLEFT').frames;
-				animation.getByName('singLEFT').frames = oldRight;
-
-				// IF THEY HAVE MISS ANIMATIONS??
-				if (animation.getByName('singRIGHTmiss') != null)
-				{
-					var oldMiss = animation.getByName('singRIGHTmiss').frames;
-					animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
-					animation.getByName('singLEFTmiss').frames = oldMiss;
-				}
-			}
-		}
 	}
 
 	function parseDataFile()
@@ -179,6 +162,19 @@ class Character extends FlxSprite
 
 				if (animation.curAnim.name.endsWith('miss') && animation.curAnim.finished && !debugMode)
 					playAnim('idle', true, false, 10);
+			}
+			else if (isPlayer)
+			{
+				if (animation.curAnim.name.startsWith('sing'))
+					holdTimer += elapsed;
+				else
+					holdTimer = 0;
+
+				if (animation.curAnim.name.endsWith('miss') && animation.curAnim.finished && !debugMode)
+					playAnim('idle', true, false, 10);
+
+				if (animation.curAnim.name == 'firstDeath' && animation.curAnim.finished)
+					playAnim('deathLoop');
 			}
 
 			if (!debugMode)

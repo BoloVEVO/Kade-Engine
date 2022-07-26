@@ -381,9 +381,10 @@ class ModMenu extends FlxSubState
 						}
 					}
 			}
-
+			#if !html5
 			if (changedMod)
 				FreeplayState.instance.updateDiffCalc();
+			#end
 		}
 	}
 }

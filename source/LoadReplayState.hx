@@ -68,7 +68,7 @@ class LoadReplayState extends MusicBeatState
 			controlsStrings.push("No Replays...");
 
 		menuBG.color = 0xFFea71fd;
-		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
+		menuBG.setGraphicSize(Std.int(FlxG.width * 1.1), FlxG.height);
 		menuBG.updateHitbox();
 		menuBG.screenCenter();
 		menuBG.antialiasing = FlxG.save.data.antialiasing;
@@ -228,7 +228,7 @@ class LoadReplayState extends MusicBeatState
 					}
 					else
 					{
-						var diff:String = ["-easy", "", "-hard"][PlayState.rep.replay.songDiff];
+						var diff:String = CoolUtil.suffixDiffsArray[PlayState.rep.replay.songDiff];
 						PlayState.SONG = Song.loadFromJson(PlayState.rep.replay.songName, diff);
 					}
 				}

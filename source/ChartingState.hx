@@ -120,7 +120,7 @@ class ChartingState extends MusicBeatState
 	var vocals:FlxSound;
 
 	var player2:Character = new Character(0, 0, "dad");
-	var player1:Boyfriend = new Boyfriend(0, 0, "bf");
+	var player1:Character = new Character(0, 0, "bf", true);
 
 	public static var leftIcon:HealthIcon;
 
@@ -155,15 +155,17 @@ class ChartingState extends MusicBeatState
 		#if FEATURE_DISCORD
 		DiscordClient.changePresence("Chart Editor", null, null, true);
 		#end
+
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
+
 		speed = PlayState.songMultiplier;
 		curSection = lastSection;
-		Debug.logTrace(1 > Math.POSITIVE_INFINITY);
 
+		Debug.logTrace(1 > Math.POSITIVE_INFINITY);
 		Debug.logTrace(PlayState.noteskinSprite);
 
-		PlayState.noteskinSprite = NoteskinHelpers.generateNoteskinSprite(FlxG.save.data.noteskin);
+		PlayState.noteskinSprite = Paths.getSparrowAtlas('noteskins/' + Data.noteskinArray[FlxG.save.data.noteskin], 'shared');
 
 		FlxG.mouse.visible = true;
 
@@ -198,7 +200,7 @@ class ChartingState extends MusicBeatState
 			}
 			else
 			{
-				var diff:String = ["-easy", "", "-hard"][PlayState.storyDifficulty];
+				var diff:String = CoolUtil.suffixDiffsArray[PlayState.storyDifficulty];
 				_song = Song.conversionChecks(Song.loadFromJson(PlayState.SONG.songId, diff));
 			}
 		}
@@ -948,11 +950,11 @@ class ChartingState extends MusicBeatState
 
 	function addOptionsUI()
 	{
-		var hitsounds = new FlxUICheckBox(10, 60, null, null, "Play hitsounds", 100);
-		hitsounds.checked = false;
-		hitsounds.callback = function()
+		var Data = new FlxUICheckBox(10, 60, null, null, "Play Data", 100);
+		Data.checked = false;
+		Data.callback = function()
 		{
-			playClaps = hitsounds.checked;
+			playClaps = Data.checked;
 		};
 
 		check_snap = new FlxUICheckBox(80, 25, null, null, "Snap to grid", 100);
@@ -966,7 +968,7 @@ class ChartingState extends MusicBeatState
 
 		var tab_options = new FlxUI(null, UI_options);
 		tab_options.name = "Options";
-		tab_options.add(hitsounds);
+		tab_options.add(Data);
 		UI_options.addGroup(tab_options);
 	}
 
@@ -1078,9 +1080,9 @@ class ChartingState extends MusicBeatState
 
 		var player2Label = new FlxText(140, 80, 64, 'Player 2');
 
-		var gfVersionDropDown = new FlxUIDropDownMenu(10, 200, FlxUIDropDownMenu.makeStrIdLabelArray(characters, true), function(gfVersion:String)
+		var gfVersionDropDown = new FlxUIDropDownMenu(10, 200, FlxUIDropDownMenu.makeStrIdLabelArray(characters, true), function(character:String)
 		{
-			_song.gfVersion = characters[Std.parseInt(gfVersion)];
+			_song.gfVersion = characters[Std.parseInt(character)];
 		});
 		gfVersionDropDown.selectedLabel = _song.gfVersion;
 
@@ -1127,7 +1129,7 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(shiftNoteDialLabel3);
 		tab_group_song.add(stepperShiftNoteDialms);
 		tab_group_song.add(shiftNoteButton);
-		// tab_group_song.add(hitsounds);
+		// tab_group_song.add(Data);
 
 		var tab_group_assets = new FlxUI(null, UI_box);
 		tab_group_assets.name = "Assets";
@@ -1533,7 +1535,7 @@ class ChartingState extends MusicBeatState
 			}
 			else
 			{
-				var diff:String = ["-easy", "", "-hard"][PlayState.storyDifficulty];
+				var diff:String = CoolUtil.suffixDiffsArray[PlayState.storyDifficulty];
 				_song = Song.conversionChecks(Song.loadFromJson(PlayState.SONG.songId, diff));
 			}
 		}
@@ -1942,7 +1944,7 @@ class ChartingState extends MusicBeatState
 					@:privateAccess
 					{
 						// No more Native restrictions bitches. https://github.com/openfl/lime/pull/1510. WEEK 8 LEAK??
-						#if desktop
+						#if !html5
 						#if (lime >= "8.0.0")
 						FlxG.sound.music._channel.__source.__backend.setPitch(speed);
 						#else
@@ -3514,9 +3516,7 @@ class ChartingState extends MusicBeatState
 
 	function loadJson(songId:String):Void
 	{
-		var difficultyArray:Array<String> = ["-easy", "", "-hard"];
-
-		PlayState.SONG = Song.loadFromJson(songId, difficultyArray[PlayState.storyDifficulty]);
+		PlayState.SONG = Song.loadFromJson(songId, CoolUtil.suffixDiffsArray[PlayState.storyDifficulty]);
 
 		while (curRenderedNotes.members.length > 0)
 		{
@@ -3613,14 +3613,12 @@ class ChartingState extends MusicBeatState
 				"name": _song.songId,
 				"offset": 0,
 			}
-		}, "\t");
+		});
 		FlxG.save.flush();
 	}
 
 	private function saveLevel()
 	{
-		var difficultyArray:Array<String> = ["-easy", "", "-hard"];
-
 		var toRemove = [];
 
 		for (i in _song.notes)
@@ -3638,7 +3636,7 @@ class ChartingState extends MusicBeatState
 			"song": _song
 		};
 
-		var data:String = Json.stringify(json, "\t");
+		var data:String = Json.stringify(json, null, " ");
 
 		if ((data != null) && (data.length > 0))
 		{
@@ -3646,7 +3644,7 @@ class ChartingState extends MusicBeatState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), _song.songId.toLowerCase() + difficultyArray[PlayState.storyDifficulty] + ".json");
+			_file.save(data.trim(), _song.songId.toLowerCase() + CoolUtil.suffixDiffsArray[PlayState.storyDifficulty] + ".json");
 		}
 	}
 
