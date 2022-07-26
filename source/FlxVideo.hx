@@ -59,6 +59,4 @@ class FlxVideo extends FlxBasic
 			finishCallback();
 		#end
 	}
-
-	function new(videoAsset:String)
 }
