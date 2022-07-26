@@ -197,9 +197,7 @@ class FreeplayState extends MusicBeatState
 		add(bottomBG);
 
 		var bottomText:String = #if PRELOAD_ALL "Press SPACE to listen to the Song Instrumental / Click and scroll through the songs with your MOUSE /"
-			+ #else 
-			+ "Click and scroll through the songs with your MOUSE /"
-			+ #end
+			+ #else "Click and scroll through the songs with your MOUSE /" + #end
 		" Your offset is "
 		+ FlxG.save.data.offset
 		+ "ms "
