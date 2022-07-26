@@ -16,9 +16,9 @@ using StringTools;
 
 class Paths
 {
-	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
+	inline public static var SOUND_EXT:String = #if web "mp3" #else "ogg" #end;
 
-	inline public static var VIDEO_EXT = "mp4";
+	inline public static var VIDEO_EXT:String = "mp4";
 
 	static var currentLevel:String;
 
@@ -27,7 +27,7 @@ class Paths
 		currentLevel = name.toLowerCase();
 	}
 
-	static function getPath(file:String, type:AssetType, ?library:Null<String>)
+	static function getPath(file:String, type:AssetType, ?library:Null<String>):String
 	{
 		if (library != null)
 			return getLibraryPath(file, library);
@@ -59,7 +59,7 @@ class Paths
 	public static var currentTrackedSounds:Map<String, Sound> = [];
 
 	// Sprite content caching with GPU based on Forever Engine texture compression.
-	static function loadImage(key:String, ?library:String, ?gpuRender:Bool)
+	static function loadImage(key:String, ?library:String, ?gpuRender:Bool):FlxGraphic
 	{
 		var path:String = '';
 
@@ -108,7 +108,7 @@ class Paths
 		return null;
 	}
 
-	public static function loadSound(path:String, key:String, ?library:String)
+	public static function loadSound(path:String, key:String, ?library:String):Sound
 	{
 		// I hate this so god damn much
 		var gottenPath:String = getPath('$path/$key.$SOUND_EXT', SOUND, library);
@@ -127,7 +127,7 @@ class Paths
 		return currentTrackedSounds.get(gottenPath);
 	}
 
-	static public function loadJSON(key:String, ?library:String):Dynamic
+	static public function loadJSON(key:String, ?library:String):String
 	{
 		var rawJson = '';
 
@@ -167,95 +167,79 @@ class Paths
 		}
 	}
 
-	static public function getLibraryPath(file:String, library = "preload")
+	static public function getLibraryPath(file:String, library = "preload"):String
 	{
 		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
 	}
 
-	inline static function getLibraryPathForce(file:String, library:String)
+	inline static function getLibraryPathForce(file:String, library:String):String
 	{
 		return '$library:assets/$library/$file';
 	}
 
-	inline static function getPreloadPath(file:String)
+	inline static function getPreloadPath(file:String):String
 	{
 		return 'assets/$file';
 	}
 
-	inline static public function file(file:String, ?library:String, type:AssetType = TEXT)
+	inline static public function file(file:String, ?library:String, type:AssetType = TEXT):String
 	{
 		return getPath(file, type, library);
 	}
 
-	inline static public function lua(key:String, ?library:String)
+	inline static public function lua(key:String, ?library:String):String
 	{
 		return getPath('data/$key.lua', TEXT, library);
 	}
 
-	inline static public function luaImage(key:String, ?library:String)
-	{
-		return getPath('data/$key.png', IMAGE, library);
-	}
-
-	inline static public function txt(key:String, ?library:String)
+	inline static public function txt(key:String, ?library:String):String
 	{
 		return getPath('$key.txt', TEXT, library);
 	}
 
-	inline static public function xml(key:String, ?library:String)
+	inline static public function xml(key:String, ?library:String):String
 	{
 		return getPath('data/$key.xml', TEXT, library);
 	}
 
-	inline static public function animJson(key:String, ?library:String)
+	inline static public function animJson(key:String, ?library:String):String
 	{
 		return getPath('images/$key/Animation.json', TEXT, library);
 	}
 
-	inline static public function spriteMapJson(key:String, ?library:String)
+	inline static public function spriteMapJson(key:String, ?library:String):String
 	{
 		return getPath('images/$key/spritemap.json', TEXT, library);
 	}
 
-	inline static public function json(key:String, ?library:String)
+	inline static public function json(key:String, ?library:String):String
 	{
 		return getPath('data/$key.json', TEXT, library);
 	}
 
-	static public function sound(key:String, ?library:String):Any
+	static public function sound(key:String, ?library:String):Sound
 	{
-		var sound:Sound = loadSound('sounds', key, library);
-		return sound;
+		return loadSound('sounds', key, library);
 	}
 
-	inline static public function soundRandom(key:String, min:Int, max:Int, ?library:String)
+	inline static public function soundRandom(key:String, min:Int, max:Int, ?library:String):Sound
 	{
-		var sound:Sound = loadSound('sounds', key + FlxG.random.int(min, max), library);
-		return sound;
+		return loadSound('sounds', key + FlxG.random.int(min, max), library);
 	}
 
-	inline static public function music(key:String, ?library:String):Any
+	inline static public function music(key:String, ?library:String):Sound
 	{
-		var file:Sound = loadSound('music', key, library);
-		return file;
+		return loadSound('music', key, library);
 	}
 
-	inline static public function voices(song:String):Any
+	inline static public function voices(song:String):Sound
 	{
-		#if PRELOAD_ALL
 		return loadSound('songs', Paths.formatToSongPath(song) + '/Voices');
-		#else
-		return 'songs:assets/songs/' + Paths.formatToSongPath(song) + '/Voices.$SOUND_EXT';
-		#end
 	}
 
-	inline static public function inst(song:String):Any
+	inline static public function inst(song:String):Sound
 	{
-		#if PRELOAD_ALL
 		return loadSound('songs', Paths.formatToSongPath(song) + '/Inst');
-		#else
-		return 'songs:assets/songs/' + Paths.formatToSongPath(song) + '/Inst.$SOUND_EXT';
-		#end
 	}
 
 	static public function doesSoundAssetExist(path:String)
@@ -283,12 +267,12 @@ class Paths
 		return image;
 	}
 
-	inline static public function font(key:String, ?library:String)
+	inline static public function font(key:String, ?library:String):String
 	{
 		return getPath('fonts/$key', FONT, library);
 	}
 
-	inline static public function formatToSongPath(path:String) {
+	inline static public function formatToSongPath(path:String):String {
 		return path.toLowerCase().replace(' ', '-').replace('.', '').replace('?', '').replace('!', '').replace('\\', '').replace('/', '');
 	}
 
@@ -368,7 +352,6 @@ class Paths
 			}
 		}
 
-		#if PRELOAD_ALL
 		// clear all sounds that are cached
 		var counterSound:Int = 0;
 		for (key in currentTrackedSounds.keys())
@@ -399,10 +382,9 @@ class Paths
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
 		openfl.Assets.cache.clear("songs");
-		#end
 	}
 
-	inline static public function fileExists(key:String, type:AssetType, ?library:String)
+	inline static public function fileExists(key:String, type:AssetType, ?library:String):Bool
 	{
 		if (OpenFlAssets.exists(getPath(key, type)))
 			return true;
@@ -410,7 +392,7 @@ class Paths
 		return false;
 	}
 
-	static public function getSparrowAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool)
+	static public function getSparrowAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool):FlxAtlasFrames
 	{
 		gpuRender = gpuRender != null ? gpuRender : FlxG.save.data.gpuRender;
 		if (isCharacter)
@@ -422,7 +404,7 @@ class Paths
 	/**
 	 * Senpai in Thorns uses this instead of Sparrow and IDK why.
 	 */
-	inline static public function getPackerAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool)
+	inline static public function getPackerAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool):FlxAtlasFrames
 	{
 		gpuRender = gpuRender != null ? gpuRender : FlxG.save.data.gpuRender;
 		if (isCharacter)
