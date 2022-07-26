@@ -134,12 +134,10 @@
 	<haxelib name="linc_luajit" if="desktop"/>
 	<haxelib name="hxvm-luajit" if="desktop"/>
 	<haxelib name="hxcpp-debug-server" if="cpp"/>
-	<haxelib name="hxCodec" if="FEATURE_MP4VIDEOS"/>
+	<haxelib name="hxCodec" if="FEATURE_MP4VIDEOS" unless="web"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
-
-	
 
 	<!--In case you want to use nape with flixel-->
 	<!--<haxelib name="nape-haxe4" />-->
