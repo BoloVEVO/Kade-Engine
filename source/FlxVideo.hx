@@ -17,7 +17,7 @@ class FlxVideo extends FlxBasic
 	{
 		super();
 
-		#if web
+		#elseif (FEATURE_MP4VIDEOS && web)
 		var video:Video = new Video();
 		video.x = 0;
 		video.y = 0;
