@@ -4038,22 +4038,7 @@ class PlayState extends MusicBeatState
 					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0], diff);
 					FlxG.sound.music.stop();
 
-					#if !FEATURE_MP4VIDEOS
-					if (storyWeek == 7 && (FlxG.save.data.optimize || !FlxG.save.data.background))
-					{
-						switch (SONG.songId)
-						{
-							case 'guns':
-								LoadingState.loadAndSwitchState(new VideoState('cutscenes/guns_cutscene', new PlayState()), true);
-							case 'stress':
-								LoadingState.loadAndSwitchState(new VideoState('cutscenes/stress_cutscene', new PlayState()), true);
-						}
-					}
-					else
-						LoadingState.loadAndSwitchState(new PlayState());
-					#else
 					LoadingState.loadAndSwitchState(new PlayState());
-					#end
 					clean();
 				}
 			}
