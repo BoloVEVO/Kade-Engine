@@ -1319,11 +1319,11 @@ class PlayState extends MusicBeatState
 				case 'thorns':
 					schoolIntro(doof);
 				case 'ugh':
-					ughIntro('cutscenes/ugh_cutscene');
+					ughIntro();
 				case 'guns':
-					gunsIntro('cutscenes/guns_cutscene');
+					gunsIntro();
 				case 'stress':
-					stressIntro('cutscenes/stress_cutscene');
+					stressIntro();
 				default:
 					createTimer(0.5, function(timer)
 					{
@@ -1459,10 +1459,12 @@ class PlayState extends MusicBeatState
 	function ughIntro(name:String):Void
 	{
 		inCinematic = true;
+
 		var black:FlxSprite = new FlxSprite(-200, -200).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
 		black.scrollFactor.set();
 		add(black);
-		new FlxVideo(Paths.video(name)).finishCallback = function()
+
+		new FlxVideo(Paths.video('ughCutscene')).finishCallback = function()
 		{
 			remove(black);
 			FlxTween.tween(FlxG.camera, {zoom: Stage.camZoom}, (Conductor.stepCrochet / 1000) * 5, {ease: FlxEase.quadInOut});
@@ -1471,6 +1473,7 @@ class PlayState extends MusicBeatState
 				startCountdown();
 			});
 		};
+
 		FlxG.camera.zoom = Stage.camZoom * 1.2;
 		camFollow.x += 100;
 		camFollow.y += 100;
@@ -1479,10 +1482,12 @@ class PlayState extends MusicBeatState
 	function gunsIntro(name:String):Void
 	{
 		inCinematic = true;
+
 		var black:FlxSprite = new FlxSprite(-200, -200).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
 		black.scrollFactor.set();
 		add(black);
-		new FlxVideo(Paths.video(name)).finishCallback = function()
+
+		new FlxVideo(Paths.video('gunsCutscene')).finishCallback = function()
 		{
 			remove(black);
 			FlxTween.tween(FlxG.camera, {zoom: Stage.camZoom}, (Conductor.stepCrochet / 1000) * 5, {ease: FlxEase.quadInOut});
@@ -1499,7 +1504,8 @@ class PlayState extends MusicBeatState
 		var black:FlxSprite = new FlxSprite(-200, -200).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
 		black.scrollFactor.set();
 		add(black);
-		new FlxVideo(Paths.video(name)).finishCallback = function()
+
+		new FlxVideo(Paths.video('stressCutscene')).finishCallback = function()
 		{
 			remove(black);
 			FlxTween.tween(FlxG.camera, {zoom: Stage.camZoom}, (Conductor.stepCrochet / 1000) * 5, {ease: FlxEase.quadInOut});
