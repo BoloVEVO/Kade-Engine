@@ -1318,14 +1318,12 @@ class PlayState extends MusicBeatState
 					schoolIntro(doof);
 				case 'thorns':
 					schoolIntro(doof);
-				#if FEATURE_MP4VIDEOS
 				case 'ugh':
 					ughIntro('cutscenes/ugh_cutscene');
 				case 'guns':
 					gunsIntro('cutscenes/guns_cutscene');
 				case 'stress':
 					stressIntro('cutscenes/stress_cutscene');
-				#end
 				default:
 					createTimer(0.5, function(timer)
 					{
