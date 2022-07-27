@@ -3613,7 +3613,7 @@ class ChartingState extends MusicBeatState
 				"name": _song.songId,
 				"offset": 0,
 			}
-		});
+		}, "\t");
 		FlxG.save.flush();
 	}
 
@@ -3636,7 +3636,7 @@ class ChartingState extends MusicBeatState
 			"song": _song
 		};
 
-		var data:String = Json.stringify(json, null, " ");
+		var data:String = Json.stringify(json, "\t");
 
 		if ((data != null) && (data.length > 0))
 		{
