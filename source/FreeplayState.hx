@@ -59,12 +59,7 @@ class FreeplayState extends MusicBeatState
 	var letter:String;
 	var combo:String = 'N/A';
 	var lerpaccuracy:Float = 0.00;
-
-	var intendedColor:Int;
-	var colorTween:FlxTween;
-
 	var bg:FlxSprite;
-
 	var Inst:FlxSound;
 
 	public static var openMod:Bool = false;
@@ -86,10 +81,9 @@ class FreeplayState extends MusicBeatState
 	public static function loadDiff(diff:Int, songId:String, array:Array<SongData>)
 		array.push(Song.conversionChecks(Song.loadFromJson(songId, CoolUtil.suffixDiffsArray[diff])));
 
-	public static var list:Array<String> = [];
-
 	override function create()
-	{Paths.clearStoredMemory();
+	{
+		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
 		FlxG.mouse.visible = true;
@@ -102,14 +96,7 @@ class FreeplayState extends MusicBeatState
 			MainMenuState.freakyPlaying = true;
 		}
 
-		list = CoolUtil.coolTextFile(Paths.txt('data/freeplaySonglist'));
-
 		cached = false;
-
-		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-
-		/*for (i in 0...songs.length - 1)
-			songs[i].diffs.reverse(); */
 
 		populateSongData();
 		PlayState.inDaPlay = false;
@@ -172,6 +159,8 @@ class FreeplayState extends MusicBeatState
 		persistentUpdate = true;
 
 		// LOAD CHARACTERS
+		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		bg.setGraphicSize(FlxG.width, FlxG.height);
 		bg.antialiasing = FlxG.save.data.antialiasing;
 		add(bg);
 
@@ -207,9 +196,8 @@ class FreeplayState extends MusicBeatState
 		bottomBG.alpha = 0.6;
 		add(bottomBG);
 
-		var bottomText:String = #if !mobile #if PRELOAD_ALL "  Press SPACE to listen to the Song Instrumental / Click and scroll through the songs with your MOUSE /"
-			+ #else "  Click and scroll through the songs with your MOUSE /"
-			+ #end #end
+		var bottomText:String = #if PRELOAD_ALL "Press SPACE to listen to the Song Instrumental / Click and scroll through the songs with your MOUSE /"
+			+ #else "Click and scroll through the songs with your MOUSE /" + #end
 		" Your offset is "
 		+ FlxG.save.data.offset
 		+ "ms "
@@ -255,8 +243,8 @@ class FreeplayState extends MusicBeatState
 
 		if (curSelected >= songs.length)
 			curSelected = 0;
+
 		bg.color = songs[curSelected].color;
-		intendedColor = bg.color;
 
 		if (!openMod)
 		{
@@ -296,14 +284,13 @@ class FreeplayState extends MusicBeatState
 	static function populateSongData()
 	{
 		cached = false;
-		list = CoolUtil.coolTextFile(Paths.txt('data/freeplaySonglist'));
 
 		songData = [];
 		songs = [];
 
-		for (i in 0...list.length)
+		for (i in 0...Data.freeplaySongArray.length)
 		{
-			var data:Array<String> = list[i].split(':');
+			var data:Array<String> = Data.freeplaySongArray[i].split(':');
 			var songId = data[0];
 			var color = data[3];
 
@@ -373,22 +360,12 @@ class FreeplayState extends MusicBeatState
 			FreeplayState.songData.set(songId, diffs);
 			trace('loaded diffs for ' + songId);
 			FreeplayState.songs.push(meta);
-
-			/*#if FFEATURE_FILESYSTEM
-				sys.thread.Thread.create(() ->
-				{
-					FlxG.sound.cache(Paths.inst(songId));
-				});
-				#else
-				FlxG.sound.cache(Paths.inst(songId));
-				#end */
 		}
 	}
 
 	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:String)
 	{
 		var meta = new FreeplaySongMetadata(songName, weekNum, songCharacter, FlxColor.fromString(color));
-
 		var diffs = [];
 		var diffsThatExist = [];
 
@@ -476,6 +453,13 @@ class FreeplayState extends MusicBeatState
 
 		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, 0.4));
 		lerpaccuracy = FlxMath.lerp(lerpaccuracy, intendedaccuracy, CoolUtil.boundTo(1 - (elapsed * 9), 0, 1) / (openfl.Lib.current.stage.frameRate / 60));
+		bg.color = FlxColor.interpolate(bg.color, songs[curSelected].color, CoolUtil.camLerpShit(0.045));
+
+		if (MainMenuState.freakyPlaying == false)
+		{
+			bg.scale.x = FlxMath.lerp(bg.scale.x, 1.0, elapsed * 6);
+			bg.scale.y = FlxMath.lerp(bg.scale.y, 1.0, elapsed * 6);
+		}
 
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
@@ -514,7 +498,7 @@ class FreeplayState extends MusicBeatState
 		{
 			if (FlxG.mouse.wheel != 0)
 			{
-				#if desktop
+				#if !html5
 				changeSelection(-FlxG.mouse.wheel);
 				#else
 				if (FlxG.mouse.wheel < 0) // HTML5 BRAIN'T
@@ -607,7 +591,7 @@ class FreeplayState extends MusicBeatState
 					changeDiff(1);
 			}
 
-			#if desktop
+			#if !html5
 			if (FlxG.keys.justPressed.SPACE)
 			{
 				FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0.7, true);
@@ -653,10 +637,6 @@ class FreeplayState extends MusicBeatState
 			{
 				MusicBeatState.switchState(new MainMenuState());
 				clean();
-				if (colorTween != null)
-				{
-					colorTween.cancel();
-				}
 			}
 
 			for (item in grpSongs.members)
@@ -692,6 +672,17 @@ class FreeplayState extends MusicBeatState
 
 			for (item in grpSongs.members)
 				item.alpha = 0;
+		}
+	}
+
+	override function beatHit()
+	{
+		super.beatHit();
+
+		if (MainMenuState.freakyPlaying == false)
+		{
+			bg.scale.x = 1.015;
+			bg.scale.y = 1.015;
 		}
 	}
 
@@ -831,26 +822,6 @@ class FreeplayState extends MusicBeatState
 
 		changeDiff();
 
-		/*if (songs[curSelected].songName.toLowerCase() == "tutorial")
-			{
-				rate = 1.0;
-		}*/
-
-		var newColor:Int = songs[curSelected].color;
-		if (newColor != intendedColor)
-		{
-			if (colorTween != null)
-			{
-				colorTween.cancel();
-			}
-			intendedColor = newColor;
-			colorTween = FlxTween.color(bg, 0.5, bg.color, intendedColor, {
-				onComplete: function(twn:FlxTween)
-				{
-					colorTween = null;
-				}
-			});
-		}
 		// selector.y = (70 * curSelected) + 30;
 
 		// adjusting the highscore song name to be compatible (changeSelection)

@@ -11,7 +11,6 @@ import openfl.Lib;
 import Discord.DiscordClient;
 #end
 import OptionsMenu;
-import KadeEngineData;
 import flixel.input.gamepad.FlxGamepad;
 
 class Option
@@ -1021,7 +1020,7 @@ class InstantRespawn extends Option
 
 	public override function left():Bool
 	{
-		FlxG.save.data.InstantRespawn = !FlxG.save.data.InstantRespawn;
+		FlxG.save.data.instantRespawn = !FlxG.save.data.instantRespawn;
 		display = updateDisplay();
 		return true;
 	}
@@ -1034,7 +1033,7 @@ class InstantRespawn extends Option
 
 	private override function updateDisplay():String
 	{
-		return "Instant Respawn: < " + (!FlxG.save.data.InstantRespawn ? "off" : "on") + " >";
+		return "Instant Respawn: < " + (!FlxG.save.data.instantRespawn ? "off" : "on") + " >";
 	}
 }
 
@@ -1191,7 +1190,6 @@ class FPSOption extends Option
 	public override function left():Bool
 	{
 		FlxG.save.data.fps = !FlxG.save.data.fps;
-		(cast(Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.fps);
 		display = updateDisplay();
 		return true;
 	}
@@ -1486,12 +1484,12 @@ class WatermarkOption extends Option
 
 	public override function left():Bool
 	{
-		Main.watermarks = !Main.watermarks;
-		FlxG.save.data.watermark = Main.watermarks;
+		FlxG.save.data.watermarks = !FlxG.save.data.watermarks;
+		FlxG.save.data.watermark = FlxG.save.data.watermarks;
 		FlxG.sound.music.stop();
 		FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
 		Conductor.changeBPM(102);
-		KadeEngineFPS.updateEngineName();
+		FPS.updateEngineName();
 		display = updateDisplay();
 		return true;
 	}
@@ -1756,7 +1754,7 @@ class HitSoundOption extends Option
 	{
 		FlxG.save.data.hitSound--;
 		if (FlxG.save.data.hitSound < 0)
-			FlxG.save.data.hitSound = HitSounds.getSound().length - 1;
+			FlxG.save.data.hitSound = Data.hitsoundArray.length - 1;
 		display = updateDisplay();
 		return true;
 	}
@@ -1764,7 +1762,7 @@ class HitSoundOption extends Option
 	public override function right():Bool
 	{
 		FlxG.save.data.hitSound++;
-		if (FlxG.save.data.hitSound > HitSounds.getSound().length - 1)
+		if (FlxG.save.data.hitSound > Data.hitsoundArray.length - 1)
 			FlxG.save.data.hitSound = 0;
 		display = updateDisplay();
 		return true;
@@ -1772,7 +1770,7 @@ class HitSoundOption extends Option
 
 	public override function getValue():String
 	{
-		return "Hitsound Style: < " + HitSounds.getSoundByID(FlxG.save.data.hitSound) + " >";
+		return "Hitsound Style: < " + Data.hitsoundArray[FlxG.save.data.hitSound] + " >";
 	}
 }
 
@@ -1970,7 +1968,7 @@ class NoteskinOption extends Option
 	{
 		FlxG.save.data.noteskin--;
 		if (FlxG.save.data.noteskin < 0)
-			FlxG.save.data.noteskin = NoteskinHelpers.getNoteskins().length - 1;
+			FlxG.save.data.noteskin = Data.noteskinArray.length - 1;
 		display = updateDisplay();
 		return true;
 	}
@@ -1978,7 +1976,7 @@ class NoteskinOption extends Option
 	public override function right():Bool
 	{
 		FlxG.save.data.noteskin++;
-		if (FlxG.save.data.noteskin > NoteskinHelpers.getNoteskins().length - 1)
+		if (FlxG.save.data.noteskin > Data.noteskinArray.length - 1)
 			FlxG.save.data.noteskin = 0;
 		display = updateDisplay();
 		return true;
@@ -1986,7 +1984,7 @@ class NoteskinOption extends Option
 
 	public override function getValue():String
 	{
-		return "Current Noteskin: < " + NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin) + " >";
+		return "Current Noteskin: < " + Data.noteskinArray[FlxG.save.data.noteskin] + " >";
 	}
 }
 
@@ -2219,7 +2217,7 @@ class ResetModifiersOption extends Option
 			return true;
 		}
 
-		KadeEngineData.resetModifiers();
+		Data.resetModifiers();
 		confirm = false;
 		trace('Modifiers went brrrr');
 		display = updateDisplay();
@@ -2356,7 +2354,7 @@ class ResetSettings extends Option
 		FlxG.save.data.showCombo = null;
 		FlxG.save.data.showComboNum = null;
 
-		KadeEngineData.initSave();
+		Data.reloadSaves();
 		confirm = false;
 		trace('All settings have been reset');
 		display = updateDisplay();

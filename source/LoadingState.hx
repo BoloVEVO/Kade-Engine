@@ -6,6 +6,7 @@ import flixel.FlxG;
 import flixel.FlxState;
 import flixel.FlxSprite;
 import flixel.util.FlxTimer;
+import openfl.media.Sound;
 import openfl.utils.Assets as OpenFlAssets;
 import lime.utils.Assets as LimeAssets;
 import lime.utils.AssetLibrary;
@@ -23,11 +24,8 @@ class LoadingState extends MusicBeatState
 	var target:FlxState;
 	var stopMusic = false;
 	var callbacks:MultiCallback;
-
 	var logo:FlxSprite;
-
 	var danceLeft:Bool = false;
-
 	var loadBar:FlxSprite;
 	var targetShit:Float = 0;
 
@@ -114,7 +112,7 @@ class LoadingState extends MusicBeatState
 		});
 	}
 
-	function checkLoadSong(path:String)
+	function checkLoadSong(path:Sound)
 	{
 		if (path != null)
 		{
@@ -192,12 +190,12 @@ class LoadingState extends MusicBeatState
 		MusicBeatState.switchState(target);
 	}
 
-	static function getSongPath()
+	static function getSongPath():Sound
 	{
 		return Paths.inst(PlayState.SONG.songId);
 	}
 
-	static function getVocalPath()
+	static function getVocalPath():Sound
 	{
 		return Paths.voices(PlayState.SONG.songId);
 	}
@@ -231,9 +229,9 @@ class LoadingState extends MusicBeatState
 	}
 
 	#if NO_PRELOAD_ALL
-	static function isSoundLoaded(path:String):Bool
+	static function isSoundLoaded(path:Sound):Bool
 	{
-		return OpenFlAssets.cache.hasSound(path);
+		return OpenFlAssets.cache.hasSound(path.toString());
 	}
 
 	static function isLibraryLoaded(library:String):Bool

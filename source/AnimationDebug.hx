@@ -30,7 +30,7 @@ using StringTools;
 class AnimationDebug extends MusicBeatState
 {
 	var _file:FileReference;
-	var bf:Boyfriend;
+	var bf:Character;
 	var dad:Character;
 	var char:Character;
 	var textAnim:FlxText;

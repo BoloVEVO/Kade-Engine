@@ -1,5 +1,5 @@
 
-![Kade Engine logo](assets/preload/images/KadeEngineLogo.png)
+![Kade Engine logo](KadeEngineLogo.png)
 
  [![KadeDev Discord](https://img.shields.io/discord/808039740464300104?label=discord)](https://discord.gg/MG6GQFh52U) [![GitHub issues](https://img.shields.io/github/issues/BoloVEVO/Kade-Engine)](https://github.com/BoloVEVO/Kade-Engine/issues) [![GitHub pull requests](https://img.shields.io/github/issues-pr/BoloVEVO/Kade-Engine)](https://github.com/BoloVEVO/Kade-Engine/pulls) []() []()
 

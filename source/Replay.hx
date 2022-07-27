@@ -1,4 +1,5 @@
 #if FEATURE_FILESYSTEM
+import sys.FileSystem;
 import sys.io.File;
 #end
 import Controls.Control;
@@ -120,6 +121,9 @@ class Replay
 		var time = Date.now().getTime();
 
 		#if FEATURE_FILESYSTEM
+		if (!FileSystem.exists("assets/replays"))
+			FileSystem.createDirectory("assets/replays");
+
 		File.saveContent("assets/replays/replay-" + PlayState.SONG.songId + "-time" + time + ".kadeReplay", data); // FUCK YOU REPLAYS!
 
 		path = "replay-" + PlayState.SONG.songId + "-time" + time + ".kadeReplay"; // for score screen shit
@@ -136,7 +140,7 @@ class Replay
 		trace('loading ' + Sys.getCwd() + 'assets/replays/' + path + ' replay...');
 		try
 		{
-			var repl:ReplayJSON = cast Json.parse(File.getContent(Sys.getCwd() + "assets/replays/" + path));
+			var repl:ReplayJSON = cast Json.parse(File.getContent("assets/replays/" + path));
 			replay = repl;
 		}
 		catch (e)

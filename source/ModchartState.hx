@@ -7,6 +7,10 @@ import LuaClass.LuaSprite;
 import LuaClass.LuaCamera;
 import LuaClass.LuaReceptor;
 import LuaClass.LuaNote;
+import openfl.utils.Assets as OpenFlAssets;
+#if FEATURE_FILESYSTEM
+import sys.io.File;
+#end
 import openfl.display3D.textures.VideoTexture;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -283,9 +287,9 @@ class ModchartState
 	{
 		var olddadx = PlayState.dad.x;
 		var olddady = PlayState.dad.y;
-		PlayState.instance.removeObject(PlayState.dad);
+		PlayState.instance.remove(PlayState.dad);
 		PlayState.dad = new Character(olddadx, olddady, id);
-		PlayState.instance.addObject(PlayState.dad);
+		PlayState.instance.add(PlayState.dad);
 		PlayState.instance.iconP2.changeIcon(id);
 	}
 
@@ -293,105 +297,45 @@ class ModchartState
 	{
 		var oldboyfriendx = PlayState.boyfriend.x;
 		var oldboyfriendy = PlayState.boyfriend.y;
-		PlayState.instance.removeObject(PlayState.boyfriend);
-		PlayState.boyfriend = new Boyfriend(oldboyfriendx, oldboyfriendy, id);
-		PlayState.instance.addObject(PlayState.boyfriend);
+		PlayState.instance.remove(PlayState.boyfriend);
+		PlayState.boyfriend = new Character(oldboyfriendx, oldboyfriendy, id, true);
+		PlayState.instance.add(PlayState.boyfriend);
 		PlayState.instance.iconP1.changeIcon(id);
-	}
-
-	function makeAnimatedLuaSprite(spritePath:String, names:Array<String>, prefixes:Array<String>, startAnim:String, id:String)
-	{
-		#if FEATURE_FILESYSTEM
-		// TODO: Make this use OpenFlAssets.
-		var data:BitmapData = BitmapData.fromFile(Sys.getCwd() + "assets/data/songs/" + PlayState.SONG.songId + '/' + spritePath + ".png");
-
-		var sprite:FlxSprite = new FlxSprite(0, 0);
-
-		sprite.frames = FlxAtlasFrames.fromSparrow(FlxGraphic.fromBitmapData(data),
-			Sys.getCwd() + "assets/data/songs/" + PlayState.SONG.songId + "/" + spritePath + ".xml");
-
-		trace(sprite.frames.frames.length);
-
-		for (p in 0...names.length)
-		{
-			var i = names[p];
-			var ii = prefixes[p];
-			sprite.animation.addByPrefix(i, ii, 24, false);
-		}
-
-		luaSprites.set(id, sprite);
-
-		PlayState.instance.addObject(sprite);
-
-		sprite.animation.play(startAnim);
-		return id;
-		#end
 	}
 
 	function makeLuaSprite(spritePath:String, toBeCalled:String, drawBehind:Bool)
 	{
 		#if FEATURE_FILESYSTEM
-		// pre lowercasing the song name (makeLuaSprite)
-		var songLowercase = StringTools.replace(PlayState.SONG.songId, " ", "-").toLowerCase();
-		switch (songLowercase)
-		{
-			case 'dad-battle':
-				songLowercase = 'dadbattle';
-			case 'philly-nice':
-				songLowercase = 'philly';
-			case 'm.i.l.f':
-				songLowercase = 'milf';
-		}
+		var data:BitmapData;
 
-		var path = Sys.getCwd() + "assets/data/songs/" + PlayState.SONG.songId + '/';
-
+		#if (FEATURE_STEPMANIA && FEATURE_FILESYSTEM)
 		if (PlayState.isSM)
-			path = PlayState.pathToSm + "/";
+			data = BitmapData.fromFile(PlayState.pathToSm + "/" + spritePath + ".png");
+		else
+		#end
+			data = OpenFlAssets.getBitmapData("assets/data/songs/" + PlayState.SONG.songId + '/' + spritePath + ".png");
 
-		var data:BitmapData = BitmapData.fromFile(path + spritePath + ".png");
+		var sprite:FlxSprite = new FlxSprite(0, 0).loadGraphic(data);
 
-		var sprite:FlxSprite = new FlxSprite(0, 0);
-		var imgWidth:Float = FlxG.width / data.width;
-		var imgHeight:Float = FlxG.height / data.height;
-		var scale:Float = imgWidth <= imgHeight ? imgWidth : imgHeight;
-
-		// Cap the scale at x1
-		if (scale > 1)
-			scale = 1;
-
-		sprite.makeGraphic(Std.int(data.width * scale), Std.int(data.width * scale), FlxColor.TRANSPARENT);
-
-		var data2:BitmapData = sprite.pixels.clone();
-		var matrix:Matrix = new Matrix();
-		matrix.identity();
-		matrix.scale(scale, scale);
-		data2.fillRect(data2.rect, FlxColor.TRANSPARENT);
-		data2.draw(data, matrix, null, null, null, true);
-		sprite.pixels = data2;
-
-		luaSprites.set(toBeCalled, sprite);
-		// and I quote:
-		// shitty layering but it works!
 		@:privateAccess
 		{
 			if (drawBehind)
 			{
-				PlayState.instance.removeObject(PlayState.gf);
-				PlayState.instance.removeObject(PlayState.boyfriend);
-				PlayState.instance.removeObject(PlayState.dad);
+				PlayState.instance.remove(PlayState.gf);
+				PlayState.instance.remove(PlayState.boyfriend);
+				PlayState.instance.remove(PlayState.dad);
 			}
-			PlayState.instance.addObject(sprite);
+			PlayState.instance.add(sprite);
 			if (drawBehind)
 			{
-				PlayState.instance.addObject(PlayState.gf);
-				PlayState.instance.addObject(PlayState.boyfriend);
-				PlayState.instance.addObject(PlayState.dad);
+				PlayState.instance.add(PlayState.gf);
+				PlayState.instance.add(PlayState.boyfriend);
+				PlayState.instance.add(PlayState.dad);
 			}
 		}
 		#end
 
 		new LuaSprite(sprite, toBeCalled).Register(lua);
-
 		return toBeCalled;
 	}
 
@@ -417,29 +361,17 @@ class ModchartState
 
 		// shaders = new Array<LuaShader>();
 
-		// pre lowercasing the song name (new)
-		var songLowercase = StringTools.replace(PlayState.SONG.songId, " ", "-").toLowerCase();
-		switch (songLowercase)
-		{
-			case 'dad-battle':
-				songLowercase = 'dadbattle';
-			case 'philly-nice':
-				songLowercase = 'philly';
-			case 'm.i.l.f':
-				songLowercase = 'milf';
-		}
+		var path:String = OpenFlAssets.getText(Paths.lua('songs/${PlayState.SONG.songId}/modchart'));
 
-		var path = Paths.lua('songs/${PlayState.SONG.songId}/modchart');
+		#if (FEATURE_STEPMANIA && FEATURE_FILESYSTEM)
 		if (PlayState.isSM)
-			path = PlayState.pathToSm + "/modchart.lua";
+			path = File.getContent(PlayState.pathToSm + "/modchart.lua");
+		#end
 
-		var result = LuaL.dofile(lua, path); // execute le file
-
+		var result = LuaL.dostring(lua, path); // execute le file
 		if (result != 0)
 		{
 			Application.current.window.alert("LUA COMPILE ERROR:\n" + Lua.tostring(lua, result), "Kade Engine Modcharts");
-			MusicBeatState.switchState(new FreeplayState());
-			PlayState.instance.clean();
 			return;
 		}
 
@@ -569,49 +501,6 @@ class ModchartState
 		Lua_helper.add_callback(lua, "setHudZoom", function(zoomAmount:Float)
 		{
 			PlayState.instance.camHUD.zoom = zoomAmount;
-		});
-
-		Lua_helper.add_callback(lua, "initBackgroundVideo", function(videoName:String)
-		{
-			trace('playing assets/videos/' + videoName + '.webm');
-			PlayState.instance.backgroundVideo("assets/videos/" + videoName + ".webm");
-		});
-
-		Lua_helper.add_callback(lua, "pauseVideo", function()
-		{
-			if (!BackgroundVideo.get().paused)
-				BackgroundVideo.get().pause();
-		});
-
-		Lua_helper.add_callback(lua, "resumeVideo", function()
-		{
-			if (BackgroundVideo.get().paused)
-				BackgroundVideo.get().pause();
-		});
-
-		Lua_helper.add_callback(lua, "restartVideo", function()
-		{
-			BackgroundVideo.get().restart();
-		});
-
-		Lua_helper.add_callback(lua, "getVideoSpriteX", function()
-		{
-			return PlayState.instance.videoSprite.x;
-		});
-
-		Lua_helper.add_callback(lua, "getVideoSpriteY", function()
-		{
-			return PlayState.instance.videoSprite.y;
-		});
-
-		Lua_helper.add_callback(lua, "setVideoSpritePos", function(x:Int, y:Int)
-		{
-			PlayState.instance.videoSprite.setPosition(x, y);
-		});
-
-		Lua_helper.add_callback(lua, "setVideoSpriteScale", function(scale:Float)
-		{
-			PlayState.instance.videoSprite.setGraphicSize(Std.int(PlayState.instance.videoSprite.width * scale));
 		});
 
 		Lua_helper.add_callback(lua, "setLaneUnderLayPos", function(value:Int)

@@ -62,7 +62,7 @@ class GameplayCustomizeState extends MusicBeatState
 
 	public static var dad:Character;
 	public static var gf:Character;
-	public static var boyfriend:Boyfriend;
+	public static var boyfriend:Character;
 	public static var Stage:Stage;
 	public static var freeplayNoteStyle:String = 'normal';
 	public static var freeplayWeek:Int = 1;
@@ -133,7 +133,7 @@ class GameplayCustomizeState extends MusicBeatState
 
 		gf = new Character(400, 130, 'gf');
 
-		boyfriend = new Boyfriend(770, 450, 'bf');
+		boyfriend = new Character(770, 450, 'bf', true);
 
 		dad = new Character(100, 100, 'dad');
 
@@ -628,7 +628,7 @@ class GameplayCustomizeState extends MusicBeatState
 			switch (noteTypeCheck)
 			{
 				case 'pixel':
-					babyArrow.loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels', 'week6'), true, 17, 17);
+					babyArrow.loadGraphic(Paths.image('noteskins/' + Data.noteskinArray[FlxG.save.data.noteskin] + '-pixel'), true, 17, 17);
 					babyArrow.animation.add('green', [6]);
 					babyArrow.animation.add('red', [7]);
 					babyArrow.animation.add('blue', [5]);
@@ -649,7 +649,7 @@ class GameplayCustomizeState extends MusicBeatState
 					}
 
 				default:
-					babyArrow.frames = NoteskinHelpers.generateNoteskinSprite(FlxG.save.data.noteskin);
+					babyArrow.frames = Paths.getSparrowAtlas('noteskins/' + Data.noteskinArray[FlxG.save.data.noteskin], 'shared');
 					for (j in 0...4)
 					{
 						babyArrow.animation.addByPrefix(dataColor[j], 'arrow' + dataSuffix[j]);

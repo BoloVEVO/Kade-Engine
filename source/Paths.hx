@@ -1,26 +1,24 @@
 package;
 
-import flash.media.Sound;
 import flixel.FlxG;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxFramesCollection;
 import animateatlas.AtlasFrameMaker;
 import flixel.graphics.frames.FlxAtlasFrames;
 import haxe.Json;
-import lime.utils.Assets;
-import openfl.system.System;
+import openfl.display.BitmapData;
+import openfl.display3D.textures.Texture;
+import openfl.media.Sound;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
-import openfl.display3D.textures.Texture;
-import openfl.display.BitmapData;
 
 using StringTools;
 
 class Paths
 {
-	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
+	inline public static var SOUND_EXT:String = #if web "mp3" #else "ogg" #end;
 
-	inline public static var VIDEO_EXT = #if FEATURE_MP4VIDEOS "mp4" #elseif (!FEATURE_MP4VIDEOS || FEATURE_WEBM) "webm" #end;
+	inline public static var VIDEO_EXT:String = "mp4";
 
 	static var currentLevel:String;
 
@@ -29,7 +27,7 @@ class Paths
 		currentLevel = name.toLowerCase();
 	}
 
-	static function getPath(file:String, type:AssetType, ?library:Null<String>)
+	static function getPath(file:String, type:AssetType, ?library:Null<String>):String
 	{
 		if (library != null)
 			return getLibraryPath(file, library);
@@ -57,12 +55,11 @@ class Paths
 	 * @return BitmapData
 	 */
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
-
 	public static var currentTrackedTextures:Map<String, Texture> = [];
 	public static var currentTrackedSounds:Map<String, Sound> = [];
 
 	// Sprite content caching with GPU based on Forever Engine texture compression.
-	static function loadImage(key:String, ?library:String, ?gpuRender:Bool)
+	static function loadImage(key:String, ?library:String, ?gpuRender:Bool):FlxGraphic
 	{
 		var path:String = '';
 
@@ -111,13 +108,11 @@ class Paths
 		return null;
 	}
 
-	public static function loadSound(path:String, key:String, ?library:String)
+	public static function loadSound(path:String, key:String, ?library:String):Sound
 	{
 		// I hate this so god damn much
-
 		var gottenPath:String = getPath('$path/$key.$SOUND_EXT', SOUND, library);
 		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
-		// trace(gottenPath);
 		if (!currentTrackedSounds.exists(gottenPath))
 		{
 			var folder:String = '';
@@ -129,16 +124,10 @@ class Paths
 		}
 
 		localTrackedAssets.push(gottenPath);
-
 		return currentTrackedSounds.get(gottenPath);
 	}
 
-	static public function getHaxeScript(string:String)
-	{
-		return Assets.getText('assets/data/$string/HaxeModchart.hx');
-	}
-
-	static public function loadJSON(key:String, ?library:String):Dynamic
+	static public function loadJSON(key:String, ?library:String):String
 	{
 		var rawJson = '';
 
@@ -178,157 +167,86 @@ class Paths
 		}
 	}
 
-	static public function getLibraryPath(file:String, library = "preload")
+	static public function getLibraryPath(file:String, library = "preload"):String
 	{
 		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
 	}
 
-	inline static function getLibraryPathForce(file:String, library:String)
+	inline static function getLibraryPathForce(file:String, library:String):String
 	{
-		var returnPath = '$library:assets/$library/$file';
-
-		return returnPath;
+		return '$library:assets/$library/$file';
 	}
 
-	inline static function getPreloadPath(file:String)
+	inline static function getPreloadPath(file:String):String
 	{
 		return 'assets/$file';
 	}
 
-	inline static public function file(file:String, ?library:String, type:AssetType = TEXT)
+	inline static public function file(file:String, ?library:String, type:AssetType = TEXT):String
 	{
 		return getPath(file, type, library);
 	}
 
-	inline static public function lua(key:String, ?library:String)
+	inline static public function lua(key:String, ?library:String):String
 	{
 		return getPath('data/$key.lua', TEXT, library);
 	}
 
-	inline static public function luaImage(key:String, ?library:String)
-	{
-		return getPath('data/$key.png', IMAGE, library);
-	}
-
-	inline static public function txt(key:String, ?library:String)
+	inline static public function txt(key:String, ?library:String):String
 	{
 		return getPath('$key.txt', TEXT, library);
 	}
 
-	inline static public function xml(key:String, ?library:String)
+	inline static public function xml(key:String, ?library:String):String
 	{
 		return getPath('data/$key.xml', TEXT, library);
 	}
 
-	inline static public function animJson(key:String, ?library:String)
+	inline static public function animJson(key:String, ?library:String):String
 	{
 		return getPath('images/$key/Animation.json', TEXT, library);
 	}
 
-	inline static public function spriteMapJson(key:String, ?library:String)
+	inline static public function spriteMapJson(key:String, ?library:String):String
 	{
 		return getPath('images/$key/spritemap.json', TEXT, library);
 	}
 
-	inline static public function json(key:String, ?library:String)
+	inline static public function json(key:String, ?library:String):String
 	{
 		return getPath('data/$key.json', TEXT, library);
 	}
 
-	static public function sound(key:String, ?library:String):Any
+	static public function sound(key:String, ?library:String):Sound
 	{
-		var sound:Sound = loadSound('sounds', key, library);
-		return sound;
+		return loadSound('sounds', key, library);
 	}
 
-	inline static public function soundRandom(key:String, min:Int, max:Int, ?library:String)
+	inline static public function soundRandom(key:String, min:Int, max:Int, ?library:String):Sound
 	{
-		return sound(key + FlxG.random.int(min, max), library);
+		return loadSound('sounds', key + FlxG.random.int(min, max), library);
 	}
 
-	inline static public function music(key:String, ?library:String):Any
+	inline static public function music(key:String, ?library:String):Sound
 	{
-		var file:Sound = loadSound('music', key, library);
-		return file;
+		return loadSound('music', key, library);
 	}
 
-	inline static public function voices(song:String):Any
+	inline static public function voices(song:String):Sound
 	{
-		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Voices';
-		switch (songLowercase)
-		{
-			case 'dad-battle':
-				songLowercase = 'dadbattle';
-			case 'philly-nice':
-				songLowercase = 'philly';
-			case 'm.i.l.f':
-				songLowercase = 'milf';
-		}
-
-		var file;
-		#if PRELOAD_ALL
-		file = loadSound('songs', songLowercase);
-		#else
-		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
-		#end
-		return file;
+		return loadSound('songs', Paths.formatToSongPath(song) + '/Voices');
 	}
 
-	inline static public function inst(song:String):Any
+	inline static public function inst(song:String):Sound
 	{
-		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Inst';
-		switch (songLowercase)
-		{
-			case 'dad-battle':
-				songLowercase = 'dadbattle';
-			case 'philly-nice':
-				songLowercase = 'philly';
-			case 'm.i.l.f':
-				songLowercase = 'milf';
-		}
-		var file;
-		#if PRELOAD_ALL
-		file = loadSound('songs', songLowercase);
-		#else
-		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
-		#end
-
-		return file;
+		return loadSound('songs', Paths.formatToSongPath(song) + '/Inst');
 	}
 
-	/*static public function listSongsToCache()
-		{
-			// We need to query OpenFlAssets, not the file system, because of Polymod.
-			var soundAssets = OpenFlAssets.list(AssetType.MUSIC).concat(OpenFlAssets.list(AssetType.SOUND));
-
-			// TODO: Maybe rework this to pull from a text file rather than scan the list of assets.
-			var songNames = [];
-
-			for (sound in soundAssets)
-			{
-				// Parse end-to-beginning to support mods.
-				var path = sound.split('/');
-				path.reverse();
-
-				var fileName = path[0];
-				var songName = path[1];
-
-				if (path[2] != 'songs')
-					continue;
-
-				// Remove duplicates.
-				if (songNames.indexOf(songName) != -1)
-					continue;
-
-				songNames.push(songName);
-			}
-
-			return songNames;
-	}*/
 	static public function doesSoundAssetExist(path:String)
 	{
 		if (path == null || path == "")
 			return false;
+
 		return OpenFlAssets.exists(path, AssetType.SOUND) || OpenFlAssets.exists(path, AssetType.MUSIC);
 	}
 
@@ -349,15 +267,13 @@ class Paths
 		return image;
 	}
 
-	inline static public function font(key:String)
+	inline static public function font(key:String, ?library:String):String
 	{
-		return 'assets/fonts/$key';
+		return getPath('fonts/$key', FONT, library);
 	}
 
-	public static function excludeAsset(key:String)
-	{
-		if (!dumpExclusions.contains(key))
-			dumpExclusions.push(key);
+	inline static public function formatToSongPath(path:String):String {
+		return path.toLowerCase().replace(' ', '-').replace('.', '').replace('?', '').replace('!', '').replace('\\', '').replace('/', '');
 	}
 
 	public static var dumpExclusions:Array<String> = [
@@ -400,13 +316,16 @@ class Paths
 				}
 			}
 		}
-		// run the garbage collector for good measure lmfao
 
-		System.gc();
+		#if FEATURE_MODCORE
+		polymod.Polymod.clearCache();
+		#end
+
+		// run the garbage collector for good measure lmfao
+		openfl.system.System.gc();
 	}
 
 	public static var localTrackedAssets:Array<String> = [];
-
 	public static function clearStoredMemory(?cleanUnused:Bool = false)
 	{
 		#if FEATURE_MULTITHREADING
@@ -433,7 +352,6 @@ class Paths
 			}
 		}
 
-		#if PRELOAD_ALL
 		// clear all sounds that are cached
 		var counterSound:Int = 0;
 		for (key in currentTrackedSounds.keys())
@@ -464,10 +382,9 @@ class Paths
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
 		openfl.Assets.cache.clear("songs");
-		#end
 	}
 
-	inline static public function fileExists(key:String, type:AssetType, ?library:String)
+	inline static public function fileExists(key:String, type:AssetType, ?library:String):Bool
 	{
 		if (OpenFlAssets.exists(getPath(key, type)))
 			return true;
@@ -475,26 +392,24 @@ class Paths
 		return false;
 	}
 
-	static public function getSparrowAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool)
+	static public function getSparrowAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool):FlxAtlasFrames
 	{
 		gpuRender = gpuRender != null ? gpuRender : FlxG.save.data.gpuRender;
 		if (isCharacter)
-		{
 			return FlxAtlasFrames.fromSparrow(image('characters/$key', library, gpuRender), file('images/characters/$key.xml', library));
-		}
+
 		return FlxAtlasFrames.fromSparrow(image(key, library, gpuRender), file('images/$key.xml', library));
 	}
 
 	/**
 	 * Senpai in Thorns uses this instead of Sparrow and IDK why.
 	 */
-	inline static public function getPackerAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool)
+	inline static public function getPackerAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool):FlxAtlasFrames
 	{
 		gpuRender = gpuRender != null ? gpuRender : FlxG.save.data.gpuRender;
 		if (isCharacter)
-		{
 			return FlxAtlasFrames.fromSpriteSheetPacker(image('characters/$key', library, gpuRender), file('images/characters/$key.txt', library));
-		}
+
 		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library, gpuRender), file('images/$key.txt', library));
 	}
 

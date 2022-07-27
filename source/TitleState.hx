@@ -55,14 +55,9 @@ class TitleState extends MusicBeatState
 	override public function create():Void
 	{
 		getBuildVer();
+
 		#if FEATURE_MULTITHREADING
 		MasterObjectLoader.mutex = new Mutex();
-		#end
-		Paths.clearUnusedMemory();
-		// TODO: Refactor this to use OpenFlAssets.
-		#if FEATURE_FILESYSTEM
-		if (!sys.FileSystem.exists(Sys.getCwd() + "/assets/replays"))
-			sys.FileSystem.createDirectory(Sys.getCwd() + "/assets/replays");
 		#end
 
 		@:privateAccess
@@ -78,26 +73,7 @@ class TitleState extends MusicBeatState
 
 		OpenFlAssets.cache.enabled = true;
 
-		KadeEngineData.initSave();
-
-		#if html5
-		FlxG.save.data.gpuRender = false;
-		#end
-
-		KeyBinds.keyCheck();
-
-		// It doesn't reupdate the list before u restart rn lmao
-
-		NoteskinHelpers.updateNoteskins();
-
-		if (FlxG.save.data.volDownBind == null)
-			FlxG.save.data.volDownBind = "NUMPADMINUS";
-		if (FlxG.save.data.volUpBind == null)
-			FlxG.save.data.volUpBind = "NUMPADPLUS";
-
-		FlxG.sound.muteKeys = [FlxKey.fromString(Std.string(FlxG.save.data.muteBind))];
-		FlxG.sound.volumeDownKeys = [FlxKey.fromString(Std.string(FlxG.save.data.volDownBind))];
-		FlxG.sound.volumeUpKeys = [FlxKey.fromString(Std.string(FlxG.save.data.volUpBind))];
+		Data.reloadSaves();
 
 		FlxG.mouse.visible = true;
 
@@ -121,7 +97,7 @@ class TitleState extends MusicBeatState
 		// bg.updateHitbox();
 
 		logoBl = new FlxSprite(-150, 1500);
-		if (Main.watermarks)
+		if (FlxG.save.data.watermarks)
 		{
 			logoBl.frames = Paths.getSparrowAtlas('KadeEngineLogoBumpin');
 		}
@@ -176,25 +152,7 @@ class TitleState extends MusicBeatState
 
 		super.create();
 
-		#if FREEPLAY
-		MusicBeatState.switchState(new FreeplayState());
-		clean();
-		#elseif CHARTING
-		MusicBeatState.switchState(new ChartingState());
-		clean();
-		#else
-		#if !cpp
-		if (!initialized)
-			new FlxTimer().start(1, function(tmr:FlxTimer)
-			{
-				startIntro();
-			});
-		else
-			startIntro();
-		#else
 		startIntro();
-		#end
-		#end
 	}
 
 	var logoBl:FlxSprite;
@@ -226,15 +184,6 @@ class TitleState extends MusicBeatState
 
 			add(credGroup);
 			add(ngSpr);
-			/*var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
-				diamond.persist = true;
-				diamond.destroyOnNoUse = false;
-
-				FlxTransitionableState.defaultTransIn = new TransitionData(FADE, FlxColor.BLACK, 1, new FlxPoint(0, -1), {asset: diamond, width: 32, height: 32},
-					new FlxRect(-200, -200, FlxG.width * 1.4, FlxG.height * 1.4));
-				FlxTransitionableState.defaultTransOut = new TransitionData(FADE, FlxColor.BLACK, 0.7, new FlxPoint(0, 1),
-					{asset: diamond, width: 32, height: 32}, new FlxRect(-200, -200, FlxG.width * 1.4, FlxG.height * 1.4));
-			 */
 
 			transIn = FlxTransitionableState.defaultTransIn;
 			transOut = FlxTransitionableState.defaultTransOut;
@@ -436,12 +385,12 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = 'In association \nwith';
 			// credTextShit.screenCenter();
 			case 5:
-				if (Main.watermarks)
+				if (FlxG.save.data.watermarks)
 					createCoolText(['Kade Engine', 'by']);
 				else
 					createCoolText(['In Partnership', 'with']);
 			case 7:
-				if (Main.watermarks)
+				if (FlxG.save.data.watermarks)
 					addMoreText('KadeDeveloper');
 				else
 				{

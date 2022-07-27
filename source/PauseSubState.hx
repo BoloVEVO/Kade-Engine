@@ -65,19 +65,14 @@ class PauseSubState extends MusicBeatSubstate
 		"I'm not longer a minor :( (-Bolo)",
 		"We are gonna be using your fork as a base for myth engine (-Awoofle)",
 		"Cool ass looking shit. Imma go steal ur code and give u credit (-BeastlyGhost)",
-		"Camellia's 2.5 fork poggers. (-Bolo)"
+		"Camellia's 2.5 fork poggers. (-Bolo)",
+		"Psych Engine ass kisser. (-Jigsaw)",
 	];
 
 	public function new()
 	{
 		Paths.clearUnusedMemory();
 		super();
-
-		if (PlayState.instance.useVideo)
-		{
-			if (BackgroundVideo.get().playing)
-				BackgroundVideo.get().pause();
-		}
 
 		if (FlxG.sound.music.playing)
 			FlxG.sound.music.pause();
@@ -160,10 +155,6 @@ class PauseSubState extends MusicBeatSubstate
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 	}
 
-	#if !mobile
-	var oldPos = FlxG.mouse.getScreenPosition();
-	#end
-
 	override function update(elapsed:Float)
 	{
 		if (pauseMusic.volume < 0.5)
@@ -171,9 +162,9 @@ class PauseSubState extends MusicBeatSubstate
 
 		super.update(elapsed);
 
-		#if !mobile
 		if (FlxG.mouse.wheel != 0)
-			#if desktop
+		{
+			#if !html5
 			changeSelection(-FlxG.mouse.wheel);
 			#else
 			if (FlxG.mouse.wheel < 0)
@@ -181,7 +172,7 @@ class PauseSubState extends MusicBeatSubstate
 			if (FlxG.mouse.wheel > 0)
 				changeSelection(-1);
 			#end
-		#end
+		}
 
 		for (i in FlxG.sound.list)
 		{
@@ -199,14 +190,6 @@ class PauseSubState extends MusicBeatSubstate
 		var leftPcontroller:Bool = false;
 		var rightPcontroller:Bool = false;
 		var oldOffset:Float = 0;
-
-		if (gamepad != null && KeyBinds.gamepad)
-		{
-			upPcontroller = gamepad.justPressed.DPAD_UP;
-			downPcontroller = gamepad.justPressed.DPAD_DOWN;
-			leftPcontroller = gamepad.justPressed.DPAD_LEFT;
-			rightPcontroller = gamepad.justPressed.DPAD_RIGHT;
-		}
 
 		var songPath = 'assets/data/songs/${PlayState.SONG.songId}/';
 
@@ -235,12 +218,6 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.scrollSpeed = (FlxG.save.data.scrollSpeed == 1 ? PlayState.SONG.speed * PlayState.songMultiplier : FlxG.save.data.scrollSpeed * PlayState.songMultiplier);
 				case "Restart Song":
 					PlayState.startTime = 0;
-					if (PlayState.instance.useVideo)
-					{
-						BackgroundVideo.get().stop();
-						PlayState.instance.remove(PlayState.instance.videoSprite);
-						PlayState.instance.removedVideo = true;
-					}
 					MusicBeatState.switchState(new PlayState());
 					PlayState.stageTesting = false;
 				case "Options":
@@ -248,12 +225,6 @@ class PauseSubState extends MusicBeatSubstate
 					close();
 				case "Exit to menu":
 					PlayState.startTime = 0;
-					if (PlayState.instance.useVideo)
-					{
-						BackgroundVideo.get().stop();
-						PlayState.instance.remove(PlayState.instance.videoSprite);
-						PlayState.instance.removedVideo = true;
-					}
 					if (PlayState.loadRep)
 					{
 						FlxG.save.data.botplay = false;

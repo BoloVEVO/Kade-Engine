@@ -20,4 +20,3 @@ thorns:spirit:6:#17005c
 ugh:tankman:7:#C69803
 guns:tankman:7:#C69803
 stress:tankman:7:#C69803
-

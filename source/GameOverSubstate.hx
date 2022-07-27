@@ -9,7 +9,7 @@ import flixel.util.FlxTimer;
 
 class GameOverSubstate extends MusicBeatSubstate
 {
-	public var bf:Boyfriend;
+	public var bf:Character;
 
 	var camFollow:FlxObject;
 
@@ -44,7 +44,7 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		Conductor.songPosition = 0;
 
-		bf = new Boyfriend(x, y, daBf);
+		bf = new Character(x, y, daBf, true);
 		add(bf);
 
 		camFollow = new FlxObject(bf.getGraphicMidpoint().x, bf.getGraphicMidpoint().y, 1, 1);
@@ -72,7 +72,7 @@ class GameOverSubstate extends MusicBeatSubstate
 			endBullshit();
 		}
 
-		if (FlxG.save.data.InstantRespawn || FlxG.save.data.optimize)
+		if (FlxG.save.data.instantRespawn || FlxG.save.data.optimize)
 		{
 			LoadingState.loadAndSwitchState(new PlayState());
 		}

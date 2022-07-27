@@ -20,19 +20,16 @@
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
-	<window width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" />
+	<window width="1280" height="720" background="#000000" hardware="true" vsync="false" />
 
 	<!--HTML5-specific-->
-	<window if="html5" width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" resizable="true" />
+	<window if="html5" resizable="true" />
 
-	<!--Desktop-specific-->
-	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
+	<!--Desktop/Switch-specific-->
+	<window if="desktop || switch" orientation="landscape" fullscreen="false" resizable="true" />
 
 	<!--Mobile-specific-->
-	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" resizable="false"/>
-
-	<!--Switch-specific-->
-	<window if="switch" orientation="landscape" fullscreen="true" width="0" height="0" resizable="true" />
+	<window if="mobile" orientation="landscape" fullscreen="true" resizable="false"/>
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
@@ -49,21 +46,21 @@
 	<!-- Allowed inputs are mobile,desktop,web,ios,android,windows,mac,linux,switch,html5,cpp,neko,flash,js -->
 
 	<!-- Defines whether the Discord client should be enabled. Only works on desktop. -->
-	<haxedef name="FEATURE_DISCORD" if="desktop" />
+	<define name="FEATURE_DISCORD" if="desktop" />
 	<!-- Defines whether the file system can be read/written directly. Does not work in browser. -->
-	<haxedef name="FEATURE_FILESYSTEM"  if="desktop"/>
+	<define name="FEATURE_FILESYSTEM"  if="desktop"/>
 	<!-- Defines whether Lua Modcharts should be enabled -->
-	<haxedef name="FEATURE_LUAMODCHART" if="desktop" />
+	<define name="FEATURE_LUAMODCHART" if="desktop" />
 	<!-- Defines whether Sprite WebM videos should be enabled -->
-	<haxedef name="FEATURE_WEBM" if="desktop" />
+	<define name="FEATURE_WEBM" if="desktop" />
 	<!-- Defines whether StepMania files can be loaded. -->
-	<haxedef name="FEATURE_STEPMANIA" if="desktop" />
+	<define name="FEATURE_STEPMANIA" if="FEATURE_FILESYSTEM" />
 	<!-- Defines whether the Thread class can be used. -->
-	<haxedef name="FEATURE_MULTITHREADING" if="cpp" />
+	<define name="FEATURE_MULTITHREADING" if="cpp" />
 	<!-- Defines whether the mp4 videos should be enabled. -->
-	<define name="FEATURE_MP4VIDEOS" if="windows | linux" unless="32bits"/>
+	<define name="FEATURE_MP4VIDEOS" if="windows || web || android" unless="32bits"/>
 	<!-- Defines whether the Mods menu will display before launching. -->
-	<haxedef name="FEATURE_MODCORE" if="desktop" />
+	<define name="FEATURE_MODCORE" if="desktop" />
 
 	<!-- <define name="PRELOAD_ALL" /> -->
 	<define name="PRELOAD_ALL" unless="web"/>
@@ -72,8 +69,6 @@
 	<section if="PRELOAD_ALL">
 		<library name="songs"    preload="true" />
 		<library name="shared"   preload="true" />
-		<library name="tutorial" preload="true" />
-		<library name="week1"    preload="true" />
 		<library name="week2"    preload="true" />
 		<library name="week3"    preload="true" />
 		<library name="week4"    preload="true" />
@@ -87,8 +82,6 @@
 	<section if="NO_PRELOAD_ALL">
 		<library name="songs"    preload="false" />
 		<library name="shared"   preload="false" />
-		<library name="tutorial" preload="false" />
-		<library name="week1"    preload="false" />
 		<library name="week2"    preload="false" />
 		<library name="week3"    preload="false" />
 		<library name="week4"    preload="false" />
@@ -96,20 +89,14 @@
 		<library name="week6"    preload="false" />
 		<library name="week7"    preload="false" />
 		<library name="sm"    preload="false" />
-		<library name="videos"    preload="true" />
+		<library name="videos"    preload="false" />
 	</section>
-	
-	<assets path="assets/videos" library="videos"  exclude="*.webm|*.ogg|*.txt" if="windows | linux"/>
-	<assets path="assets/videos" library="videos" exclude="*.mp4"  unless="windows | linux"/>
-	<assets path="assets/videos" library="videos" exclude="cutscenes"/>
+
+	<assets path="assets/videos"   library="videos"   exclude="*.mp4"  unless="FEATURE_MP4VIDEOS"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.ogg" if="web"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.ogg" if="web"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.mp3" unless="web"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.ogg" if="web"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.mp3" unless="web"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/week2"    library="week2"    exclude="*.ogg" if="web"/>
 	<assets path="assets/week2"    library="week2"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/week3"    library="week3"    exclude="*.ogg" if="web"/>
@@ -125,33 +112,19 @@
 	<assets path="assets/sm"    library="sm"    exclude="*.ogg" if="web"/>
 	<assets path="assets/sm"    library="sm"    exclude="*.mp3" unless="web"/>
 
-	<assets path='example_mods' rename='mods' embed='false'/>
+	<assets path='mods' embed='false' />
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />
-	<assets path='LICENSE' rename='LICENSE.txt' />
-	<!-- <template path='mods' /> -->
-	
-	<!-- <assets path="CHANGELOG.md" rename='changelog.txt'/> -->
-
-	<!-- NOTE FOR FUTURE SELF SINCE FONTS ARE ALWAYS FUCKY 
-		TO FIX ONE OF THEM, I CONVERTED IT TO OTF. DUNNO IF YOU NEED TO
-		THEN UHHH I USED THE NAME OF THE FONT WITH SETFORMAT() ON THE TEXT!!!
-		NOT USING A DIRECT THING TO THE ASSET!!!
-	-->
-	<assets path="assets/fonts" embed='true'/>
+	<assets path='LICENSE.md' rename='LICENSE.txt' />
 
 	<!-- _______________________________ Libraries ______________________________ -->
 
 	<haxelib name="flixel" />
-	<haxedev set='webgl' />
-	
+	<haxedev set='webgl' if="html5" />
+
 	<!--In case you want to use the addons package-->
 	<haxelib name="flixel-addons" />
 	<haxelib name="hscript" />
-
 	<define name="hscriptPos" />
-
-	<haxelib name="actuate" />
-	<haxelib name="extension-webm"/> <!-- Make sure to use https://github.com/KadeDev/extension-webm/ -->
 
 	<!--In case you want to use the ui package-->
 	<haxelib name="flixel-ui" />
@@ -160,39 +133,10 @@
 	<haxelib name="discord_rpc" if="desktop"/>
 	<haxelib name="linc_luajit" if="desktop"/>
 	<haxelib name="hxvm-luajit" if="desktop"/>
-	<haxelib name="hxcpp-debug-server" if="desktop"/>
-	<haxelib name="hxCodec" if="FEATURE_MP4VIDEOS"/>
-
-	<!-- <haxelib name="markdown" /> -->
-	<!-- <haxelib name="HtmlParser" /> -->
-
-	
-
-	<!--In case you want to use nape with flixel-->
-	<!--<haxelib name="nape-haxe4" />-->
+	<haxelib name="hxCodec" if="FEATURE_MP4VIDEOS" unless="web"/>
+	<haxelib name="hxcpp-debug-server" if="cpp"/>
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
-
-	<!--Enable the Flixel core recording system-->
-	<!--<haxedef name="FLX_RECORD" />-->
-
-	<!--Disable the right and middle mouse buttons-->
-	<!-- <haxedef name="FLX_NO_MOUSE_ADVANCED" /> -->
-
-	<!--Disable the native cursor API on Flash-->
-	<!--<haxedef name="FLX_NO_NATIVE_CURSOR" />-->
-
-	<!--Optimise inputs, be careful you will get null errors if you don't use conditionals in your game-->
-	<!-- <haxedef name="FLX_NO_MOUSE" if="mobile" /> -->
-	<!-- <haxedef name="FLX_NO_KEYBOARD" if="mobile" /> -->
-	<!-- <haxedef name="FLX_NO_TOUCH" if="desktop" /> -->
-	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
-
-	<!--Disable the Flixel core sound tray-->
-	<!--<haxedef name="FLX_NO_SOUND_TRAY" />-->
-
-	<!--Disable the Flixel sound management code-->
-	<!--<haxedef name="FLX_NO_SOUND_SYSTEM" />-->
 
 	<!--Disable the Flixel core focus lost screen-->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
@@ -204,7 +148,7 @@
 
 	<!--Enable this for Nape release builds for a serious peformance improvement-->
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
-	
+
 	<!-- Show debug traces for hxCodec -->
 	<haxedef name="HXC_DEBUG_TRACE" if="debug" />
 
@@ -220,5 +164,4 @@
 	<icon path="art/icon256.png" size='256'/>
 	<icon path="art/icon512.png" size='512'/>
 	<icon path="art/iconOG.png" />
-
 </project>
