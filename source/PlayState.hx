@@ -1456,7 +1456,7 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function ughIntro(name:String):Void
+	function ughIntro():Void
 	{
 		inCinematic = true;
 
@@ -1479,7 +1479,7 @@ class PlayState extends MusicBeatState
 		camFollow.y += 100;
 	}
 
-	function gunsIntro(name:String):Void
+	function gunsIntro():Void
 	{
 		inCinematic = true;
 
@@ -1498,7 +1498,7 @@ class PlayState extends MusicBeatState
 		};
 	}
 
-	function stressIntro(name:String):Void
+	function stressIntro():Void
 	{
 		inCinematic = true;
 		var black:FlxSprite = new FlxSprite(-200, -200).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
