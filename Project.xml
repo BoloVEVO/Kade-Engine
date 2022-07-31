@@ -202,6 +202,11 @@
 	
 	<!-- Show debug traces for hxCodec -->
 	<haxedef name="HXC_DEBUG_TRACE" if="debug" />
+	
+	<!-- This Is For Crashing ERRORS! Used for Izzy Engine's crash handler -->
+	<haxedef name="HXCPP_STACK_TRACE" if="desktop"/>  <!--if you want stack traces--> 
+	<haxedef name="HXCPP_CHECK_POINTER" if="desktop" />
+	<haxedef name="HXCPP_STACK_LINE" if="desktop" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 
