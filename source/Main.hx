@@ -18,6 +18,7 @@ import openfl.display.FPS;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.utils.Assets as OpenFlAssets;
+#if !html5
 //crash handler stuff
 import lime.app.Application;
 import openfl.events.UncaughtErrorEvent;
@@ -26,6 +27,7 @@ import haxe.io.Path;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
+#end
 
 class Main extends Sprite
 {
@@ -129,7 +131,9 @@ class Main extends Sprite
 		// Finish up loading debug tools.
 		Debug.onGameStart();
 		
+		#if !html5
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
+		#end
 	}
 
 	var game:FlxGame;
@@ -190,6 +194,7 @@ class Main extends Sprite
 	
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
+	#if !html5 //because of how it show up on desktop
 	function onCrash(e:UncaughtErrorEvent):Void
 	{
 		if (FlxG.fullscreen)
@@ -230,4 +235,5 @@ class Main extends Sprite
 		DiscordClient.shutdown();
 		Sys.exit(1);
 	}
+	#end
 }
