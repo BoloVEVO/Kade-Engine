@@ -20,19 +20,16 @@
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
-	<window width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" />
+	<window width="1280" height="720" background="#000000" hardware="true" vsync="false" allow-shaders="true" require-shaders="true" />
 
 	<!--HTML5-specific-->
-	<window if="html5" width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" resizable="true" />
+	<window if="html5" resizable="true" />
 
-	<!--Desktop-specific-->
-	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
+	<!--Desktop/Switch-specific-->
+	<window if="desktop || switch" orientation="landscape" fullscreen="false" resizable="true" />
 
 	<!--Mobile-specific-->
-	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" resizable="false"/>
-
-	<!--Switch-specific-->
-	<window if="switch" orientation="landscape" fullscreen="true" width="0" height="0" resizable="true" />
+	<window if="mobile" orientation="landscape" fullscreen="true" resizable="false"/>
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
@@ -40,7 +37,7 @@
 	<set name="BUILD_DIR" value="export/release" unless="debug" />
 	<set name="BUILD_DIR" value="export/32bit" if="32bit" />
 
-	<classpath name="source" />
+	<source name="source" />
 
 	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
@@ -49,23 +46,22 @@
 	<!-- Allowed inputs are mobile,desktop,web,ios,android,windows,mac,linux,switch,html5,cpp,neko,flash,js -->
 
 	<!-- Defines whether the Discord client should be enabled. Only works on desktop. -->
-	<haxedef name="FEATURE_DISCORD" if="desktop" />
+	<define name="FEATURE_DISCORD" if="desktop" />
 	<!-- Defines whether the file system can be read/written directly. Does not work in browser. -->
-	<haxedef name="FEATURE_FILESYSTEM"  if="desktop"/>
+	<define name="FEATURE_FILESYSTEM"  if="desktop"/>
 	<!-- Defines whether Lua Modcharts should be enabled -->
-	<haxedef name="FEATURE_LUAMODCHART" if="desktop" />
+	<define name="FEATURE_LUAMODCHART" if="desktop" />
 	<!-- Defines whether StepMania files can be loaded. -->
-	<haxedef name="FEATURE_STEPMANIA" if="desktop" />
+	<define name="FEATURE_STEPMANIA" if="desktop" />
 	<!-- Defines whether the Thread class can be used. -->
-	<haxedef name="FEATURE_MULTITHREADING" if="cpp" />
+	<define name="FEATURE_MULTITHREADING" if="cpp" />
 	<!-- Defines whether the mp4 videos should be enabled. -->
 	<define name="FEATURE_MP4VIDEOS" unless="32bits"/>
 	<!-- Defines whether the Mods menu will display before launching. -->
-	<haxedef name="FEATURE_MODCORE" if="desktop" />
+	<define name="FEATURE_MODCORE" if="desktop" />
 
-	<!-- <define name="PRELOAD_ALL" /> -->
 	<define name="PRELOAD_ALL" unless="web"/>
-	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
+	<define name="NO_PRELOAD_ALL" if="web"/>
 	
 	<section if="PRELOAD_ALL">
 		<library name="songs"    preload="true" />
@@ -137,36 +133,22 @@
 
 	<!-- _______________________________ Libraries ______________________________ -->
 
+	<haxedev set='webgl' if="html5" />
+
 	<haxelib name="flixel" />
-	<haxedev set='webgl' />
-	
-	<!--In case you want to use the addons package-->
 	<haxelib name="flixel-addons" />
-	<haxelib name="hscript" />
-
-	<define name="hscriptPos" />
-
-	<haxelib name="actuate" />
-
-	<!--In case you want to use the ui package-->
 	<haxelib name="flixel-ui" />
-	<haxelib name="faxe" if='switch'/>
-	<haxelib name="polymod"/>
-	<haxelib name="discord_rpc" if="desktop"/>
-	<haxelib name="linc_luajit" if="desktop"/>
-	<haxelib name="hxvm-luajit" if="desktop"/>
-	<haxelib name="hxcpp-debug-server" if="desktop"/>
+	<haxelib name="hscript" />
+	<haxelib name="polymod" if="FEATURE_MODCORE"/>
+	<haxelib name="discord_rpc" if="FEATURE_DISCORD"/>
+	<haxelib name="linc_luajit" if="FEATURE_LUAMODCHART"/>
+	<haxelib name="hxcpp-debug-server" if="cpp"/>
 	<haxelib name="hxCodec" if="FEATURE_MP4VIDEOS" unless="web"/>
 
-	<!-- <haxelib name="markdown" /> -->
-	<!-- <haxelib name="HtmlParser" /> -->
-
-	
-
-	<!--In case you want to use nape with flixel-->
-	<!--<haxelib name="nape-haxe4" />-->
-
 	<!-- ______________________________ Haxedefines _____________________________ -->
+
+	<define name="hscriptPos" />
+	<haxeflag name="-dce no" />
 
 	<!--Enable the Flixel core recording system-->
 	<!--<haxedef name="FLX_RECORD" />-->
