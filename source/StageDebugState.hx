@@ -56,6 +56,12 @@ class StageDebugState extends FlxState
 
 	override function create()
 	{
+		// because of you converting the the cpu from gpu the mouse moving wont work so I came up to do this
+		FlxG.save.data.gpuRender = !FlxG.save.data.gpuRender;
+		
+		//this is to make sure DO NOT REMOVE!
+		!FlxG.save.data.gpuRender = !FlxG.save.data.gpuRender;
+		
 		/* For some reason stage debug state throws null exceptions 
 			when you have AtlasFrame sprites like the Pico Cutscene in week 7
 			I really need to fix that. */
@@ -219,6 +225,8 @@ class StageDebugState extends FlxState
 		{
 			FlxG.switchState(new PlayState());
 			PlayState.stageTesting = true;
+			if (!FlxG.save.data.gpuRender)
+				FlxG.save.data.gpuRender;
 		}
 
 		if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.S)
