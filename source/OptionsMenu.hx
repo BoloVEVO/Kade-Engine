@@ -396,7 +396,6 @@ class OptionsMenu extends FlxSubState
 		var any = false;
 		var escape = false;
 		var clickedCat = false;
-		var clickedOpt = false;
 
 		changedOption = false;
 
@@ -571,19 +570,17 @@ class OptionsMenu extends FlxSubState
 
 						if (selectedOptionIndex > options[selectedCatIndex].options.length - 1)
 						{
-							for (i in 0...selectedCat.options.length)
-							{
-								var opt = selectedCat.optionObjects.members[i];
-								opt.y = options[4].titleObject.y + 54 + (46 * i);
-							}
-							selectedOptionIndex = 0;
+								for (i in 0...selectedCat.options.length)
+								{
+									var opt = selectedCat.optionObjects.members[i];
+									opt.y = options[4].titleObject.y + 54 + (46 * i);
+								}
+								selectedOptionIndex = 0;
 						}
-
-						if (selectedOptionIndex != 0
-							&& selectedOptionIndex != options[selectedCatIndex].options.length - 1
-							&& options[selectedCatIndex].options.length > 6)
+	
+						if (selectedOptionIndex != 0 && options[selectedCatIndex].options.length > 6)
 						{
-							if (selectedOptionIndex >= (options[selectedCatIndex].options.length - 1) / 2)
+							if (selectedOptionIndex >= (options[selectedCatIndex].options.length - 1) / (2+options[selectedCatIndex].options.length*0.1))
 								for (i in selectedCat.optionObjects.members)
 								{
 									i.y -= 46;
@@ -605,24 +602,25 @@ class OptionsMenu extends FlxSubState
 						if (selectedOptionIndex < 0)
 						{
 							selectedOptionIndex = options[selectedCatIndex].options.length - 1;
-
-							if (options[selectedCatIndex].options.length > 6)
-								for (i in selectedCat.optionObjects.members)
+							if (options[selectedCatIndex].options.length > 6){
+								for (i in 0...selectedCat.options.length)
 								{
-									i.y -= (46 * ((options[selectedCatIndex].options.length - 1) / 2));
+									var opt = selectedCat.optionObjects.members[i];
+									opt.y = options[4].titleObject.y + 54 -(options[selectedCatIndex].options.length*(16+options[selectedCatIndex].options.length)) + (46 * i);
 								}
+							}
 						}
-
+	
 						if (selectedOptionIndex != 0 && options[selectedCatIndex].options.length > 6)
 						{
-							if (selectedOptionIndex >= (options[selectedCatIndex].options.length - 1) / 2)
+							if (selectedOptionIndex >= (options[selectedCatIndex].options.length - 1) / (2+options[selectedCatIndex].options.length*0.1))
 								for (i in selectedCat.optionObjects.members)
 								{
 									i.y += 46;
 								}
 						}
-
-						if (selectedOptionIndex < (options[selectedCatIndex].options.length - 1) / 2)
+	
+						if (selectedOptionIndex < (options[selectedCatIndex].options.length - 1) / (2+options[selectedCatIndex].options.length*0.1))
 						{
 							for (i in 0...selectedCat.options.length)
 							{

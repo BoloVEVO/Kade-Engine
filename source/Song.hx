@@ -11,10 +11,10 @@ class Event
 {
 	public var name:String;
 	public var position:Float;
-	public var value:Float;
+	public var value:Any;
 	public var type:String;
 
-	public function new(name:String, pos:Float, value:Float, type:String)
+	public function new(name:String, pos:Float, value:Any, type:String)
 	{
 		this.name = name;
 		this.position = pos;

@@ -1,5 +1,5 @@
 version: '{build}'
-image: Ubuntu2004
+image: ubuntu-22.04
 environment:
   global:
     HAXELIB_ROOT: /home/appveyor/haxelib
@@ -7,7 +7,6 @@ environment:
 
 install:
   - cd /home/appveyor
-  - sudo add-apt-repository ppa:haxe/releases -y
   - sudo apt update
   - sudo apt install neko tar gcc-7 g++-7 gcc-7-multilib g++-7-multilib -y
   - wget https://github.com/HaxeFoundation/haxe/releases/download/4.2.4/haxe-4.2.4-linux64.tar.gz
@@ -24,7 +23,7 @@ install:
   - haxelib install flixel-addons
   - haxelib install flixel-ui
   - haxelib install hscript
-  - haxelib install hxCodec
+  - haxelib git hxCodec https://github.com/polybiusproxy/hxCodec
   - haxelib git faxe https://github.com/uhrobots/faxe
   - haxelib git polymod https://github.com/larsiusprime/polymod.git
   - haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc

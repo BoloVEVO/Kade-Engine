@@ -1,12 +1,12 @@
 {
 	"name": "Boyfriend holding GF",
 	"asset": "characters/bfAndGF",
-	"flipX": true,
 	"barColor": "#31B0D1",
 	"camPos": [0,0],
-	"holdLength": 4,
+	"holdLength": 1,
 	"scale": 1,
 	"startingAnim": "idle",
+	"flipX": true,
 	"animations": [
 		{
 			"offsets": [-5,0],

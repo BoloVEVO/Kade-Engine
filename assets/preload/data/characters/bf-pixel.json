@@ -2,10 +2,11 @@
   "name": "Boyfriend (Pixel Day)",
   "asset": "characters/bfPixel",
   "barColor": "#31B0D1",
-  "flipX": true,
   "scale": 6,
   "antialiasing": false,
   "startingAnim": "idle",
+  "flipX": true,
+  "holdLenght": 1,
   "animations": [
     {
       "name": "idle",

@@ -2,7 +2,6 @@
   "name": "Pico",
   "asset": "characters/Pico_FNF_assetss",
   "barColor": "#B7D855",
-  "flipX": true,
   "startingAnim": "idle",
   "camPos": [600, 0],
   "animations": [

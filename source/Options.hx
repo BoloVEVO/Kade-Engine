@@ -1489,7 +1489,11 @@ class WatermarkOption extends Option
 		Main.watermarks = !Main.watermarks;
 		FlxG.save.data.watermark = Main.watermarks;
 		FlxG.sound.music.stop();
-		FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
+		if (!PlayState.inDaPlay)
+		{
+			FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
+			MainMenuState.freakyPlaying = true;
+		}
 		Conductor.changeBPM(102);
 		KadeEngineFPS.updateEngineName();
 		display = updateDisplay();

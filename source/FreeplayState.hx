@@ -44,6 +44,9 @@ class FreeplayState extends MusicBeatState
 	public static var rate:Float = 1.0;
 
 	public static var curSelected:Int = 0;
+
+	public static var curPlayed:Int = 0;
+
 	public static var curDifficulty:Int = 1;
 
 	var scoreText:FlxText;
@@ -97,11 +100,6 @@ class FreeplayState extends MusicBeatState
 		Paths.clearUnusedMemory();
 
 		PlayState.wentToChartEditor = false;
-		if (!FlxG.sound.music.playing)
-		{
-			FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
-			MainMenuState.freakyPlaying = true;
-		}
 
 		list = CoolUtil.coolTextFile(Paths.txt('data/freeplaySonglist'));
 
@@ -170,7 +168,7 @@ class FreeplayState extends MusicBeatState
 		isDebug = true;
 		#end
 
-		persistentUpdate = true;
+		persistentUpdate = persistentDraw = true;
 
 		// LOAD CHARACTERS
 		bg.antialiasing = FlxG.save.data.antialiasing;
@@ -285,6 +283,37 @@ class FreeplayState extends MusicBeatState
 		PlayStateChangeables.healthLoss = FlxG.save.data.hloss;
 		PlayStateChangeables.practiceMode = FlxG.save.data.practice;
 		PlayStateChangeables.skillIssue = FlxG.save.data.noMisses;
+
+		if (MainMenuState.freakyPlaying)
+		{
+			if (!FlxG.sound.music.playing)
+				FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
+			Conductor.changeBPM(102);
+		}
+
+		#if desktop
+		if (!FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
+		{
+			try
+			{
+				var hmm = songData.get(songs[curSelected].songName)[curDifficulty];
+				FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0.7, true);
+				curPlayed = curSelected;
+				FlxG.sound.music.fadeIn(0.75, 0, 0.8);
+				MainMenuState.freakyPlaying = false;
+
+				Conductor.changeBPM(hmm.bpm);
+				Conductor.mapBPMChanges(hmm);
+				Conductor.bpm = hmm.bpm;
+
+				Paths.clearUnusedMemory();
+			}
+			catch (e)
+			{
+				Debug.logError(e);
+			}
+		}
+		#end
 
 		super.create();
 	}
@@ -466,9 +495,13 @@ class FreeplayState extends MusicBeatState
 		}
 	}
 
+	public var updateFrame = 0;
+
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+
+		Conductor.songPosition = FlxG.sound.music.time * rate;
 
 		if (FlxG.sound.music.volume < 0.7)
 		{
@@ -556,6 +589,20 @@ class FreeplayState extends MusicBeatState
 		}
 		previewtext.text = "Rate: " + FlxMath.roundDecimal(rate, 2) + "x";
 
+		if (!MainMenuState.freakyPlaying)
+		{
+			var bpmRatio = Conductor.bpm / 100;
+			if (FlxG.save.data.camzoom)
+			{
+				FlxG.camera.zoom = FlxMath.lerp(1, FlxG.camera.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125 * bpmRatio * rate), 0, 1));
+			}
+
+			var mult:Float = FlxMath.lerp(1, iconArray[curSelected].scale.x, CoolUtil.boundTo(1 - (elapsed * 35 * rate), 0, 1));
+			iconArray[curSelected].scale.set(mult, mult);
+
+			iconArray[curSelected].updateHitbox();
+		}
+
 		previewtext.alpha = 1;
 
 		if (FlxG.keys.justPressed.CONTROL && !openMod && !MusicBeatState.switchingState)
@@ -569,7 +616,6 @@ class FreeplayState extends MusicBeatState
 		{
 			if (FlxG.keys.pressed.SHIFT) // && songs[curSelected].songName.toLowerCase() != "tutorial")
 			{
-				var songHighscore = StringTools.replace(songs[curSelected].songName, " ", "-");
 				if (FlxG.keys.justPressed.LEFT)
 				{
 					rate -= 0.05;
@@ -613,8 +659,17 @@ class FreeplayState extends MusicBeatState
 			{
 				try
 				{
+					var hmm = songData.get(songs[curSelected].songName)[curDifficulty];
 					FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0.7, true);
+					curPlayed = curSelected;
+					FlxG.sound.music.fadeIn(0.75, 0, 0.8);
 					MainMenuState.freakyPlaying = false;
+
+					Conductor.changeBPM(hmm.bpm);
+					Conductor.mapBPMChanges(hmm);
+					Conductor.bpm = hmm.bpm;
+
+					Paths.clearUnusedMemory();
 				}
 				catch (e)
 				{
@@ -622,6 +677,54 @@ class FreeplayState extends MusicBeatState
 				}
 			}
 			#end
+		}
+
+		var hmm = songData.get(songs[curPlayed].songName)[curDifficulty];
+
+		TimingStruct.clearTimings();
+		var currentIndex = 0;
+		if (hmm != null && hmm.eventObjects != null)
+		{
+			for (i in hmm.eventObjects)
+			{
+				if (i.type == "BPM Change")
+				{
+					var beat:Float = i.position * rate;
+
+					var endBeat:Float = Math.POSITIVE_INFINITY;
+
+					var bpm = Std.parseInt(i.value) * rate;
+
+					TimingStruct.addTiming(beat, bpm, endBeat, 0); // offset in this case = start time since we don't have a offset
+					if (currentIndex != 0)
+					{
+						var data = TimingStruct.AllTimings[currentIndex - 1];
+						data.endBeat = beat;
+						data.length = ((data.endBeat - data.startBeat) / (data.bpm / 60)) / rate;
+						var step = (((60 / data.bpm) * 1000) / rate) / 4;
+
+						TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step) / rate);
+						TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length / rate;
+					}
+					currentIndex++;
+				}
+			}
+		}
+
+		if (FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
+		{
+			var timingSeg = TimingStruct.getTimingAtBeat(curDecimalBeat);
+
+			if (timingSeg != null)
+			{
+				var timingSegBpm = timingSeg.bpm;
+
+				if (timingSegBpm != Conductor.bpm)
+				{
+					Debug.logInfo("BPM CHANGE to " + timingSegBpm);
+					Conductor.changeBPM(timingSegBpm, false);
+				}
+			}
 		}
 
 		#if cpp
@@ -660,7 +763,6 @@ class FreeplayState extends MusicBeatState
 			if (controls.BACK)
 			{
 				MusicBeatState.switchState(new MainMenuState());
-				clean();
 				if (colorTween != null)
 				{
 					colorTween.cancel();
@@ -700,6 +802,34 @@ class FreeplayState extends MusicBeatState
 
 			for (item in grpSongs.members)
 				item.alpha = 0;
+		}
+	}
+
+	override function beatHit()
+	{
+		super.beatHit();
+	}
+
+	override function stepHit()
+	{
+		super.stepHit();
+
+		if (!MainMenuState.freakyPlaying)
+		{
+			if (curStep % Math.round(1 * rate) == 0)
+			{
+				if (FlxG.save.data.camzoom && FlxG.camera.zoom < 1.35 && curStep % 16 == 0)
+				{
+					FlxG.camera.zoom += 0.03 / rate;
+				}
+			}
+
+			if (curStep % Math.round(4 * rate) == 0)
+			{
+				iconArray[curSelected].scale.set(1.2, 1.2);
+
+				iconArray[curSelected].updateHitbox();
+			}
 		}
 	}
 
@@ -905,11 +1035,7 @@ class FreeplayState extends MusicBeatState
 		{
 			hmm = songData.get(songs[curSelected].songName)[curDifficulty];
 			if (hmm != null)
-			{
-				if (FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
-					Conductor.changeBPM(hmm.bpm);
 				GameplayCustomizeState.freeplayNoteStyle = hmm.noteStyle;
-			}
 		}
 		catch (ex)
 		{

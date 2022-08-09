@@ -36,7 +36,7 @@ class PauseSubState extends MusicBeatSubstate
 	var perSongOffset:FlxText;
 
 	var offsetChanged:Bool = false;
-	var startOffset:Float = PlayState.songOffset;
+	var startOffset:Float = PlayState.SONG.offset;
 
 	var bg:FlxSprite;
 
@@ -48,6 +48,7 @@ class PauseSubState extends MusicBeatSubstate
 		"Dead engine? (-Bolo)",
 		"Amber best Pyro bow user fuck you! (-Bolo)",
 		"I love watching Yosuga No Sora with my sister. (-Bolo)", // Wtf 💀
+		"God i love futabu!! so fucking much (-McChomk)", // God died in vain 💀
 		"Lag issues? Don't worry we are currently mining cryptocurrencies with ur pc :D (-Bolo)",
 		"Are you really reading this thing? (-Bolo)",
 		"I fced Sex mod with only one hand! (-Bolo)",
@@ -107,7 +108,7 @@ class PauseSubState extends MusicBeatSubstate
 		add(bg);
 
 		var levelInfo:FlxText = new FlxText(20, 15, 0, "", 32);
-		levelInfo.text += PlayState.instance.songFixedName.toUpperCase();
+		levelInfo.text += PlayState.SONG.songName.toUpperCase();
 		levelInfo.scrollFactor.set();
 		levelInfo.setFormat(Paths.font("vcr.ttf"), 32);
 		levelInfo.updateHitbox();
@@ -253,8 +254,6 @@ class PauseSubState extends MusicBeatSubstate
 					#end
 					if (FlxG.save.data.fpsCap > 300)
 						(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
-
-					PlayState.instance.clean();
 
 					if (PlayState.isStoryMode)
 					{

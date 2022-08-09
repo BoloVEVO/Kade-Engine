@@ -1,6 +1,5 @@
 package;
 
-import flixel.system.FlxBGSprite;
 import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.FlxBasic;
@@ -10,8 +9,8 @@ import flixel.addons.effects.chainable.FlxWaveEffect;
 import flixel.util.FlxTimer;
 import flixel.math.FlxMath;
 import flixel.math.FlxAngle;
-import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import flixel.util.FlxColor;
 
 class Stage extends MusicBeatState
 {
@@ -661,6 +660,12 @@ class Stage extends MusicBeatState
 						swagBacks['foreGround5'] = foreGround5;
 						layInFront[2].push(foreGround5);
 					}
+				case 'void': // In case you want to do chart with videos.
+					camZoom = 0.9;
+					curStage = 'void';
+					var black:FlxSprite = new FlxSprite().makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
+					black.scrollFactor.set(0, 0);
+					toAdd.push(black);
 
 				default:
 					{

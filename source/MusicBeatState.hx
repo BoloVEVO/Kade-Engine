@@ -2,24 +2,20 @@ package;
 
 import Conductor.BPMChangeEvent;
 import flixel.FlxBasic;
-import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.addons.transition.FlxTransitionableState;
-import GlobalUIState;
-import flixel.math.FlxMath;
-import flixel.text.FlxText;
-import flixel.util.FlxColor;
 import lime.app.Application;
 import openfl.Lib;
 import flixel.addons.ui.FlxUI;
 import flixel.FlxSprite;
-import openfl.system.System;
+import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.addons.ui.FlxUIState;
 #if FEATURE_DISCORD
 import Discord.DiscordClient;
 #end
 
-class MusicBeatState extends GlobalUIState
+class MusicBeatState extends FlxUIState
 {
 	private var lastBeat:Float = 0;
 	private var lastStep:Float = 0;
@@ -51,11 +47,29 @@ class MusicBeatState extends GlobalUIState
 
 	public function destroyObject(Object:Dynamic):Void
 	{
-		Object.kill();
-		Object.alive = false;
-		remove(Object, true);
-		Object.destroy();
-		Object = null;
+		if (Std.isOfType(Object, FlxSprite))
+		{
+			var spr:FlxSprite = cast(Object, FlxSprite);
+			spr.kill();
+			remove(spr, true);
+			spr.destroy();
+			spr = null;
+		}
+		else if (Std.isOfType(Object, FlxTypedGroup))
+		{
+			var grp:FlxTypedGroup<Dynamic> = cast(Object, FlxTypedGroup<Dynamic>);
+			for (ObjectGroup in grp.members)
+			{
+				if (Std.isOfType(ObjectGroup, FlxSprite))
+				{
+					var spr:FlxSprite = cast(ObjectGroup, FlxSprite);
+					spr.kill();
+					remove(spr, true);
+					spr.destroy();
+					spr = null;
+				}
+			}
+		}
 	}
 
 	override function add(Object:FlxBasic):FlxBasic
@@ -89,20 +103,17 @@ class MusicBeatState extends GlobalUIState
 
 	public function clean()
 	{
-		if (FlxG.save.data.optimize)
+		#if FEATURE_MULTITHREADING
+		for (i in MasterObjectLoader.Objects)
 		{
-			#if FEATURE_MULTITHREADING
-			for (i in MasterObjectLoader.Objects)
-			{
-				destroyObject(i);
-			}
-			#else
-			for (i in assets)
-			{
-				remove(i);
-			}
-			#end
+			destroyObject(i);
 		}
+		#else
+		for (i in assets)
+		{
+			remove(i);
+		}
+		#end
 	}
 
 	override function create()

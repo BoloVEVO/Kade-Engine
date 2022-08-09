@@ -59,7 +59,7 @@ If you get an error telling you that you need a newer macOS version, you need to
 ## Cloning the repository
 Since you already installed `git` in a previous step, we'll use it to clone the repository.
 1. `cd` to where you want to store the source code (i.e. `C:\Users\username\Desktop` or `~/Desktop`)
-2. `git clone https://github.com/BoloVEVO/Kade-Engine.git`
+2. `git clone https://github.com/BoloVEVO/Kade-Engine-Public.git`
 3. `cd` into the source code: `cd Kade-Engine`
 4. (optional) If you want to build a specific version of Kade Engine, you can use `git checkout` to switch to it (i.e. `git checkout 1.4-KE`) (remember that versions 1.4 and older cannot build to Linux or HTML5)
 - You should **not** do this if you are planning to contribute, as you should always be developing on the latest version.

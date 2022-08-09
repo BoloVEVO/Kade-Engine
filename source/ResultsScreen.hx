@@ -100,7 +100,7 @@ class ResultsScreen extends FlxSubState
 		if (!PlayState.isStoryMode)
 		{
 			songText = new FlxText(20, -65, FlxG.width,
-				'Played on ${PlayState.instance.songFixedName} - ${CoolUtil.difficultyFromInt(PlayState.storyDifficulty).toUpperCase()}');
+				'Played on ${PlayState.SONG.songName} - ${CoolUtil.difficultyFromInt(PlayState.storyDifficulty).toUpperCase()}');
 			songText.size = 34;
 			songText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 			songText.color = FlxColor.WHITE;
@@ -293,7 +293,6 @@ class ResultsScreen extends FlxSubState
 				Conductor.changeBPM(102);
 				MusicBeatState.switchState(new FreeplayState());
 			}
-			PlayState.instance.clean();
 		}
 
 		if (FlxG.keys.justPressed.F1 && !PlayState.loadRep)
@@ -309,7 +308,6 @@ class ResultsScreen extends FlxSubState
 			PlayState.isStoryMode = false;
 			PlayState.storyDifficulty = PlayState.storyDifficulty;
 			LoadingState.loadAndSwitchState(new PlayState());
-			PlayState.instance.clean();
 		}
 
 		super.update(elapsed);

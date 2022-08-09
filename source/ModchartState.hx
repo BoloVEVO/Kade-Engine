@@ -503,6 +503,11 @@ class ModchartState
 
 		// sprites
 
+		Lua_helper.add_callback(lua, "initBackgroundOverlayVideo", function(vidPath:String, type:String, layInFront:Bool)
+		{
+			PlayState.instance.backgroundOverlayVideo(vidPath, type, layInFront);
+		});
+
 		Lua_helper.add_callback(lua, "setNoteWiggle", function(wiggleId)
 		{
 			PlayState.instance.camNotes.setFilters([new ShaderFilter(luaWiggles.get(wiggleId).shader)]);

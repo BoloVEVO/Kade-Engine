@@ -4,9 +4,9 @@
   "barColor": "#e1e1e1",
   "startingAnim": "idle",
   "holdLength": 4,
-  "flipX": true,
   "camPos":[0,0],
   "charPos":[0,240],
+  "flipX":true,
   "animations": [
     {
       "name": "idle",

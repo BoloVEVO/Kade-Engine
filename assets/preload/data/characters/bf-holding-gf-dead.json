@@ -1,6 +1,5 @@
 {
 	"asset": "characters/bfHoldingGF-DEAD",
-	"flipX": true,
 	"barColor": "#31B0D1",
 	"camPos": [0,0],
 	"holdLength": 4,

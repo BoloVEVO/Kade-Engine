@@ -179,10 +179,8 @@ class TitleState extends MusicBeatState
 
 		#if FREEPLAY
 		MusicBeatState.switchState(new FreeplayState());
-		clean();
 		#elseif CHARTING
 		MusicBeatState.switchState(new ChartingState());
-		clean();
 		#else
 		#if !cpp
 		if (!initialized)
@@ -318,12 +316,10 @@ class TitleState extends MusicBeatState
 				if (MainMenuState.updateShit)
 				{
 					MusicBeatState.switchState(new OutdatedSubState());
-					clean();
 				}
 				else
 				{
 					MusicBeatState.switchState(new MainMenuState());
-					clean();
 				}
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
@@ -362,7 +358,6 @@ class TitleState extends MusicBeatState
 		http.onError = function(error)
 		{
 			Debug.logError('error: $error');
-			clean();
 		}
 
 		http.request();

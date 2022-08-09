@@ -157,6 +157,7 @@ class StoryMenuState extends MusicBeatState
 			if (!FlxG.sound.music.playing)
 			{
 				FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
+				MainMenuState.freakyPlaying = true;
 				Conductor.changeBPM(102);
 			}
 		}
@@ -406,7 +407,6 @@ class StoryMenuState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			movedBack = true;
 			MusicBeatState.switchState(new MainMenuState());
-			clean();
 		}
 
 		if (FlxG.sound.music != null)

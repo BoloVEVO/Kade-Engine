@@ -280,7 +280,6 @@ class MainMenuState extends MusicBeatState
 	function goToState()
 	{
 		var daChoice:String = optionShit[curSelected];
-		clean();
 		switch (daChoice)
 		{
 			case 'story mode':
