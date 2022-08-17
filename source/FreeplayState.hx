@@ -296,15 +296,12 @@ class FreeplayState extends MusicBeatState
 		{
 			try
 			{
+				rate = 1;
 				var hmm = songData.get(songs[curSelected].songName)[curDifficulty];
 				FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0.7, true);
 				curPlayed = curSelected;
 				FlxG.sound.music.fadeIn(0.75, 0, 0.8);
 				MainMenuState.freakyPlaying = false;
-
-				Conductor.changeBPM(hmm.bpm);
-				Conductor.mapBPMChanges(hmm);
-				Conductor.bpm = hmm.bpm;
 
 				Paths.clearUnusedMemory();
 			}
@@ -816,12 +813,9 @@ class FreeplayState extends MusicBeatState
 
 		if (!MainMenuState.freakyPlaying)
 		{
-			if (curStep % Math.round(1 * rate) == 0)
+			if (FlxG.save.data.camzoom && FlxG.camera.zoom < 1.35 && curStep % Math.round(16 * rate) == 0)
 			{
-				if (FlxG.save.data.camzoom && FlxG.camera.zoom < 1.35 && curStep % 16 == 0)
-				{
-					FlxG.camera.zoom += 0.03 / rate;
-				}
+				FlxG.camera.zoom += 0.03 / rate;
 			}
 
 			if (curStep % Math.round(4 * rate) == 0)

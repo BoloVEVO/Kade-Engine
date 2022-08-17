@@ -341,7 +341,6 @@ class Note extends FlxSprite
 				tooLate = true;
 		}
 
-		var bpmRatio = PlayState.SONG.bpm / 100;
 		if (isSustainNote)
 			isSustainEnd = spotInLine == parent.children.length - 1;
 

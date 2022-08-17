@@ -3804,7 +3804,10 @@ class PlayState extends MusicBeatState
 						if (songStarted)
 							if (daNote.sustainActive)
 								if (!daNote.mustPress
-									|| (daNote.mustPress && holdArray[Math.floor(Math.abs(daNote.noteData))])
+									|| (daNote.mustPress
+										&& (holdArray[Math.floor(Math.abs(daNote.noteData))]
+											|| daNote.isSustainEnd
+											|| !daNote.isSustainEnd))
 									|| PlayStateChangeables.botPlay)
 								{
 									if (daNote.y - daNote.offset.y * daNote.scale.y + daNote.height >= origin)
@@ -3827,7 +3830,7 @@ class PlayState extends MusicBeatState
 						{
 							if (daNote.sustainActive)
 								if (((!daNote.mustPress || daNote.wasGoodHit))
-									|| (daNote.mustPress && holdArray[Math.floor(Math.abs(daNote.noteData))])
+									|| (daNote.mustPress && (holdArray[Math.floor(Math.abs(daNote.noteData))] || daNote.isSustainEnd))
 									|| PlayStateChangeables.botPlay)
 								{
 									// Clip to strumline
@@ -3907,29 +3910,30 @@ class PlayState extends MusicBeatState
 								}
 								else
 								{
-									if (!daNote.wasGoodHit
-										&& daNote.isSustainNote
-										&& daNote.sustainActive
-										&& daNote.spotInLine < daNote.parent.children.length)
-									{
-										// health -= 0.05; // give a health punishment for failing a LN
-										Debug.logTrace("User released key while at the end of the sustain note at: " + daNote.spotInLine);
-										for (i in daNote.parent.children)
+									/*if (!daNote.wasGoodHit
+											&& daNote.isSustainNote
+											&& daNote.sustainActive
+											&& daNote.spotInLine < daNote.parent.children.length)
 										{
-											i.alpha = 0.3;
-											i.sustainActive = false;
-											if (!PlayStateChangeables.opponentMode)
-												health -= (0.08 * PlayStateChangeables.healthLoss) / daNote.parent.children.length;
-											else
-												health += (0.08 * PlayStateChangeables.healthLoss) / daNote.parent.children.length;
+											// health -= 0.05; // give a health punishment for failing a LN
+											Debug.logTrace("User released key while at the end of the sustain note at: " + daNote.spotInLine);
+											for (i in daNote.parent.children)
+											{
+												i.alpha = 0.3;
+												i.sustainActive = false;
+												if (!PlayStateChangeables.opponentMode)
+													health -= (0.08 * PlayStateChangeables.healthLoss) / daNote.parent.children.length;
+												else
+													health += (0.08 * PlayStateChangeables.healthLoss) / daNote.parent.children.length;
+											}
+											if (daNote.parent.wasGoodHit)
+											{
+												totalNotesHit -= 1;
+											}
+											noteMiss(daNote.noteData, daNote);
 										}
-										if (daNote.parent.wasGoodHit)
-										{
-											totalNotesHit -= 1;
-										}
-										noteMiss(daNote.noteData, daNote);
-									}
-									else if (!daNote.wasGoodHit && !daNote.isSustainNote)
+										else */
+									if (!daNote.wasGoodHit && !daNote.isSustainNote)
 									{
 										if (!PlayStateChangeables.opponentMode)
 											health -= (0.04 * PlayStateChangeables.healthLoss);
