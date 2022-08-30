@@ -81,6 +81,9 @@ class KadeEngineData
 		if (FlxG.save.data.frames == null)
 			FlxG.save.data.frames = 10;
 
+		if (FlxG.save.data.alpha == null)
+			FlxG.save.data.alpha = 0.6;	
+
 		if (FlxG.save.data.accuracyMod == null)
 			FlxG.save.data.accuracyMod = 1;
 

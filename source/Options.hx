@@ -2321,6 +2321,56 @@ class ResetScoreOption extends Option
 	}
 }
 
+class ScrollAlpha extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+		acceptValues = true;
+	}
+
+	public override function press():Bool
+	{
+		return false;
+	}
+
+	private override function updateDisplay():String
+	{
+		return (FlxG.save.data.alpha ? "Scroll Alpha" : "Scroll Alpha");
+	}
+
+	override function right():Bool
+	{
+		FlxG.save.data.alpha += 0.1;
+
+		if (FlxG.save.data.alpha < 0)
+			FlxG.save.data.alpha = 0;
+
+		if (FlxG.save.data.alpha > 1)
+			FlxG.save.data.alpha = 1;
+		return true;
+	}
+
+	override function getValue():String
+	{
+		return "Current Scroll transparency: " + HelperFunctions.truncateFloat(FlxG.save.data.alpha, 1);
+	}
+
+	override function left():Bool
+	{
+		FlxG.save.data.alpha -= 0.1;
+
+		if (FlxG.save.data.alpha < 0)
+			FlxG.save.data.alpha = 0;
+
+		if (FlxG.save.data.alpha > 1)
+			FlxG.save.data.alpha = 1;
+
+		return true;
+	}
+}
+
 class ResetSettings extends Option
 {
 	var confirm:Bool = false;

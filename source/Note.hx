@@ -243,7 +243,7 @@ class Note extends FlxSprite
 			noteYOff = -stepHeight + swagWidth * 0.5;
 
 			noteScore * 0.2;
-			alpha = 0.6;
+			alpha = FlxG.save.data.alpha;
 
 			if (FlxG.save.data.downscroll)
 				flipY = true;
