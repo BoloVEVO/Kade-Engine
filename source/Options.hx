@@ -2354,7 +2354,7 @@ class ScrollAlpha extends Option
 
 	override function getValue():String
 	{
-		return "Current Scroll transparency: " + HelperFunctions.truncateFloat(FlxG.save.data.alpha, 1);
+		return "Hold note transparency: < " + HelperFunctions.truncateFloat(FlxG.save.data.alpha, 1) + " >";
 	}
 
 	override function left():Bool
