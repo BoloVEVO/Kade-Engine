@@ -516,4 +516,14 @@ class Paths
 
 		return AtlasFrameMaker.construct(key, library, excludeArray);
 	}
+				
+	inline static public function getJSONAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool)
+	{
+		gpuRender = gpuRender != null ? gpuRender : FlxG.save.data.gpuRender;
+		if (isCharacter)
+			return FlxAtlasFrames.fromTexturePackerJson(image('characters/$key', library, gpuRender), file('images/characters/$key.json', library));
+
+		return FlxAtlasFrames.fromTexturePackerJson(image(key, library), file('images/$key.json', library));
+	}
+
 }
