@@ -6370,11 +6370,9 @@ class PlayState extends MusicBeatState
 			pixelShitPart4 = 'week6';
 		}
 
-		Paths.image(pixelShitPart1 + "sick" + pixelShitPart2, pixelShitPart3);
-		Paths.image(pixelShitPart1 + "good" + pixelShitPart2, pixelShitPart3);
-		Paths.image(pixelShitPart1 + "bad" + pixelShitPart2, pixelShitPart3);
-		Paths.image(pixelShitPart1 + "shit" + pixelShitPart2, pixelShitPart3);
-		Paths.image(pixelShitPart1 + "combo" + pixelShitPart2, pixelShitPart3);
+		var things:Array<String> = ['sick', 'good', 'bad', 'shit', 'combo'];
+		for (precaching in things)
+			Paths.image(pixelShitPart1 + precaching + pixelShitPart2, pixelShitPart3);
 
 		for (i in 0...10)
 		{
@@ -6399,10 +6397,9 @@ class PlayState extends MusicBeatState
 		for (asset in introAlts)
 			Paths.image(asset, week6Bullshit);
 
-		Paths.sound('intro3' + altSuffix);
-		Paths.sound('intro2' + altSuffix);
-		Paths.sound('intro1' + altSuffix);
-		Paths.sound('introGo' + altSuffix);
+		var things:Array<String> = ['intro3', 'intro2', 'intro1', 'introGo'];
+		for (precaching in things)
+			Paths.sound(precaching + altSuffix);
 	}
 
 	function startVideo(name:String):Void
