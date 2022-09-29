@@ -666,7 +666,7 @@ class OptionsMenu extends FlxSubState
 					{
 						FlxG.sound.play(Paths.sound('scrollMenu'));
 
-						if (selectedCatIndex >= 4)
+						if (selectedCatIndex >= 5)
 							selectedCatIndex = 0;
 
 						PlayerSettings.player1.controls.loadKeyBinds();
