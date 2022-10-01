@@ -192,6 +192,8 @@
 	<haxedef name="HXCPP_STACK_TRACE" if="desktop"/>  <!--if you want stack traces--> 
 	<haxedef name="HXCPP_CHECK_POINTER" if="desktop" />
 	<haxedef name="HXCPP_STACK_LINE" if="desktop" />
+	
+	<haxedef name="no-deprecation-warnings" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 
