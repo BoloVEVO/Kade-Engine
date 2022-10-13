@@ -3958,31 +3958,32 @@ class PlayState extends MusicBeatState
 				}
 
 				// HOLD KEY RELEASE SHIT
-				if (daNote.mustPress)
-				{
-					if (!daNote.wasGoodHit
-						&& daNote.isSustainNote
-						&& daNote.sustainActive
-						&& !daNote.isSustainEnd
-						&& !holdArray[Std.int(Math.abs(daNote.noteData))])
+				if (!FlxG.save.data.botplay)
+					if (daNote.mustPress)
 					{
-						Debug.logTrace("User released key while playing a sustain at: " + daNote.spotInLine);
-						for (i in daNote.parent.children)
+						if (!daNote.wasGoodHit
+							&& daNote.isSustainNote
+							&& daNote.sustainActive
+							&& !daNote.isSustainEnd
+							&& !holdArray[Std.int(Math.abs(daNote.noteData))])
 						{
-							i.alpha = 0.3;
-							i.sustainActive = false;
-							if (!PlayStateChangeables.opponentMode)
-								health -= (0.08 * PlayStateChangeables.healthLoss) / daNote.parent.children.length;
-							else
-								health += (0.08 * PlayStateChangeables.healthLoss) / daNote.parent.children.length;
+							Debug.logTrace("User released key while playing a sustain at: " + daNote.spotInLine);
+							for (i in daNote.parent.children)
+							{
+								i.alpha = 0.3;
+								i.sustainActive = false;
+								if (!PlayStateChangeables.opponentMode)
+									health -= (0.08 * PlayStateChangeables.healthLoss) / daNote.parent.children.length;
+								else
+									health += (0.08 * PlayStateChangeables.healthLoss) / daNote.parent.children.length;
+							}
+							if (daNote.parent.wasGoodHit)
+							{
+								totalNotesHit -= 1;
+							}
+							noteMiss(daNote.noteData, daNote);
 						}
-						if (daNote.parent.wasGoodHit)
-						{
-							totalNotesHit -= 1;
-						}
-						noteMiss(daNote.noteData, daNote);
 					}
-				}
 			});
 		}
 		if (FlxG.save.data.cpuStrums)
@@ -5648,13 +5649,13 @@ class PlayState extends MusicBeatState
 			&& curStep < Math.round(800 * songMultiplier)
 			&& camZooming)
 		{
-			if (curStep % Math.round(4 * songMultiplier) == 0)
+			if (curStep % Math.round(4) == 0)
 			{
 				FlxG.camera.zoom += 0.015;
 				camHUD.zoom += 0.03;
 			}
 		}
-		if (camZooming && FlxG.camera.zoom < 1.35 && curStep % Math.round(16 * songMultiplier) == 0)
+		if (camZooming && FlxG.camera.zoom < 1.35 && curStep % Math.round(16) == 0)
 		{
 			FlxG.camera.zoom += 0.015;
 			camHUD.zoom += 0.03;
@@ -6370,11 +6371,9 @@ class PlayState extends MusicBeatState
 			pixelShitPart4 = 'week6';
 		}
 
-		Paths.image(pixelShitPart1 + "sick" + pixelShitPart2, pixelShitPart3);
-		Paths.image(pixelShitPart1 + "good" + pixelShitPart2, pixelShitPart3);
-		Paths.image(pixelShitPart1 + "bad" + pixelShitPart2, pixelShitPart3);
-		Paths.image(pixelShitPart1 + "shit" + pixelShitPart2, pixelShitPart3);
-		Paths.image(pixelShitPart1 + "combo" + pixelShitPart2, pixelShitPart3);
+		var things:Array<String> = ['sick', 'good', 'bad', 'shit', 'combo'];
+		for (precaching in things)
+			Paths.image(pixelShitPart1 + precaching + pixelShitPart2, pixelShitPart3);
 
 		for (i in 0...10)
 		{
@@ -6399,10 +6398,9 @@ class PlayState extends MusicBeatState
 		for (asset in introAlts)
 			Paths.image(asset, week6Bullshit);
 
-		Paths.sound('intro3' + altSuffix);
-		Paths.sound('intro2' + altSuffix);
-		Paths.sound('intro1' + altSuffix);
-		Paths.sound('introGo' + altSuffix);
+		var things:Array<String> = ['intro3', 'intro2', 'intro1', 'introGo'];
+		for (precaching in things)
+			Paths.sound(precaching + altSuffix);
 	}
 
 	function startVideo(name:String):Void

@@ -182,33 +182,36 @@ class MusicBeatState extends FlxUIState
 			{
 				var data = TimingStruct.getTimingAtTimestamp(Conductor.songPosition);
 
-				FlxG.watch.addQuick("Current Conductor Timing Seg", data.bpm);
-
-				Conductor.crochet = ((60 / data.bpm) * 1000) / PlayState.songMultiplier;
-
-				var step = ((60 / data.bpm) * 1000) / 4;
-				var startInMS = (data.startTime * 1000);
-
-				curDecimalBeat = data.startBeat + ((((Conductor.songPosition / 1000)) - data.startTime) * (data.bpm / 60));
-				var ste:Int = Math.floor(data.startStep + ((Conductor.songPosition) - startInMS) / step);
-				if (ste >= 0)
+				if (data != null)
 				{
-					if (ste > curStep)
+					FlxG.watch.addQuick("Current Conductor Timing Seg", data.bpm);
+
+					Conductor.crochet = ((60 / data.bpm) * 1000) / PlayState.songMultiplier;
+
+					var step = ((60 / data.bpm) * 1000) / 4;
+					var startInMS = (data.startTime * 1000);
+
+					curDecimalBeat = data.startBeat + ((((Conductor.songPosition / 1000)) - data.startTime) * (data.bpm / 60));
+					var ste:Int = Math.floor(data.startStep + ((Conductor.songPosition) - startInMS) / step);
+					if (ste >= 0)
 					{
-						for (i in curStep...ste)
+						if (ste > curStep)
 						{
-							curStep++;
+							for (i in curStep...ste)
+							{
+								curStep++;
+								updateBeat();
+								stepHit();
+							}
+						}
+						else if (ste < curStep)
+						{
+							trace("reset steps for some reason?? at " + Conductor.songPosition);
+							// Song reset?
+							curStep = ste;
 							updateBeat();
 							stepHit();
 						}
-					}
-					else if (ste < curStep)
-					{
-						trace("reset steps for some reason?? at " + Conductor.songPosition);
-						// Song reset?
-						curStep = ste;
-						updateBeat();
-						stepHit();
 					}
 				}
 			}
