@@ -21,6 +21,8 @@ import flixel.addons.ui.FlxUIDropDownMenu;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.addons.ui.FlxUINumericStepper;
 import flixel.addons.ui.FlxUITabMenu;
+import flixel.addons.plugin.FlxMouseControl;
+import flixel.addons.display.FlxExtendedSprite;
 
 using StringTools;
 
@@ -29,7 +31,7 @@ class GameplayCustomizeState extends MusicBeatState
 	var defaultX:Float = FlxG.width * 0.55 - 135;
 	var defaultY:Float = FlxG.height / 2 - 50;
 
-	var sick:FlxSprite;
+	var sick:FlxExtendedSprite;
 
 	var UI_options:FlxUITabMenu;
 
@@ -53,7 +55,12 @@ class GameplayCustomizeState extends MusicBeatState
 
 	private var camHUD:FlxCamera;
 	private var camGame:FlxCamera;
-	private var camFollow:FlxObject;
+
+	private var camRatings:FlxCamera;
+
+	private var camFollow:FlxPoint;
+
+	private var camFollowPos:FlxObject;
 
 	private var camStrums:FlxCamera;
 
@@ -71,14 +78,13 @@ class GameplayCustomizeState extends MusicBeatState
 
 	public var mainCam:FlxCamera;
 
-	var changedPos:Bool = false;
+	var changedPos:Bool = true;
 
 	var timeShown = 0;
 
 	public override function create()
 	{
 		Paths.clearStoredMemory();
-		super.create();
 
 		#if FEATURE_DISCORD
 		// Updating Discord Rich Presence
@@ -89,23 +95,25 @@ class GameplayCustomizeState extends MusicBeatState
 		camHUD = new FlxCamera();
 		mainCam = new FlxCamera();
 		camStrums = new FlxCamera();
-		camStrums.height = 1300;
+		camRatings = new FlxCamera();
 		camStrums.bgColor.alpha = 0;
 		mainCam.bgColor.alpha = 0;
 		camHUD.bgColor.alpha = 0;
+		camRatings.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
-		FlxG.cameras.add(camHUD);
-		FlxG.cameras.add(camStrums);
-		FlxG.cameras.add(mainCam);
+		FlxG.cameras.add(camHUD, false);
+		FlxG.cameras.add(camStrums, false);
+		FlxG.cameras.add(camRatings, false);
+		FlxG.cameras.add(mainCam, false);
 
 		PsychTransition.nextCamera = mainCam;
-
-		FlxCamera.defaultCameras = [camGame];
 
 		camHUD.zoom = FlxG.save.data.zoom;
 
 		camStrums.zoom = camHUD.zoom;
+
+		camRatings.zoom = camHUD.zoom;
 
 		persistentUpdate = persistentDraw = true;
 
@@ -191,17 +199,19 @@ class GameplayCustomizeState extends MusicBeatState
 			camPos = new FlxPoint(0, 0);
 		}
 
-		camFollow = new FlxObject(0, 0, 1, 1);
+		camFollow = new FlxPoint();
+		camFollowPos = new FlxObject(0, 0, 1, 1);
 
-		camFollow.setPosition(camPos.x, camPos.y);
+		snapCamFollowToPos(camPos.x, camPos.y);
 
-		add(camFollow);
+		add(camFollowPos);
 
-		FlxG.camera.follow(camFollow, LOCKON, 0.01);
+		FlxG.camera.follow(camFollowPos, LOCKON, 0.01);
+		FlxG.camera.focusOn(camFollow);
 		FlxG.camera.zoom = Stage.camZoom;
-		FlxG.camera.focusOn(camFollow.getPosition());
+		FlxG.camera.focusOn(camFollowPos.getPosition());
 
-		// FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
+		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 
 		strumLine = new FlxSprite(0, 0).makeGraphic(FlxG.width, 14);
 		strumLine.scrollFactor.set();
@@ -210,9 +220,9 @@ class GameplayCustomizeState extends MusicBeatState
 		add(strumLine);
 
 		if (FlxG.save.data.downscroll)
-			strumLine.y = FlxG.height - (165 * Math.pow(FlxG.save.data.zoom, 0.75));
+			strumLine.y = FlxG.height - 165;
 		else
-			strumLine.y = FlxG.height - (647.5 / Math.pow(FlxG.save.data.zoom, 1.05));
+			strumLine.y = FlxG.height - 670;
 
 		laneunderlayOpponent = new FlxSprite(0, 0).makeGraphic(110 * 4 + 50, FlxG.height * 2);
 		laneunderlayOpponent.alpha = FlxG.save.data.laneTransparency;
@@ -249,7 +259,9 @@ class GameplayCustomizeState extends MusicBeatState
 			pixelShitPart4 = 'week6';
 		}
 
-		sick = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'sick' + pixelShitPart2, pixelShitPart3));
+		FlxG.plugins.add(new FlxMouseControl());
+
+		sick = new FlxExtendedSprite(0, 0, Paths.image(pixelShitPart1 + 'sick' + pixelShitPart2, pixelShitPart3));
 		sick.setGraphicSize(Std.int(sick.width * 0.7));
 		sick.scrollFactor.set();
 
@@ -261,12 +273,14 @@ class GameplayCustomizeState extends MusicBeatState
 		else
 			sick.setGraphicSize(Std.int(sick.width * CoolUtil.daPixelZoom * 0.7));
 
+		sick.enableMouseDrag(false, false, 255);
+
 		sick.updateHitbox();
 		add(sick);
 
 		strumLine.cameras = [camHUD];
 		strumLineNotes.cameras = [camHUD];
-		sick.cameras = [camHUD];
+		sick.cameras = [camRatings];
 
 		generateStaticArrows(0);
 		generateStaticArrows(1);
@@ -294,30 +308,32 @@ class GameplayCustomizeState extends MusicBeatState
 		FlxTween.tween(text, {y: FlxG.height - 18}, 2, {ease: FlxEase.elasticInOut});
 		FlxTween.tween(blackBorder, {y: FlxG.height - 18}, 2, {ease: FlxEase.elasticInOut});
 
-		if (!FlxG.save.data.changedHit)
-		{
-			FlxG.save.data.changedHitX = defaultX;
-			FlxG.save.data.changedHitY = defaultY;
-		}
-
 		sick.x = FlxG.save.data.changedHitX;
 		sick.y = FlxG.save.data.changedHitY;
 
 		FlxG.mouse.visible = true;
 
+		super.create();
 		Paths.clearUnusedMemory();
+	}
+
+	function snapCamFollowToPos(x:Float, y:Float)
+	{
+		camFollow.set(x, y);
+		camFollowPos.setPosition(x, y);
 	}
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		// sick.update(elapsed);
 
 		if (FlxG.save.data.zoom >= 0.8 && FlxG.save.data.zoom <= 1.2)
 		{
 			if (FlxG.save.data.downscroll)
-				strumLine.y = FlxG.height - (165 * Math.pow(FlxG.save.data.zoom, 0.75));
+				strumLine.y = FlxG.height - 165
 			else
-				strumLine.y = FlxG.height - (647.5 / Math.pow(FlxG.save.data.zoom, 1.05));
+				strumLine.y = FlxG.height - 670;
 		}
 
 		if (FlxG.sound.music != null)
@@ -360,21 +376,6 @@ class GameplayCustomizeState extends MusicBeatState
 			changedPos = true;
 		}
 
-		if (FlxG.mouse.overlaps(sick) && FlxG.mouse.pressed)
-		{
-			if (!FlxG.save.data.optimize)
-			{
-				sick.x = (FlxG.mouse.x - (sick.width + 145));
-				sick.y = (FlxG.mouse.y - (sick.height + 145));
-			}
-			else
-			{
-				sick.x = (FlxG.mouse.x - (sick.width + 145)) + (FlxG.width * 0.7);
-				sick.y = (FlxG.mouse.y - (sick.height + 145)) + (FlxG.height * 0.8);
-			}
-			changedPos = true;
-		}
-
 		for (i in playerStrums)
 			i.y = strumLine.y;
 		for (i in strumLineNotes)
@@ -384,19 +385,20 @@ class GameplayCustomizeState extends MusicBeatState
 		{
 			FlxG.save.data.zoom += 0.02;
 			camHUD.zoom = FlxG.save.data.zoom;
+			camRatings.zoom = FlxG.save.data.zoom;
 		}
 
 		if (FlxG.keys.justPressed.E)
 		{
 			FlxG.save.data.zoom -= 0.02;
 			camHUD.zoom = FlxG.save.data.zoom;
+			camRatings.zoom = FlxG.save.data.zoom;
 		}
 
 		if (changedPos)
 		{
 			FlxG.save.data.changedHitX = sick.x;
 			FlxG.save.data.changedHitY = sick.y;
-			FlxG.save.data.changedHit = true;
 		}
 
 		if (FlxG.keys.justPressed.C)
@@ -416,7 +418,7 @@ class GameplayCustomizeState extends MusicBeatState
 				comboSpr.x += 142.5;
 				comboSpr.y += 65;
 			}
-			comboSpr.cameras = [camHUD];
+			comboSpr.cameras = [camRatings];
 			comboSpr.acceleration.y = 600;
 			comboSpr.velocity.y -= 150;
 
@@ -445,8 +447,10 @@ class GameplayCustomizeState extends MusicBeatState
 				add(currentTimingShown);
 
 			currentTimingShown.screenCenter();
-			currentTimingShown.x = comboSpr.x + 600;
-			currentTimingShown.y = sick.y + 350;
+			currentTimingShown.x = sick.x + 225;
+			currentTimingShown.y = sick.y + 150;
+
+			currentTimingShown.cameras = [camRatings];
 
 			// make sure we have 3 digits to display (looks weird otherwise lol)
 			if (comboSplit.length == 1)
@@ -470,7 +474,7 @@ class GameplayCustomizeState extends MusicBeatState
 				numScore.screenCenter();
 				numScore.x = sick.x + (43 * daLoop) - 50;
 				numScore.y = sick.y + 100;
-				numScore.cameras = [camHUD];
+				numScore.cameras = [camRatings];
 
 				if (freeplayNoteStyle != 'pixel')
 				{

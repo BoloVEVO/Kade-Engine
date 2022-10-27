@@ -43,6 +43,8 @@ class FreeplayState extends MusicBeatState
 
 	public static var rate:Float = 1.0;
 
+	public static var lastRate:Float = 1.0;
+
 	public static var curSelected:Int = 0;
 
 	public static var curPlayed:Int = 0;
@@ -87,7 +89,7 @@ class FreeplayState extends MusicBeatState
 	public static var instance:FreeplayState;
 
 	public static function loadDiff(diff:Int, songId:String, array:Array<SongData>)
-		array.push(Song.conversionChecks(Song.loadFromJson(songId, CoolUtil.suffixDiffsArray[diff])));
+		array.push(Song.loadFromJson(songId, CoolUtil.suffixDiffsArray[diff]));
 
 	public static var list:Array<String> = [];
 
@@ -288,29 +290,7 @@ class FreeplayState extends MusicBeatState
 		{
 			if (!FlxG.sound.music.playing)
 				FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
-			Conductor.changeBPM(102);
 		}
-
-		#if desktop
-		if (!FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
-		{
-			try
-			{
-				rate = 1;
-				var hmm = songData.get(songs[curSelected].songName)[curDifficulty];
-				FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0.7, true);
-				curPlayed = curSelected;
-				FlxG.sound.music.fadeIn(0.75, 0, 0.8);
-				MainMenuState.freakyPlaying = false;
-
-				Paths.clearUnusedMemory();
-			}
-			catch (e)
-			{
-				Debug.logError(e);
-			}
-		}
-		#end
 
 		super.create();
 	}
@@ -494,11 +474,67 @@ class FreeplayState extends MusicBeatState
 
 	public var updateFrame = 0;
 
+	var playinSong:SongData;
+
 	override function update(elapsed:Float)
 	{
-		super.update(elapsed);
+		Conductor.songPosition = FlxG.sound.music.time;
 
-		Conductor.songPosition = FlxG.sound.music.time * rate;
+		if (FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
+		{
+			/*if (playinSong != null)
+				if (updateFrame == 4)
+				{
+					TimingStruct.clearTimings();
+					var currentIndex = 0;
+					for (i in playinSong.eventObjects)
+					{
+						if (i.type == "BPM Change")
+						{
+							var beat:Float = i.position;
+
+							var endBeat:Float = Math.POSITIVE_INFINITY;
+
+							var bpm = i.value * rate;
+
+							TimingStruct.addTiming(beat, bpm, endBeat, 0); // offset in this case = start time since we don't have a offset
+							if (currentIndex != 0)
+							{
+								var data = TimingStruct.AllTimings[currentIndex - 1];
+								data.endBeat = beat;
+								data.length = ((data.endBeat - data.startBeat) / (data.bpm / 60));
+								var step = (((60 / data.bpm) * 1000)) / 4;
+
+								TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step));
+								TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length;
+							}
+							currentIndex++;
+						}
+					}
+					updateFrame++;
+				}
+				else if (updateFrame != 5)
+					updateFrame++; */
+
+			var timingSeg = TimingStruct.getTimingAtBeat(curDecimalBeat);
+			if (timingSeg != null)
+			{
+				var timingSegBpm = timingSeg.bpm;
+
+				if (timingSegBpm != Conductor.bpm)
+				{
+					Debug.logInfo("BPM CHANGE to " + timingSegBpm);
+					Conductor.changeBPM(timingSegBpm, false);
+				}
+			}
+		}
+
+		if (!FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
+		{
+			dotheMusicThing();
+		}
+
+		super.update(elapsed);
 
 		if (FlxG.sound.music.volume < 0.7)
 		{
@@ -583,6 +619,11 @@ class FreeplayState extends MusicBeatState
 			{
 				changeSelection(1);
 			}
+
+			if (FlxG.keys.justPressed.SPACE)
+			{
+				dotheMusicThing();
+			}
 		}
 		previewtext.text = "Rate: " + FlxMath.roundDecimal(rate, 2) + "x";
 
@@ -616,28 +657,33 @@ class FreeplayState extends MusicBeatState
 				if (FlxG.keys.justPressed.LEFT)
 				{
 					rate -= 0.05;
+					lastRate = rate;
 					updateDiffCalc();
 				}
 				if (FlxG.keys.justPressed.RIGHT)
 				{
 					rate += 0.05;
+					lastRate = rate;
 					updateDiffCalc();
 				}
 
 				if (FlxG.keys.justPressed.R)
 				{
 					rate = 1;
+					lastRate = rate;
 					updateDiffCalc();
 				}
 
 				if (rate > 3)
 				{
 					rate = 3;
+					lastRate = rate;
 					updateDiffCalc();
 				}
 				else if (rate < 0.5)
 				{
 					rate = 0.5;
+					lastRate = rate;
 					updateDiffCalc();
 				}
 
@@ -651,154 +697,82 @@ class FreeplayState extends MusicBeatState
 					changeDiff(1);
 			}
 
-			#if desktop
-			if (FlxG.keys.justPressed.SPACE)
+			#if cpp
+			@:privateAccess
 			{
-				try
+				if (FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
 				{
-					var hmm = songData.get(songs[curSelected].songName)[curDifficulty];
-					FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0.7, true);
-					curPlayed = curSelected;
-					FlxG.sound.music.fadeIn(0.75, 0, 0.8);
-					MainMenuState.freakyPlaying = false;
-
-					Conductor.changeBPM(hmm.bpm);
-					Conductor.mapBPMChanges(hmm);
-					Conductor.bpm = hmm.bpm;
-
-					Paths.clearUnusedMemory();
+					#if (lime >= "8.0.0")
+					FlxG.sound.music._channel.__source.__backend.setPitch(rate);
+					#else
+					lime.media.openal.AL.sourcef(FlxG.sound.music._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, rate);
+					#end
 				}
-				catch (e)
+			}
+			#elseif html5
+			@:privateAccess
+			{
+				if (FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
 				{
-					Debug.logError(e);
+					#if (lime >= "8.0.0" && lime_howlerjs)
+					FlxG.sound.music._channel.__source.__backend.setPitch(rate);
+					#else
+					FlxG.sound.music._channel.__source.__backend.parent.buffer.__srcHowl.rate(rate);
+					#end
 				}
 			}
 			#end
-		}
 
-		var hmm = songData.get(songs[curPlayed].songName)[curDifficulty];
+			#if html5
+			diffCalcText.text = "RATING: N/A";
+			diffCalcText.alpha = 0.5;
+			#end
 
-		TimingStruct.clearTimings();
-		var currentIndex = 0;
-		if (hmm != null && hmm.eventObjects != null)
-		{
-			for (i in hmm.eventObjects)
+			if (!openMod && !MusicBeatState.switchingState)
 			{
-				if (i.type == "BPM Change")
+				if (controls.BACK)
 				{
-					var beat:Float = i.position * rate;
-
-					var endBeat:Float = Math.POSITIVE_INFINITY;
-
-					var bpm = Std.parseInt(i.value) * rate;
-
-					TimingStruct.addTiming(beat, bpm, endBeat, 0); // offset in this case = start time since we don't have a offset
-					if (currentIndex != 0)
+					MusicBeatState.switchState(new MainMenuState());
+					if (colorTween != null)
 					{
-						var data = TimingStruct.AllTimings[currentIndex - 1];
-						data.endBeat = beat;
-						data.length = ((data.endBeat - data.startBeat) / (data.bpm / 60)) / rate;
-						var step = (((60 / data.bpm) * 1000) / rate) / 4;
-
-						TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step) / rate);
-						TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length / rate;
+						colorTween.cancel();
 					}
-					currentIndex++;
 				}
-			}
-		}
 
-		if (FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
-		{
-			var timingSeg = TimingStruct.getTimingAtBeat(curDecimalBeat);
+				for (item in grpSongs.members)
+					if (accepted
+						|| (((FlxG.mouse.overlaps(item) && item.targetY == 0) || (FlxG.mouse.overlaps(iconArray[curSelected])))
+							&& FlxG.mouse.pressed))
+					{
+						loadSong();
+						break;
+					}
+				#if debug
+				// Going to charting state via Freeplay is only enable in debug builds.
+				else if (charting)
+					loadSong(true);
 
-			if (timingSeg != null)
-			{
-				var timingSegBpm = timingSeg.bpm;
+				// AnimationDebug and StageDebug are only enabled in debug builds.
 
-				if (timingSegBpm != Conductor.bpm)
+				if (dadDebug)
 				{
-					Debug.logInfo("BPM CHANGE to " + timingSegBpm);
-					Conductor.changeBPM(timingSegBpm, false);
+					loadAnimDebug(true);
 				}
-			}
-		}
-
-		#if cpp
-		@:privateAccess
-		{
-			if (FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
-			{
-				#if (lime >= "8.0.0")
-				FlxG.sound.music._channel.__source.__backend.setPitch(rate);
-				#else
-				lime.media.openal.AL.sourcef(FlxG.sound.music._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, rate);
+				if (bfDebug)
+				{
+					loadAnimDebug(false);
+				}
 				#end
 			}
-		}
-		#elseif html5
-		@:privateAccess
-		{
-			if (FlxG.sound.music.playing && !MainMenuState.freakyPlaying)
+
+			if (openMod)
 			{
-				#if (lime >= "8.0.0" && lime_howlerjs)
-				FlxG.sound.music._channel.__source.__backend.setPitch(rate);
-				#else
-				FlxG.sound.music._channel.__source.__backend.parent.buffer.__srcHowl.rate(rate);
-				#end
+				for (i in 0...iconArray.length)
+					iconArray[i].alpha = 0;
+
+				for (item in grpSongs.members)
+					item.alpha = 0;
 			}
-		}
-		#end
-
-		#if html5
-		diffCalcText.text = "RATING: N/A";
-		diffCalcText.alpha = 0.5;
-		#end
-
-		if (!openMod && !MusicBeatState.switchingState)
-		{
-			if (controls.BACK)
-			{
-				MusicBeatState.switchState(new MainMenuState());
-				if (colorTween != null)
-				{
-					colorTween.cancel();
-				}
-			}
-
-			for (item in grpSongs.members)
-				if (accepted
-					|| (((FlxG.mouse.overlaps(item) && item.targetY == 0) || (FlxG.mouse.overlaps(iconArray[curSelected])))
-						&& FlxG.mouse.pressed))
-				{
-					loadSong();
-					break;
-				}
-			#if debug
-			// Going to charting state via Freeplay is only enable in debug builds.
-			else if (charting)
-				loadSong(true);
-
-			// AnimationDebug and StageDebug are only enabled in debug builds.
-
-			if (dadDebug)
-			{
-				loadAnimDebug(true);
-			}
-			if (bfDebug)
-			{
-				loadAnimDebug(false);
-			}
-			#end
-		}
-
-		if (openMod)
-		{
-			for (i in 0...iconArray.length)
-				iconArray[i].alpha = 0;
-
-			for (item in grpSongs.members)
-				item.alpha = 0;
 		}
 	}
 
@@ -813,12 +787,12 @@ class FreeplayState extends MusicBeatState
 
 		if (!MainMenuState.freakyPlaying)
 		{
-			if (FlxG.save.data.camzoom && FlxG.camera.zoom < 1.35 && curStep % Math.round(16 * rate) == 0)
+			if (FlxG.save.data.camzoom && FlxG.camera.zoom < 1.35 && curStep % 16 == 0)
 			{
 				FlxG.camera.zoom += 0.03 / rate;
 			}
 
-			if (curStep % Math.round(4 * rate) == 0)
+			if (curStep % 4 == 0)
 			{
 				iconArray[curSelected].scale.set(1.2, 1.2);
 
@@ -912,6 +886,8 @@ class FreeplayState extends MusicBeatState
 		#end
 
 		PlayState.songMultiplier = rate;
+
+		lastRate = rate;
 
 		if (isCharting)
 			LoadingState.loadAndSwitchState(new ChartingState(reloadSong));
@@ -1064,6 +1040,60 @@ class FreeplayState extends MusicBeatState
 				}
 			}
 		}
+	}
+
+	private function dotheMusicThing():Void
+	{
+		#if desktop
+		try
+		{
+			playinSong = songData.get(songs[curSelected].songName)[curDifficulty];
+
+			FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0.7, true);
+
+			FlxG.sound.music.fadeIn(0.75, 0, 0.8);
+			MainMenuState.freakyPlaying = false;
+
+			Conductor.changeBPM(playinSong.bpm);
+
+			TimingStruct.clearTimings();
+
+			var currentIndex = 0;
+
+			for (i in playinSong.eventObjects)
+			{
+				if (i.type == "BPM Change")
+				{
+					var beat:Float = i.position;
+
+					var endBeat:Float = Math.POSITIVE_INFINITY;
+
+					var bpm = i.value;
+
+					TimingStruct.addTiming(beat, bpm, endBeat, 0); // offset in this case = start time since we don't have a offset
+
+					if (currentIndex != 0)
+					{
+						var data = TimingStruct.AllTimings[currentIndex - 1];
+						data.endBeat = beat;
+						data.length = ((data.endBeat - data.startBeat) / (data.bpm / 60));
+						var step = ((60 / data.bpm) * 1000) / 4;
+						TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step));
+						TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length;
+					}
+
+					currentIndex++;
+				}
+			}
+
+			rate = lastRate;
+			Paths.clearUnusedMemory();
+		}
+		catch (e)
+		{
+			Debug.logError(e);
+		}
+		#end
 	}
 
 	public function updateDiffCalc():Void

@@ -15,7 +15,7 @@ import flixel.util.FlxColor;
 class Stage extends MusicBeatState
 {
 	public var curStage:String = '';
-	public var camZoom:Float; // The zoom of the camera to have at the start of the game
+	public var camZoom:Float = 1.05; // The zoom of the camera to have at the start of the game
 	public var hideLastBG:Bool = false; // True = hide last BGs and show ones from slowBacks on certain step, False = Toggle visibility of BGs from SlowBacks on certain step
 	// Use visible property to manage if BG would be visible or not at the start of the game
 	public var tweenDuration:Float = 2; // How long will it tween hiding/showing BGs, variable above must be set to True for tween to activate
@@ -55,12 +55,14 @@ class Stage extends MusicBeatState
 		]
 	];
 
+	public var stageCamZooms:Map<String, Float> = ['limo' => 0.90, 'mall' => 0.80, 'tank' => 0.90, 'void' => 0.9, 'stage' => 0.90];
+
 	public function new(daStage:String)
 	{
 		super();
 
 		this.curStage = daStage;
-		camZoom = 1.05; // Don't change zoom here, unless you want to change zoom of every stage that doesn't have custom one
+		// camZoom = 1.05; // Don't change zoom here, unless you want to change zoom of every stage that doesn't have custom one
 
 		if (!FlxG.save.data.optimize && FlxG.save.data.background)
 		{
@@ -150,8 +152,6 @@ class Stage extends MusicBeatState
 					}
 				case 'limo':
 					{
-						camZoom = 0.90;
-
 						var skyBG:FlxSprite = new FlxSprite(-120, -50).loadGraphic(Paths.image('limo/limoSunset', 'week4'));
 						skyBG.scrollFactor.set(0.1, 0.1);
 						skyBG.antialiasing = FlxG.save.data.antialiasing;
@@ -221,8 +221,6 @@ class Stage extends MusicBeatState
 					}
 				case 'mall':
 					{
-						camZoom = 0.80;
-
 						var bg:FlxSprite = new FlxSprite(-1000, -500).loadGraphic(Paths.image('christmas/bgWalls', 'week5'));
 						bg.antialiasing = FlxG.save.data.antialiasing;
 						bg.scrollFactor.set(0.2, 0.2);
@@ -449,7 +447,6 @@ class Stage extends MusicBeatState
 						 */
 					}
 				case 'tank':
-					camZoom = 0.9;
 					var tankSky:FlxSprite = new FlxSprite(-400, -400).loadGraphic(Paths.image('tankSky', 'week7'));
 					tankSky.antialiasing = FlxG.save.data.antialiasing;
 					tankSky.scrollFactor.set(0, 0);
@@ -558,7 +555,7 @@ class Stage extends MusicBeatState
 							gfCutscene.frames = Paths.getSparrowAtlas('cutscenes/stressGF', 'week7');
 							gfCutscene.animation.addByPrefix('dieBitch', 'GF STARTS TO TURN PART 1', 24, false);
 							gfCutscene.animation.addByPrefix('getRektLmao', 'GF STARTS TO TURN PART 2', 24, false);
-							gfCutscene.visible = false;
+							gfCutscene.alpha = 0.0001;
 							swagBacks['gfCutscene'] = gfCutscene;
 							layInFront[2].push(gfCutscene);
 
@@ -567,7 +564,7 @@ class Stage extends MusicBeatState
 							swagBacks['picoCutscene'] = picoCutscene;
 							picoCutscene.frames = Paths.getTextureAtlas('cutscenes/stressPico', 'week7');
 							picoCutscene.animation.addByPrefix('anim', 'Pico Badass', 24, false);
-							picoCutscene.visible = false;
+							picoCutscene.alpha = 0.0001;
 
 							toAdd.push(picoCutscene);
 
@@ -661,7 +658,6 @@ class Stage extends MusicBeatState
 						layInFront[2].push(foreGround5);
 					}
 				case 'void': // In case you want to do chart with videos.
-					camZoom = 0.9;
 					curStage = 'void';
 					var black:FlxSprite = new FlxSprite().makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
 					black.scrollFactor.set(0, 0);
@@ -669,7 +665,6 @@ class Stage extends MusicBeatState
 
 				default:
 					{
-						camZoom = 0.9;
 						curStage = 'stage';
 						var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback', 'shared'));
 						bg.antialiasing = FlxG.save.data.antialiasing;

@@ -146,7 +146,6 @@ class ResultsScreen extends FlxSubState
 		anotherBackground.alpha = 0;
 		add(anotherBackground);
 
-		#if !html5
 		graph = new HitGraph(FlxG.width - 500, 45, 495, 240);
 		graph.alpha = 0;
 
@@ -156,7 +155,6 @@ class ResultsScreen extends FlxSubState
 		graphSprite.alpha = 0;
 
 		add(graphSprite);
-		#end
 
 		var sicks = HelperFunctions.truncateFloat(PlayState.sicks / PlayState.goods, 1);
 		var goods = HelperFunctions.truncateFloat(PlayState.goods / PlayState.bads, 1);
@@ -168,21 +166,21 @@ class ResultsScreen extends FlxSubState
 
 		var mean:Float = 0;
 
-		for (i in 0...PlayState.rep.replay.songNotes.length)
+		for (i in 0...PlayState.instance.saveNotes.length)
 		{
 			// 0 = time
 			// 1 = length
 			// 2 = type
 			// 3 = diff
-			var obj = PlayState.rep.replay.songNotes[i];
+			var obj = PlayState.instance.saveNotes[i];
 			// judgement
-			var obj2 = PlayState.rep.replay.songJudgements[i];
+			var obj2 = PlayState.instance.saveJudge[i];
 
 			var obj3 = obj[0];
 
 			var diff = obj[3];
 			var judge = obj2;
-			if (diff != (Ratings.timingWindows[0] * Math.floor((PlayState.rep.replay.sf / 60) * 1000) / Ratings.timingWindows[0]))
+			if (diff != (Ratings.timingWindows[0] * Math.floor((10 / 60) * 1000) / Ratings.timingWindows[0]))
 				mean += diff;
 			if (obj[1] != -1)
 				graph.addToHistory(diff / PlayState.songMultiplier, judge, obj3 / PlayState.songMultiplier);
@@ -192,15 +190,14 @@ class ResultsScreen extends FlxSubState
 			sicks = 0;
 		if (goods == Math.POSITIVE_INFINITY || goods == Math.NaN)
 			goods = 0;
-		#if !html5
+
 		graph.update();
-		#end
 
 		superMegaConditionShit = Ratings.timingWindows[3] == 45
 			&& Ratings.timingWindows[2] == 90
 			&& Ratings.timingWindows[1] == 135
 			&& Ratings.timingWindows[0] == 160
-			&& (!PlayStateChangeables.botPlay || !PlayState.usedBot)
+			&& (!PlayStateChangeables.botPlay && !PlayState.usedBot && !FlxG.save.data.botplay)
 			&& !FlxG.save.data.practice
 			&& PlayStateChangeables.holds
 			&& !PlayState.wentToChartEditor
@@ -215,7 +212,7 @@ class ResultsScreen extends FlxSubState
 			Highscore.saveLetter(PlayState.SONG.songId, Ratings.GenerateLetterRank(PlayState.instance.accuracy), PlayState.storyDifficulty);
 		}
 
-		mean = HelperFunctions.truncateFloat(mean / PlayState.rep.replay.songNotes.length, 2);
+		mean = HelperFunctions.truncateFloat(mean / PlayState.instance.saveNotes.length, 2);
 		var acceptShit:String = (superMegaConditionShit && FlxG.save.data.accuracyMod == 0 ? '| Accepted' : '| Rejected');
 
 		if (!PlayStateChangeables.modchart #if FEATURE_LUAMODCHART
@@ -248,7 +245,6 @@ class ResultsScreen extends FlxSubState
 		FlxTween.tween(contText, {y: FlxG.height - 45}, 0.5, {ease: FlxEase.expoInOut});
 		FlxTween.tween(settingsText, {y: FlxG.height - 35}, 0.5, {ease: FlxEase.expoInOut});
 
-		#if !html5
 		FlxTween.tween(anotherBackground, {alpha: 0.6}, 0.5, {
 			onUpdate: function(tween:FlxTween)
 			{
@@ -256,7 +252,6 @@ class ResultsScreen extends FlxSubState
 				graphSprite.alpha = FlxMath.lerp(0, 1, tween.percent);
 			}
 		});
-		#end
 
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 

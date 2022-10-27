@@ -27,8 +27,8 @@ class HitGraph extends Sprite
 	public var maxLabel:TextField;
 	public var avgLabel:TextField;
 
-	public var minValue:Float = -(Math.floor((PlayState.rep.replay.sf / 60) * 1000) + 95);
-	public var maxValue:Float = Math.floor((PlayState.rep.replay.sf / 60) * 1000) + 95;
+	public var minValue:Float = -(Math.floor((10 / 60) * 1000) + 95);
+	public var maxValue:Float = Math.floor((10 / 60) * 1000) + 95;
 
 	public var showInput:Bool = FlxG.save.data.inputShow;
 
@@ -62,7 +62,7 @@ class HitGraph extends Sprite
 		_axis = new Shape();
 		_axis.x = _labelWidth + 10;
 
-		ts = Math.floor((PlayState.rep.replay.sf / 60) * 1000) / Ratings.timingWindows[0];
+		ts = Math.floor((10 / 60) * 1000) / Ratings.timingWindows[0];
 
 		var early = createTextField(10, 10, FlxColor.WHITE, 12);
 		var late = createTextField(10, _height - 20, FlxColor.WHITE, 12);
@@ -128,7 +128,7 @@ class HitGraph extends Sprite
 
 		gfx.lineStyle(1, graphColor, 0.3);
 
-		var ts = Math.floor((PlayState.rep.replay.sf / 60) * 1000) / 166;
+		var ts = Math.floor((10 / 60) * 1000) / 166;
 		var range:Float = Math.max(maxValue - minValue, maxValue * 0.1);
 
 		var value = ((ms * ts) - minValue) / range;
@@ -191,27 +191,27 @@ class HitGraph extends Sprite
 		var range:Float = Math.max(maxValue - minValue, maxValue * 0.1);
 		var graphX = _axis.x + 1;
 
-		if (showInput)
-		{
-			for (i in 0...PlayState.rep.replay.ana.anaArray.length)
+		/*if (showInput)
 			{
-				var ana = PlayState.rep.replay.ana.anaArray[i];
+				for (i in 0...PlayState.rep.replay.ana.anaArray.length)
+				{
+					var ana = PlayState.rep.replay.ana.anaArray[i];
 
-				var value = (ana.key * 25 - minValue) / range;
+					var value = (ana.key * 25 - minValue) / range;
 
-				if (ana.hit)
-					gfx.beginFill(0xFFFF00);
-				else
-					gfx.beginFill(0xC2B280);
+					if (ana.hit)
+						gfx.beginFill(0xFFFF00);
+					else
+						gfx.beginFill(0xC2B280);
 
-				if (ana.hitTime < 0)
-					continue;
+					if (ana.hitTime < 0)
+						continue;
 
-				var pointY = (-value * _height - 1) + _height;
-				gfx.drawRect(graphX + fitX(ana.hitTime), pointY, 2, 2);
-				gfx.endFill();
-			}
-		}
+					var pointY = (-value * _height - 1) + _height;
+					gfx.drawRect(graphX + fitX(ana.hitTime), pointY, 2, 2);
+					gfx.endFill();
+				}
+		}*/
 
 		for (i in 0...history.length)
 		{
@@ -249,7 +249,7 @@ class HitGraph extends Sprite
 
 	public function fitX(x:Float)
 	{
-		return ((x / (FlxG.sound.music.length / PlayState.songMultiplier)) * width) * PlayState.songMultiplier;
+		return ((x / (PlayState.instance.inst.length / PlayState.songMultiplier)) * width) * PlayState.songMultiplier;
 	}
 
 	public function addToHistory(diff:Float, judge:String, time:Float)

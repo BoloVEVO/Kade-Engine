@@ -56,13 +56,6 @@ class KadeEngineData
 		if (FlxG.save.data.rotateSprites == null)
 			FlxG.save.data.rotateSprites = true;
 
-		if (FlxG.save.data.changedHit == null)
-		{
-			FlxG.save.data.changedHitX = -1;
-			FlxG.save.data.changedHitY = -1;
-			FlxG.save.data.changedHit = false;
-		}
-
 		if (FlxG.save.data.fpsRain == null)
 			FlxG.save.data.fpsRain = false;
 
@@ -249,6 +242,12 @@ class KadeEngineData
 
 		if (FlxG.save.data.mute == null)
 			FlxG.save.data.mute = false;
+
+		if (FlxG.save.data.changedHitX == null)
+			FlxG.save.data.changedHitX = FlxG.width * 0.55 - 135;
+
+		if (FlxG.save.data.changedHitY == null)
+			FlxG.save.data.changedHitY = FlxG.height / 2 - 50;
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 

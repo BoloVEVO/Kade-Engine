@@ -145,6 +145,8 @@ class KadeEngineFPS extends TextField
 				+ "FNF v"
 				+ MainMenuState.gameVer
 				+ (Main.watermarks?'\n$engineName ' + "v" + MainMenuState.kadeEngineVer #if debug + "\nDEBUG MODE" #end : "") : memoryUsage
+				+ '\nFNF v'
+				+ MainMenuState.gameVer
 				+ (Main.watermarks?'\n$engineName ' + "v" + MainMenuState.kadeEngineVer #if debug + "\nDEBUG MODE" #end : ""));
 
 			#if (gl_stats && !disable_cffi && (!html5 || !canvas))
@@ -179,7 +181,7 @@ class KadeEngineFPS extends TextField
 	{
 		if (FlxG.random.bool(5))
 		{
-			switch (FlxG.random.int(0, 5))
+			switch (FlxG.random.int(0, 14))
 			{
 				case 0:
 					engineName = "Dake Engine ";
@@ -193,6 +195,24 @@ class KadeEngineFPS extends TextField
 					engineName = "Sora Engine ";
 				case 5:
 					engineName = "Kade Engine ";
+				case 6:
+					engineName = "Awoo Engine";
+				case 7:
+					engineName = "Gara Engine";
+				case 8:
+					engineName = "Amber Engine";
+				case 9:
+					engineName = "Jack Engine";
+				case 10:
+					engineName = "Codex Engine";
+				case 11:
+					engineName = "Foxy Engine";
+				case 12:
+					engineName = "Kev Engine";
+				case 13:
+					engineName = "Gabi Engine";
+				case 14:
+					engineName = "Dreamy Engine";
 			}
 		}
 	}

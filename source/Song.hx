@@ -11,7 +11,7 @@ class Event
 {
 	public var name:String;
 	public var position:Float;
-	public var value:Any;
+	public var value:Float;
 	public var type:String;
 
 	public function new(name:String, pos:Float, value:Any, type:String)
@@ -124,17 +124,17 @@ class Song
 		{
 			if (i.type == "BPM Change")
 			{
-				var beat:Float = i.position;
+				var beat:Float = i.position * PlayState.songMultiplier;
 
 				var endBeat:Float = Math.POSITIVE_INFINITY;
 
-				TimingStruct.addTiming(beat, i.value, endBeat, 0); // offset in this case = start time since we don't have a offset
+				TimingStruct.addTiming(beat, i.value * PlayState.songMultiplier, endBeat, 0); // offset in this case = start time since we don't have a offset
 
 				if (currentIndex != 0)
 				{
 					var data = TimingStruct.AllTimings[currentIndex - 1];
 					data.endBeat = beat;
-					data.length = (data.endBeat - data.startBeat) / (data.bpm / 60);
+					data.length = (data.endBeat - data.startBeat) / (data.bpm / 60) / PlayState.songMultiplier;
 					var step = ((60 / data.bpm) * 1000) / 4;
 					TimingStruct.AllTimings[currentIndex].startStep = Math.floor(((data.endBeat / (data.bpm / 60)) * 1000) / step);
 					TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length;
@@ -207,6 +207,8 @@ class Song
 		}
 
 		songData.offset = songMetaData.offset != null ? songMetaData.offset : 0;
+		if (songMetaData.name != null)
+			songData.songName = songMetaData.name;
 
 		return Song.conversionChecks(songData);
 	}
