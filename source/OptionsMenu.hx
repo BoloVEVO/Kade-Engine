@@ -167,7 +167,6 @@ class OptionsMenu extends FlxSubState
 				new Colour("The color behind icons now fit with their theme. (e.g. Pico = green)"),
 				new NPSDisplayOption("Shows your current Notes Per Second on the info bar."),
 				new RainbowFPSOption("Make the FPS Counter flicker through rainbow colors."),
-				new BorderFps("Draw a border around the FPS Text (Consumes a lot of CPU Resources)"),
 				new CpuStrums("Toggle the CPU's strumline lighting up when it hits a note."),
 				new NoteCocks("Toggle The Note Splashes every time you get a SICK!")
 			]),
@@ -186,9 +185,9 @@ class OptionsMenu extends FlxSubState
 				new ShowInput("Display every single input on the score screen."),
 			]),
 			new OptionCata(935, 40, "Performance", [
-				new GPURendering("Toggle GPU rendering to push Graphics textures to GPU, reducing CPU memory usage. "),
-				new OptimizeOption("Disable Background and Characters to save memory. Useful to low-end computers."),
-				new Background("Disable Stage Background to save memory (Only characters are visible)."),
+				new GPURendering("Toggle GPU rendering to push Graphics textures to GPU, reducing RAM memory usage. "),
+				new CharacterOption("Toogle Characters on Stage depending of your computer performance."),
+				new Background("Toogle Stage Background depending of your computer performance."),
 				new DistractionsAndEffectsOption("Toggle stage distractions that can hinder your gameplay and save memory.")
 			]),
 			new OptionCata(50, 104, "Saves", [
@@ -356,7 +355,6 @@ class OptionsMenu extends FlxSubState
 		catch (e)
 		{
 			Debug.logError("oops\n" + e);
-			selectedCatIndex = 0;
 		}
 
 		Debug.logTrace("Changed cat: " + selectedCatIndex);
@@ -480,29 +478,24 @@ class OptionsMenu extends FlxSubState
 				{
 					if (!isInPause)
 					{
-						if (!FlxG.save.data.optimize)
+						FlxTween.tween(background, {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
+						for (i in 0...selectedCat.optionObjects.length)
 						{
-							FlxTween.tween(background, {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
-							for (i in 0...selectedCat.optionObjects.length)
-							{
-								FlxTween.tween(selectedCat.optionObjects.members[i], {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
-							}
-							for (i in 0...options.length - 1)
-							{
-								FlxTween.tween(options[i].titleObject, {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
-								FlxTween.tween(options[i], {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
-							}
-							FlxTween.tween(descText, {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
-							FlxTween.tween(descBack, {alpha: 0}, 0.5, {
-								ease: FlxEase.smootherStepInOut,
-								onComplete: function(twn:FlxTween)
-								{
-									MusicBeatState.switchState(new MainMenuState());
-								}
-							});
+							FlxTween.tween(selectedCat.optionObjects.members[i], {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
 						}
-						else
-							MusicBeatState.switchState(new MainMenuState());
+						for (i in 0...options.length - 1)
+						{
+							FlxTween.tween(options[i].titleObject, {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
+							FlxTween.tween(options[i], {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
+						}
+						FlxTween.tween(descText, {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
+						FlxTween.tween(descBack, {alpha: 0}, 0.5, {
+							ease: FlxEase.smootherStepInOut,
+							onComplete: function(twn:FlxTween)
+							{
+								MusicBeatState.switchState(new MainMenuState());
+							}
+						});
 					}
 					else
 					{
@@ -572,17 +565,17 @@ class OptionsMenu extends FlxSubState
 
 						if (selectedOptionIndex > options[selectedCatIndex].options.length - 1)
 						{
-								for (i in 0...selectedCat.options.length)
-								{
-									var opt = selectedCat.optionObjects.members[i];
-									opt.y = options[4].titleObject.y + 54 + (46 * i);
-								}
-								selectedOptionIndex = 0;
+							for (i in 0...selectedCat.options.length)
+							{
+								var opt = selectedCat.optionObjects.members[i];
+								opt.y = options[4].titleObject.y + 54 + (46 * i);
+							}
+							selectedOptionIndex = 0;
 						}
-	
+
 						if (selectedOptionIndex != 0 && options[selectedCatIndex].options.length > 6)
 						{
-							if (selectedOptionIndex >= (options[selectedCatIndex].options.length - 1) / (2+options[selectedCatIndex].options.length*0.1))
+							if (selectedOptionIndex >= (options[selectedCatIndex].options.length - 1) / (2 + options[selectedCatIndex].options.length * 0.1))
 								for (i in selectedCat.optionObjects.members)
 								{
 									i.y -= 46;
@@ -604,25 +597,29 @@ class OptionsMenu extends FlxSubState
 						if (selectedOptionIndex < 0)
 						{
 							selectedOptionIndex = options[selectedCatIndex].options.length - 1;
-							if (options[selectedCatIndex].options.length > 6){
+							if (options[selectedCatIndex].options.length > 6)
+							{
 								for (i in 0...selectedCat.options.length)
 								{
 									var opt = selectedCat.optionObjects.members[i];
-									opt.y = options[4].titleObject.y + 54 -(options[selectedCatIndex].options.length*(16+options[selectedCatIndex].options.length)) + (46 * i);
+									opt.y = options[4].titleObject.y
+										+ 54
+										- (options[selectedCatIndex].options.length * (16 + options[selectedCatIndex].options.length))
+										+ (46 * i);
 								}
 							}
 						}
-	
+
 						if (selectedOptionIndex != 0 && options[selectedCatIndex].options.length > 6)
 						{
-							if (selectedOptionIndex >= (options[selectedCatIndex].options.length - 1) / (2+options[selectedCatIndex].options.length*0.1))
+							if (selectedOptionIndex >= (options[selectedCatIndex].options.length - 1) / (2 + options[selectedCatIndex].options.length * 0.1))
 								for (i in selectedCat.optionObjects.members)
 								{
 									i.y += 46;
 								}
 						}
-	
-						if (selectedOptionIndex < (options[selectedCatIndex].options.length - 1) / (2+options[selectedCatIndex].options.length*0.1))
+
+						if (selectedOptionIndex < (options[selectedCatIndex].options.length - 1) / (2 + options[selectedCatIndex].options.length * 0.1))
 						{
 							for (i in 0...selectedCat.options.length)
 							{
@@ -724,19 +721,19 @@ class OptionsMenu extends FlxSubState
 		catch (e)
 		{
 			Debug.logError("wtf we actually did something wrong, but we dont crash bois.\n" + e);
-			selectedCatIndex = 0;
-			selectedOptionIndex = 0;
-			FlxG.sound.play(Paths.sound('scrollMenu'));
-			if (selectedCat != null)
-			{
-				for (i in 0...selectedCat.options.length)
+			/*selectedCatIndex = 0;
+				selectedOptionIndex = 0;
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				if (selectedCat != null)
 				{
-					var opt = selectedCat.optionObjects.members[i];
-					opt.y = options[4].titleObject.y + 54 + (46 * i);
-				}
-				selectedCat.optionObjects.members[selectedOptionIndex].text = selectedOption.getValue();
-				isInCat = true;
-			}
+					for (i in 0...selectedCat.options.length)
+					{
+						var opt = selectedCat.optionObjects.members[i];
+						opt.y = options[4].titleObject.y + 54 + (46 * i);
+					}
+					selectedCat.optionObjects.members[selectedOptionIndex].text = selectedOption.getValue();
+					isInCat = true;
+			}*/
 		}
 	}
 
@@ -752,11 +749,8 @@ class OptionsMenu extends FlxSubState
 			selectedCat.optionObjects.members[9].color = FlxColor.YELLOW;
 			#end
 		}
-		if (FlxG.save.data.optimize && selectedCatIndex == 3)
-		{
-			selectedCat.optionObjects.members[2].color = FlxColor.YELLOW;
-		}
-		if ((!FlxG.save.data.background || FlxG.save.data.optimize) && selectedCatIndex == 3)
+
+		if (!FlxG.save.data.background && selectedCatIndex == 3)
 		{
 			selectedCat.optionObjects.members[3].color = FlxColor.YELLOW;
 		}
@@ -781,7 +775,7 @@ class OptionsMenu extends FlxSubState
 
 					selectedCat.optionObjects.members[15].color = FlxColor.YELLOW;
 				case 1:
-					selectedCat.optionObjects.members[17].color = FlxColor.YELLOW;
+					selectedCat.optionObjects.members[16].color = FlxColor.YELLOW;
 				case 3:
 					for (i in 0...4)
 						selectedCat.optionObjects.members[i].color = FlxColor.YELLOW;
@@ -796,11 +790,6 @@ class OptionsMenu extends FlxSubState
 			if (selectedOptionIndex == 12 && !FlxG.save.data.healthBar && selectedCatIndex == 1)
 			{
 				descText.text = "HEALTH BAR IS DISABLED! Colored health bar are disabled.";
-				descText.color = FlxColor.YELLOW;
-			}
-			if (selectedOptionIndex == 2 && FlxG.save.data.optimize && selectedCatIndex == 3)
-			{
-				descText.text = "OPTIMIZATION IS ENABLED! Backgrounds are disabled.";
 				descText.color = FlxColor.YELLOW;
 			}
 			if (selectedOptionIndex == 3 && !FlxG.save.data.background && selectedCatIndex == 3)

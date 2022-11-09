@@ -941,7 +941,7 @@ class DistractionsAndEffectsOption extends Option
 
 	public override function left():Bool
 	{
-		if (OptionsMenu.isInPause || FlxG.save.data.optimize || !FlxG.save.data.background)
+		if (OptionsMenu.isInPause || !FlxG.save.data.background)
 			return false;
 		FlxG.save.data.distractions = !FlxG.save.data.distractions;
 		display = updateDisplay();
@@ -1297,7 +1297,7 @@ class FPSCapOption extends Option
 		if (FlxG.save.data.fpsCap >= 300)
 		{
 			FlxG.save.data.fpsCap = 300;
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(700);
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
 		}
 		else
 			FlxG.save.data.fpsCap = FlxG.save.data.fpsCap + 10;
@@ -1572,33 +1572,6 @@ class OffsetMenu extends Option
 	private override function updateDisplay():String
 	{
 		return "Time your offset";
-	}
-}
-
-class BorderFps extends Option
-{
-	public function new(desc:String)
-	{
-		super();
-		description = desc;
-	}
-
-	public override function left():Bool
-	{
-		FlxG.save.data.fpsBorder = !FlxG.save.data.fpsBorder;
-		display = updateDisplay();
-		return true;
-	}
-
-	public override function right():Bool
-	{
-		left();
-		return true;
-	}
-
-	private override function updateDisplay():String
-	{
-		return "FPS Border: < " + (!FlxG.save.data.fpsBorder ? "off" : "on") + " >";
 	}
 }
 
@@ -1879,7 +1852,7 @@ class Background extends Option
 
 	public override function left():Bool
 	{
-		if (OptionsMenu.isInPause || FlxG.save.data.optimize)
+		if (OptionsMenu.isInPause)
 			return false;
 		FlxG.save.data.background = !FlxG.save.data.background;
 		display = updateDisplay();
@@ -1898,7 +1871,7 @@ class Background extends Option
 	}
 }
 
-class OptimizeOption extends Option
+class CharacterOption extends Option
 {
 	public function new(desc:String)
 	{
@@ -1913,7 +1886,7 @@ class OptimizeOption extends Option
 	{
 		if (OptionsMenu.isInPause)
 			return false;
-		FlxG.save.data.optimize = !FlxG.save.data.optimize;
+		FlxG.save.data.characters = !FlxG.save.data.characters;
 		display = updateDisplay();
 		return true;
 	}
@@ -1926,7 +1899,7 @@ class OptimizeOption extends Option
 
 	private override function updateDisplay():String
 	{
-		return "Optimization: < " + (FlxG.save.data.optimize ? "Enabled" : "Disabled") + " >";
+		return "Display Characters: < " + (FlxG.save.data.characters ? "Enabled" : "Disabled") + " >";
 	}
 }
 
@@ -2427,7 +2400,7 @@ class ResetSettings extends Option
 		FlxG.save.data.camzoom = null;
 		FlxG.save.data.scoreScreen = null;
 		FlxG.save.data.inputShow = null;
-		FlxG.save.data.optimize = null;
+		FlxG.save.data.characters = null;
 		FlxG.save.data.cacheImages = null;
 		FlxG.save.data.editor = null;
 		FlxG.save.data.laneTransparency = 0;

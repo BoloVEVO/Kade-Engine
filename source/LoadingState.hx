@@ -92,18 +92,12 @@ class LoadingState extends MusicBeatState
 			// Essential libraries (characters,notes,gameplay elements)
 			checkLibrary("videos");
 			checkLibrary("shared");
-			if (!FlxG.save.data.optimize && FlxG.save.data.background)
+			if (FlxG.save.data.background)
 			{
 				if (PlayState.storyWeek > 0)
 					checkLibrary("week" + PlayState.storyWeek); // Non-important libraries for optimization (stages, unique-week elements, in-game cutscenes)
 				else
 					checkLibrary("tutorial");
-			}
-			else
-			{
-				if (OpenFlAssets.hasLibrary("week" + PlayState.storyWeek))
-					OpenFlAssets.unloadLibrary("week" +
-						PlayState.storyWeek); // Unloading the week library in case it's loaded to save memory in optimization mode or with no background.
 			}
 
 			if (GameplayCustomizeState.freeplayNoteStyle == 'pixel') // Essential library for Customize gameplay. (Very light)

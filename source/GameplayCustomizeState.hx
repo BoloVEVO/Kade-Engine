@@ -1,3 +1,4 @@
+import flixel.system.frontEnds.BitmapFrontEnd;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
@@ -145,7 +146,7 @@ class GameplayCustomizeState extends MusicBeatState
 
 		Stage = new Stage('stage');
 
-		if (!FlxG.save.data.optimize)
+		if (FlxG.save.data.background)
 		{
 			var positions = Stage.positions[Stage.curStage];
 			if (positions != null)
@@ -185,8 +186,6 @@ class GameplayCustomizeState extends MusicBeatState
 				}
 			}
 
-			camPos = new FlxPoint(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
-
 			switch (dad.curCharacter)
 			{
 				case 'gf':
@@ -196,8 +195,20 @@ class GameplayCustomizeState extends MusicBeatState
 		}
 		else
 		{
-			camPos = new FlxPoint(0, 0);
+			gf.scrollFactor.set(0.95, 0.95);
+			add(gf);
+			add(dad);
+			add(boyfriend);
 		}
+
+		if (!FlxG.save.data.characters)
+		{
+			gf.alpha = 0;
+			dad.alpha = 0;
+			boyfriend.alpha = 0;
+		}
+
+		camPos = new FlxPoint(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
 
 		camFollow = new FlxPoint();
 		camFollowPos = new FlxObject(0, 0, 1, 1);

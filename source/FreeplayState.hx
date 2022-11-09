@@ -94,7 +94,8 @@ class FreeplayState extends MusicBeatState
 	public static var list:Array<String> = [];
 
 	override function create()
-	{FlxG.mouse.visible = true;
+	{
+		FlxG.mouse.visible = true;
 		instance = this;
 
 		Main.dumpCache();
@@ -211,10 +212,7 @@ class FreeplayState extends MusicBeatState
 		var bottomText:String = #if !mobile #if PRELOAD_ALL "  Press SPACE to listen to the Song Instrumental / Click and scroll through the songs with your MOUSE /"
 			+ #else "  Click and scroll through the songs with your MOUSE /"
 			+ #end #end
-		" Your offset is "
-		+ FlxG.save.data.offset
-		+ "ms "
-		+ (FlxG.save.data.optimize ? "/ Optimized" : "");
+		" Your offset is " + FlxG.save.data.offset + "ms ";
 
 		var downText:FlxText = new FlxText(bottomBG.x, bottomBG.y + 4, FlxG.width, bottomText, 16);
 		downText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT);

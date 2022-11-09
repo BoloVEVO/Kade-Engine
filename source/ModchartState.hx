@@ -281,6 +281,11 @@ class ModchartState
 		return Reflect.field(PlayState.instance, id);
 	}
 
+	function setPropertyByName(id:String, value:Dynamic)
+	{
+		return Reflect.setProperty(PlayState.instance, id, value);
+	}
+
 	public static var luaSprites:Map<String, FlxSprite> = [];
 
 	function changeDadCharacter(id:String)
@@ -499,6 +504,7 @@ class ModchartState
 		// callbacks
 
 		Lua_helper.add_callback(lua, "getProperty", getPropertyByName);
+		Lua_helper.add_callback(lua, "setProperty", setPropertyByName);
 		Lua_helper.add_callback(lua, "makeSprite", makeLuaSprite);
 
 		// sprites
