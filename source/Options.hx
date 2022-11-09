@@ -2337,7 +2337,7 @@ class ScrollAlpha extends Option
 
 	private override function updateDisplay():String
 	{
-		return (FlxG.save.data.alpha ? "Scroll Alpha" : "Scroll Alpha");
+		return ("Scroll Alpha");
 	}
 
 	override function right():Bool
