@@ -19,7 +19,7 @@ import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.utils.Assets as OpenFlAssets;
 #if !html5
-//crash handler stuff
+// crash handler stuff
 import lime.app.Application;
 import openfl.events.UncaughtErrorEvent;
 import haxe.CallStack;
@@ -41,8 +41,6 @@ class Main extends Sprite
 
 	public static var bitmapFPS:Bitmap;
 
-	public static var instance:Main;
-
 	public static var watermarks = true; // Whether to put Kade Engine literally anywhere
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
@@ -56,8 +54,6 @@ class Main extends Sprite
 
 	public function new()
 	{
-		instance = this;
-
 		super();
 
 		if (stage != null)
@@ -130,7 +126,7 @@ class Main extends Sprite
 
 		// Finish up loading debug tools.
 		Debug.onGameStart();
-		
+
 		#if !html5
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
 		#end
@@ -156,7 +152,6 @@ class Main extends Sprite
 			}
 		}
 		Assets.cache.clear("songs");
-		Assets.cache.clear("images");
 		#end
 		// */
 	}
@@ -185,21 +180,14 @@ class Main extends Sprite
 		return fpsCounter.currentFPS;
 	}
 
-	// lov u tails
-	// https://github.com/nebulazorua/tails-gets-trolled-v3/blob/master/source/Main.hx
-	public static function adjustFPS(num:Float):Float
-	{
-		return num * (60 / (cast(Lib.current.getChildAt(0), Main)).getFPS());
-	}
-	
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
-	#if !html5 //because of how it show up on desktop
+	#if !html5 // because of how it show up on desktop
 	function onCrash(e:UncaughtErrorEvent):Void
 	{
 		if (FlxG.fullscreen)
 			FlxG.fullscreen = !FlxG.fullscreen;
-		
+
 		var errMsg:String = "";
 		var path:String;
 		var callStack:Array<StackItem> = CallStack.exceptionStack(true);
@@ -221,7 +209,9 @@ class Main extends Sprite
 			}
 		}
 
-		errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to My Github page: https://github.com/BoloVEVO/Kade-Engine-Public\n\n> Crash Handler written by: sqirra-rng";
+		errMsg += "\nUncaught Error: "
+			+ e.error
+			+ "\nPlease report this error to My Github page: https://github.com/BoloVEVO/Kade-Engine-Public\n\n> Crash Handler written by: sqirra-rng";
 
 		if (!FileSystem.exists("./crash/"))
 			FileSystem.createDirectory("./crash/");

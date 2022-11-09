@@ -100,7 +100,7 @@ class Character extends FlxSprite
 
 		var data:CharacterData = cast jsonData;
 
-		if (!FlxG.save.data.optimize)
+		if (FlxG.save.data.characters)
 		{
 			var tex:FlxFramesCollection;
 
@@ -142,26 +142,26 @@ class Character extends FlxSprite
 						animNext[anim.name] = anim.nextAnim;
 				}
 
-			this.replacesGF = data.replacesGF == null ? false : data.replacesGF;
-			this.hasTrail = data.hasTrail == null ? false : data.hasTrail;
-			this.isDancing = data.isDancing == null ? false : data.isDancing;
-			this.charPos = data.charPos == null ? [0, 0] : data.charPos;
-			this.camPos = data.camPos == null ? [0, 0] : data.camPos;
-			this.camFollow = data.camFollow == null ? [0, 0] : data.camFollow;
-			this.holdLength = data.holdLength == null ? 4 : data.holdLength;
-
-			flipX = data.flipX == null ? false : data.flipX;
-
 			if (data.scale != null)
 			{
 				setGraphicSize(Std.int(width * data.scale));
 				updateHitbox();
 			}
 
-			antialiasing = data.antialiasing == null ? FlxG.save.data.antialiasing : data.antialiasing;
-
 			playAnim(data.startingAnim);
 		}
+
+		this.replacesGF = data.replacesGF == null ? false : data.replacesGF;
+		this.hasTrail = data.hasTrail == null ? false : data.hasTrail;
+		this.isDancing = data.isDancing == null ? false : data.isDancing;
+		this.charPos = data.charPos == null ? [0, 0] : data.charPos;
+		this.camPos = data.camPos == null ? [0, 0] : data.camPos;
+		this.camFollow = data.camFollow == null ? [0, 0] : data.camFollow;
+		this.holdLength = data.holdLength == null ? 4 : data.holdLength;
+
+		flipX = data.flipX == null ? false : data.flipX;
+
+		antialiasing = data.antialiasing == null ? FlxG.save.data.antialiasing : data.antialiasing;
 
 		barColor = FlxColor.fromString(data.barColor);
 	}
@@ -242,7 +242,7 @@ class Character extends FlxSprite
 	{
 		if (!debugMode)
 		{
-			if (!FlxG.save.data.optimize)
+			if (FlxG.save.data.characters)
 			{
 				if (animation.curAnim != null)
 				{
@@ -284,7 +284,7 @@ class Character extends FlxSprite
 
 	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void
 	{
-		if (!FlxG.save.data.optimize)
+		if (FlxG.save.data.characters)
 		{
 			if (AnimName.endsWith('alt') && animation.getByName(AnimName) == null)
 			{
