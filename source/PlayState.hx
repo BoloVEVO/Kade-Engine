@@ -616,37 +616,6 @@ class PlayState extends MusicBeatState
 			SONG.eventObjects = [new Song.Event("Init BPM", 0, SONG.bpm, "BPM Change")];
 		}
 
-		TimingStruct.clearTimings();
-
-		var currentIndex = 0;
-		for (i in SONG.eventObjects)
-		{
-			if (i.type == "BPM Change")
-			{
-				var beat:Float = i.position;
-
-				var endBeat:Float = Math.POSITIVE_INFINITY;
-
-				var bpm = i.value * songMultiplier;
-
-				TimingStruct.addTiming(beat, bpm, endBeat, 0); // offset in this case = start time since we don't have a offset
-
-				if (currentIndex != 0)
-				{
-					var data = TimingStruct.AllTimings[currentIndex - 1];
-					data.endBeat = beat;
-					data.length = ((data.endBeat - (data.startBeat)) / (data.bpm / 60));
-					var step = ((60 / (data.bpm)) * 1000) / 4;
-					TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step));
-					TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length;
-				}
-
-				currentIndex++;
-			}
-		}
-
-		recalculateAllSectionTimes();
-
 		trace('INFORMATION ABOUT WHAT U PLAYIN WIT:\nFRAMES: ' + PlayStateChangeables.safeFrames + '\nZONE: ' + Conductor.safeZoneOffset + '\nTS: '
 			+ Conductor.timeScale + '\nBotPlay : ' + PlayStateChangeables.botPlay);
 
@@ -2029,36 +1998,7 @@ class PlayState extends MusicBeatState
 		Conductor.songPosition = startTime;
 		startTime = 0;
 
-		TimingStruct.clearTimings();
-
-		var currentIndex = 0;
-		for (i in SONG.eventObjects)
-		{
-			if (i.type == "BPM Change")
-			{
-				var beat:Float = i.position;
-
-				var endBeat:Float = Math.POSITIVE_INFINITY;
-
-				var bpm = i.value * songMultiplier;
-
-				TimingStruct.addTiming(beat, bpm, endBeat, 0); // offset in this case = start time since we don't have a offset
-
-				if (currentIndex != 0)
-				{
-					var data = TimingStruct.AllTimings[currentIndex - 1];
-					data.endBeat = beat;
-					data.length = ((data.endBeat - (data.startBeat)) / (data.bpm / 60));
-					var step = ((60 / (data.bpm)) * 1000) / 4;
-					TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step));
-					TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length;
-				}
-
-				currentIndex++;
-			}
-		}
-
-		recalculateAllSectionTimes();
+		addSongTiming();
 
 		songPosBG = new FlxSprite(0, FlxG.height - 710).loadGraphic(Paths.image('healthBar', 'shared'));
 
@@ -2195,7 +2135,7 @@ class PlayState extends MusicBeatState
 			#end
 		}
 
-		inst.pause();
+		addSongTiming();
 
 		Conductor.crochet = ((60 / (SONG.bpm) * 1000));
 		Conductor.stepCrochet = Conductor.crochet / 4;
@@ -2846,12 +2786,12 @@ class PlayState extends MusicBeatState
 		}
 
 		var lerpVal:Float = CoolUtil.boundTo(elapsed * 2.4 * songMultiplier, 0, 1);
-		var lerpScore:Float = CoolUtil.boundTo(elapsed * 140, 0, 1);
+		var lerpScore:Float = CoolUtil.boundTo(elapsed * 35, 0, 1);
 
 		camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
 
-		shownSongScore = Math.floor(FlxMath.lerp(shownSongScore, songScore, lerpVal));
-		shownAccuracy = FlxMath.lerp(shownAccuracy, accuracy, lerpVal);
+		shownSongScore = Math.floor(FlxMath.lerp(shownSongScore, songScore, lerpScore));
+		shownAccuracy = FlxMath.lerp(shownAccuracy, accuracy, lerpScore);
 		if (Math.abs(shownAccuracy - accuracy) <= 0)
 			shownAccuracy = accuracy;
 		if (Math.abs(shownSongScore - songScore) <= 100)
@@ -2931,43 +2871,7 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-		if (!songStarted)
-		{
-			if (updateFrame == 4)
-			{
-				TimingStruct.clearTimings();
-				var currentIndex = 0;
-				for (i in SONG.eventObjects)
-				{
-					if (i.type == "BPM Change")
-					{
-						var beat:Float = i.position;
 
-						var endBeat:Float = Math.POSITIVE_INFINITY;
-
-						var bpm = i.value * songMultiplier;
-
-						TimingStruct.addTiming(beat, bpm, endBeat, 0); // offset in this case = start time since we don't have a offset
-
-						if (currentIndex != 0)
-						{
-							var data = TimingStruct.AllTimings[currentIndex - 1];
-							data.endBeat = beat;
-							data.length = ((data.endBeat - data.startBeat) / (data.bpm / 60));
-							var step = (((60 / data.bpm) * 1000)) / 4;
-
-							TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step));
-							TimingStruct.AllTimings[currentIndex].startTime = (data.startTime + data.length);
-						}
-						currentIndex++;
-					}
-				}
-				recalculateAllSectionTimes();
-				updateFrame++;
-			}
-			else if (updateFrame != 5)
-				updateFrame++;
-		}
 		if (inst.playing)
 		{
 			var timingSeg = TimingStruct.getTimingAtBeat(curDecimalBeat);
@@ -4187,7 +4091,7 @@ class PlayState extends MusicBeatState
 					if (FlxG.save.data.scoreScreen)
 					{
 						paused = true;
-
+						persistentUpdate = false;
 						openSubState(new ResultsScreen());
 						createTimer(1, function(tmr:FlxTimer)
 						{
@@ -6531,6 +6435,40 @@ class PlayState extends MusicBeatState
 			case 'music':
 				Paths.music(target, library);
 		}
+	}
+
+	private function addSongTiming()
+	{
+		TimingStruct.clearTimings();
+
+		var currentIndex = 0;
+		for (i in SONG.eventObjects)
+		{
+			if (i.type == "BPM Change")
+			{
+				var beat:Float = i.position;
+
+				var endBeat:Float = Math.POSITIVE_INFINITY;
+
+				var bpm = i.value * songMultiplier;
+
+				TimingStruct.addTiming(beat, bpm, endBeat, 0); // offset in this case = start time since we don't have a offset
+
+				if (currentIndex != 0)
+				{
+					var data = TimingStruct.AllTimings[currentIndex - 1];
+					data.endBeat = beat;
+					data.length = ((data.endBeat - (data.startBeat)) / (data.bpm / 60));
+					var step = ((60 / (data.bpm)) * 1000) / 4;
+					TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step));
+					TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length;
+				}
+
+				currentIndex++;
+			}
+		}
+
+		recalculateAllSectionTimes();
 	}
 
 	function snapCamFollowToPos(x:Float, y:Float)
