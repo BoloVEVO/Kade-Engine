@@ -657,12 +657,14 @@ class FreeplayState extends MusicBeatState
 					rate -= 0.05;
 					lastRate = rate;
 					updateDiffCalc();
+					updateScoreText();
 				}
 				if (FlxG.keys.justPressed.RIGHT)
 				{
 					rate += 0.05;
 					lastRate = rate;
 					updateDiffCalc();
+					updateScoreText();
 				}
 
 				if (FlxG.keys.justPressed.R)
@@ -670,6 +672,7 @@ class FreeplayState extends MusicBeatState
 					rate = 1;
 					lastRate = rate;
 					updateDiffCalc();
+					updateScoreText();
 				}
 
 				if (rate > 3)
@@ -677,12 +680,14 @@ class FreeplayState extends MusicBeatState
 					rate = 3;
 					lastRate = rate;
 					updateDiffCalc();
+					updateScoreText();
 				}
 				else if (rate < 0.5)
 				{
 					rate = 0.5;
 					lastRate = rate;
 					updateDiffCalc();
+					updateScoreText();
 				}
 
 				previewtext.text = "Rate: < " + FlxMath.roundDecimal(rate, 2) + "x >";
@@ -772,6 +777,27 @@ class FreeplayState extends MusicBeatState
 					item.alpha = 0;
 			}
 		}
+	}
+
+	function updateScoreText()
+	{
+		var songHighscore = StringTools.replace(songs[curSelected].songName, " ", "-");
+		// adjusting the highscore song name to be compatible (changeDiff)
+		switch (songHighscore)
+		{
+			case 'Dad-Battle':
+				songHighscore = 'Dadbattle';
+			case 'Philly-Nice':
+				songHighscore = 'Philly';
+			case 'M.I.L.F':
+				songHighscore = 'Milf';
+		}
+		#if !switch
+		intendedScore = Highscore.getScore(songHighscore, curDifficulty, rate);
+		combo = Highscore.getCombo(songHighscore, curDifficulty, rate);
+		letter = Highscore.getLetter(songHighscore, curDifficulty, rate);
+		intendedaccuracy = Highscore.getAcc(songHighscore, curDifficulty, rate);
+		#end
 	}
 
 	override function beatHit()
@@ -902,24 +928,7 @@ class FreeplayState extends MusicBeatState
 		if (curDifficulty > songs[curSelected].diffs.length - 1)
 			curDifficulty = 0;
 
-		var songHighscore = StringTools.replace(songs[curSelected].songName, " ", "-");
-		// adjusting the highscore song name to be compatible (changeDiff)
-		switch (songHighscore)
-		{
-			case 'Dad-Battle':
-				songHighscore = 'Dadbattle';
-			case 'Philly-Nice':
-				songHighscore = 'Philly';
-			case 'M.I.L.F':
-				songHighscore = 'Milf';
-		}
-
-		#if !switch
-		intendedScore = Highscore.getScore(songHighscore, curDifficulty);
-		combo = Highscore.getCombo(songHighscore, curDifficulty);
-		letter = Highscore.getLetter(songHighscore, curDifficulty);
-		intendedaccuracy = Highscore.getAcc(songHighscore, curDifficulty);
-		#end
+		updateScoreText();
 		updateDiffCalc();
 		diffText.text = 'DIFFICULTY: < ' + songs[curSelected].diffs[curDifficulty].toUpperCase() + ' >';
 	}
@@ -972,13 +981,7 @@ class FreeplayState extends MusicBeatState
 				songHighscore = 'Milf';
 		}
 
-		#if !switch
-		intendedScore = Highscore.getScore(songHighscore, curDifficulty);
-		combo = Highscore.getCombo(songHighscore, curDifficulty);
-		letter = Highscore.getLetter(songHighscore, curDifficulty);
-		intendedaccuracy = Highscore.getAcc(songHighscore, curDifficulty);
-		// lerpScore = 0;
-		#end
+		updateScoreText();
 
 		/*diffCalcText.text = 'RATING: ${DiffCalc.CalculateDiff(songData.get(songs[curSelected].songName)[curDifficulty])}';
 			diffText.text = 'DIFFICULTY: < ' + CoolUtil.difficultyFromInt(curDifficulty).toUpperCase() + ' >'; */

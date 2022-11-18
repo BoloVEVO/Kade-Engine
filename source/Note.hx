@@ -83,6 +83,8 @@ class Note extends FlxSprite
 	public var lateHitMult:Float = 0.5;
 	public var earlyHitMult:Float = 1.0;
 
+	public var insideCharter:Bool = false;
+
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inCharter:Bool = false, ?isAlt:Bool = false, ?bet:Float = 0)
 	{
 		super();
@@ -96,6 +98,7 @@ class Note extends FlxSprite
 
 		this.prevNote = prevNote;
 		this.isSustainNote = sustainNote;
+		this.insideCharter = inCharter;
 
 		lateHitMult = isSustainNote ? 0.5 : 1;
 
@@ -134,10 +137,16 @@ class Note extends FlxSprite
 			noteData = Std.int(Math.abs(3 - noteData));
 		}
 
+		if (inCharter || !FlxG.save.data.postProcessNotes)
+			loadNote();
+	}
+
+	public function loadNote():Void
+	{
 		// defaults if no noteStyle was found in chart
 		var noteTypeCheck:String = 'normal';
 
-		if (inCharter)
+		if (insideCharter)
 		{
 			frames = PlayState.noteskinSprite;
 
@@ -166,39 +175,40 @@ class Note extends FlxSprite
 			{
 				noteTypeCheck = PlayState.SONG.noteStyle;
 			}
-
-			switch (noteTypeCheck)
-			{
-				case 'pixel':
-					loadGraphic(PlayState.noteskinPixelSprite, true, 17, 17);
-					if (isSustainNote)
-						loadGraphic(PlayState.noteskinPixelSpriteEnds, true, 7, 6);
-
-					for (i in 0...4)
-					{
-						animation.add(dataColor[i] + 'Scroll', [i + 4]); // Normal notes
-						animation.add(dataColor[i] + 'hold', [i]); // Holds
-						animation.add(dataColor[i] + 'holdend', [i + 4]); // Tails
-					}
-
-					setGraphicSize(Std.int(width * CoolUtil.daPixelZoom));
-					updateHitbox();
-				default:
-					frames = PlayState.noteskinSprite;
-
-					for (i in 0...4)
-					{
-						animation.addByPrefix(dataColor[i] + 'Scroll', dataColor[i] + ' alone'); // Normal notes
-						animation.addByPrefix(dataColor[i] + 'hold', dataColor[i] + ' hold'); // Hold
-						animation.addByPrefix(dataColor[i] + 'holdend', dataColor[i] + ' tail'); // Tails
-					}
-
-					setGraphicSize(Std.int(width * 0.7));
-					updateHitbox();
-
-					antialiasing = FlxG.save.data.antialiasing;
-			}
 		}
+
+		switch (noteTypeCheck)
+		{
+			case 'pixel':
+				loadGraphic(PlayState.noteskinPixelSprite, true, 17, 17);
+				if (isSustainNote)
+					loadGraphic(PlayState.noteskinPixelSpriteEnds, true, 7, 6);
+
+				for (i in 0...4)
+				{
+					animation.add(dataColor[i] + 'Scroll', [i + 4]); // Normal notes
+					animation.add(dataColor[i] + 'hold', [i]); // Holds
+					animation.add(dataColor[i] + 'holdend', [i + 4]); // Tails
+				}
+
+				setGraphicSize(Std.int(width * CoolUtil.daPixelZoom));
+				updateHitbox();
+			default:
+				frames = PlayState.noteskinSprite;
+
+				for (i in 0...4)
+				{
+					animation.addByPrefix(dataColor[i] + 'Scroll', dataColor[i] + ' alone'); // Normal notes
+					animation.addByPrefix(dataColor[i] + 'hold', dataColor[i] + ' hold'); // Hold
+					animation.addByPrefix(dataColor[i] + 'holdend', dataColor[i] + ' tail'); // Tails
+				}
+
+				setGraphicSize(Std.int(width * 0.7));
+				updateHitbox();
+
+				antialiasing = FlxG.save.data.antialiasing;
+		}
+
 		x += swagWidth * (noteData % 4);
 
 		animation.play(dataColor[noteData] + 'Scroll');
@@ -235,8 +245,8 @@ class Note extends FlxSprite
 			originColor = col;
 		}
 
-		stepHeight = (((0.45 * Conductor.stepCrochet)) * FlxMath.roundDecimal(PlayState.instance.scrollSpeed == 1 ? PlayState.SONG.speed : PlayState.instance.scrollSpeed,
-			2)) / PlayState.songMultiplier;
+		stepHeight = (((0.45 * PlayState.fakeNoteStepCrochet)) * FlxMath.roundDecimal(PlayState.instance.scrollSpeed == 1 ? PlayState.SONG.speed : PlayState.instance.scrollSpeed,
+			2)) * PlayState.songMultiplier;
 
 		if (isSustainNote && prevNote != null)
 		{
@@ -260,7 +270,8 @@ class Note extends FlxSprite
 
 			// if (noteTypeCheck == 'pixel')
 			//	x += 30;
-			if (inCharter)
+
+			if (insideCharter)
 				x += 30;
 
 			if (prevNote.isSustainNote)

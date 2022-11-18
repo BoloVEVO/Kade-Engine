@@ -188,7 +188,8 @@ class OptionsMenu extends FlxSubState
 				new GPURendering("Toggle GPU rendering to push Graphics textures to GPU, reducing RAM memory usage. "),
 				new CharacterOption("Toogle Characters on Stage depending of your computer performance."),
 				new Background("Toogle Stage Background depending of your computer performance."),
-				new DistractionsAndEffectsOption("Toggle stage distractions that can hinder your gameplay and save memory.")
+				new DistractionsAndEffectsOption("Toggle stage distractions that can hinder your gameplay and save memory."),
+				new NotePostProcessing("Toggle Note Post processing to load notes while song elapses. (Useful for low-end computers)")
 			]),
 			new OptionCata(50, 104, "Saves", [
 				#if desktop // new ReplayOption("View saved song replays."),
@@ -777,7 +778,7 @@ class OptionsMenu extends FlxSubState
 				case 1:
 					selectedCat.optionObjects.members[16].color = FlxColor.YELLOW;
 				case 3:
-					for (i in 0...4)
+					for (i in 0...5)
 						selectedCat.optionObjects.members[i].color = FlxColor.YELLOW;
 				case 4:
 					for (i in 0...4)
@@ -797,6 +798,7 @@ class OptionsMenu extends FlxSubState
 				descText.text = "BACKGROUNDS ARE DISABLED! Distractions are disabled.";
 				descText.color = FlxColor.YELLOW;
 			}
+
 			#if html5
 			if (selectedOptionIndex == 9 && selectedCatIndex == 0)
 			{

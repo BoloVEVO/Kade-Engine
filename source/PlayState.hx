@@ -422,8 +422,8 @@ class PlayState extends MusicBeatState
 		if (previousRate < 1.00)
 			previousRate = 1;
 
-		if (FlxG.save.data.fpsCap > 300)
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
+		if (FlxG.save.data.fpsCap > 800)
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(800);
 
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
@@ -1592,15 +1592,6 @@ class PlayState extends MusicBeatState
 						note.updateHitbox();
 					}
 			}
-			for (note in unspawnNotes)
-			{
-				if (note.animation.curAnim != null)
-					if (note.isSustainNote && !note.animation.curAnim.name.endsWith('end'))
-					{
-						note.scale.y *= ratio;
-						note.updateHitbox();
-					}
-			}
 		}
 		scrollSpeed = value;
 		return value;
@@ -2217,10 +2208,10 @@ class PlayState extends MusicBeatState
 					swagNote.isParent = true;
 
 				var type = 0;
-				var floorSus:Int = Math.floor(susLength);
-				if (floorSus > 0)
+
+				if (susLength > 0)
 				{
-					for (susNote in 0...floorSus + 1)
+					for (susNote in 0...Std.int(Math.max(susLength, 2)))
 					{
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
@@ -2750,14 +2741,16 @@ class PlayState extends MusicBeatState
 		if (FlxG.save.data.background)
 			Stage.update(elapsed);
 
-		var shit:Float = 14000;
+		var shit:Float = 3500;
 		if (SONG.speed < 1 || scrollSpeed < 1)
 			shit /= scrollSpeed == 1 ? SONG.speed : scrollSpeed;
 		if (unspawnNotes[0] != null)
 		{
-			if (unspawnNotes[0].strumTime - Conductor.songPosition < 14000 * songMultiplier)
+			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < shit)
 			{
 				var dunceNote:Note = unspawnNotes[0];
+				if (FlxG.save.data.postProcessNotes)
+					dunceNote.loadNote();
 				notes.add(dunceNote);
 
 				#if FEATURE_LUAMODCHART
@@ -3996,8 +3989,8 @@ class PlayState extends MusicBeatState
 		PlayStateChangeables.botPlay = false;
 		scrollSpeed = 1 / songMultiplier;
 
-		if (FlxG.save.data.fpsCap > 300)
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
+		if (FlxG.save.data.fpsCap > 800)
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(800);
 
 		#if FEATURE_LUAMODCHART
 		if (luaModchart != null)
@@ -4025,10 +4018,10 @@ class PlayState extends MusicBeatState
 			&& HelperFunctions.truncateFloat(PlayStateChangeables.healthLoss, 2) >= 1;
 		if (SONG.validScore && superMegaConditionShit)
 		{
-			Highscore.saveScore(PlayState.SONG.songId, Math.round(songScore), storyDifficulty);
-			Highscore.saveCombo(PlayState.SONG.songId, Ratings.GenerateComboRank(accuracy), storyDifficulty);
-			Highscore.saveAcc(PlayState.SONG.songId, HelperFunctions.truncateFloat(accuracy, 2), storyDifficulty);
-			Highscore.saveLetter(PlayState.SONG.songId, Ratings.GenerateLetterRank(accuracy), storyDifficulty);
+			Highscore.saveScore(PlayState.SONG.songId, Math.round(songScore), storyDifficulty, songMultiplier);
+			Highscore.saveCombo(PlayState.SONG.songId, Ratings.GenerateComboRank(accuracy), storyDifficulty, songMultiplier);
+			Highscore.saveAcc(PlayState.SONG.songId, HelperFunctions.truncateFloat(accuracy, 2), storyDifficulty, songMultiplier);
+			Highscore.saveLetter(PlayState.SONG.songId, Ratings.GenerateLetterRank(accuracy), storyDifficulty, songMultiplier);
 		}
 
 		if (offsetTesting)
@@ -4119,7 +4112,7 @@ class PlayState extends MusicBeatState
 
 					if (SONG.validScore)
 					{
-						Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
+						Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty, 1);
 					}
 					StoryMenuState.unlockNextWeek(storyWeek);
 				}
@@ -5056,7 +5049,7 @@ class PlayState extends MusicBeatState
 			// var noteDiff:Float = Math.abs(daNote.strumTime - Conductor.songPosition);
 			// var wife:Float = EtternaFunctions.wife3(noteDiff, FlxG.save.data.etternaMode ? 1 : 1.7);
 
-			totalNotesHit -= 0.5;
+			totalNotesHit -= 1;
 
 			if (daNote != null)
 			{

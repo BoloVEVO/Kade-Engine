@@ -1294,10 +1294,10 @@ class FPSCapOption extends Option
 		#if html5
 		return false;
 		#end
-		if (FlxG.save.data.fpsCap >= 300)
+		if (FlxG.save.data.fpsCap >= 800)
 		{
-			FlxG.save.data.fpsCap = 300;
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
+			FlxG.save.data.fpsCap = 800;
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(800);
 		}
 		else
 			FlxG.save.data.fpsCap = FlxG.save.data.fpsCap + 10;
@@ -1311,8 +1311,8 @@ class FPSCapOption extends Option
 		#if html5
 		return false;
 		#end
-		if (FlxG.save.data.fpsCap > 300)
-			FlxG.save.data.fpsCap = 300;
+		if (FlxG.save.data.fpsCap > 800)
+			FlxG.save.data.fpsCap = 800;
 		else if (FlxG.save.data.fpsCap < 60)
 			FlxG.save.data.fpsCap = Application.current.window.displayMode.refreshRate;
 		else
@@ -2088,6 +2088,39 @@ class ScoreSmoothing extends Option
 	private override function updateDisplay():String
 	{
 		return "Smooth Score PopUp: < " + (FlxG.save.data.lerpScore ? "on" : "off") + " >";
+	}
+}
+
+class NotePostProcessing extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		if (OptionsMenu.isInPause)
+			description = "This option cannot be toggled in the pause menu.";
+		else
+			description = desc;
+	}
+
+	public override function left():Bool
+	{
+		if (OptionsMenu.isInPause)
+			return false;
+		FlxG.save.data.postProcessNotes = !FlxG.save.data.postProcessNotes;
+
+		display = updateDisplay();
+		return true;
+	}
+
+	public override function right():Bool
+	{
+		left();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "[EXP] Post Process Song Notes: < " + (FlxG.save.data.postProcessNotes ? "on" : "off") + " >";
 	}
 }
 

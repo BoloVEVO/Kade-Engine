@@ -234,6 +234,11 @@ class KadeEngineData
 			#end
 		}
 
+		if (FlxG.save.data.postProcessNotes == null)
+		{
+			FlxG.save.data.postProcessNotes = true;
+		}
+
 		if (FlxG.save.data.volume == null)
 			FlxG.save.data.volume = 1;
 
