@@ -9,6 +9,7 @@ import haxe.Timer;
 import openfl.events.Event;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
+import haxe.Int64;
 import openfl.display3D.Context3D;
 #if gl_stats
 import openfl.display._internal.stats.Context3DStats;
@@ -36,9 +37,9 @@ class KadeEngineFPS extends TextField
 	**/
 	public var currentFPS(default, null):Int;
 
-	public var memoryMegas:Float = 0;
+	public var memoryMegas:Int64 = 0;
 
-	public var memoryTotal:Float = 0;
+	public var memoryTotal:Int64 = 0;
 
 	public var memoryUsage:String;
 
@@ -120,10 +121,14 @@ class KadeEngineFPS extends TextField
 
 		var currentCount = times.length;
 		currentFPS = Math.round((currentCount + cacheCount) / 2);
+		if (currentFPS > FlxG.save.data.fpsCap)
+			currentFPS = FlxG.save.data.fpsCap;
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
-			memoryMegas = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
+			memoryUsage = (FlxG.save.data.memoryDisplay ? "Memory Usage: " : "");
+
+			memoryMegas = Int64.make(0, System.totalMemory);
 
 			/* This shit gets the gpu usage of every program of ur pc and not from the game. The gpu usage will be very innacurate.*/
 			// gpuMemory = Math.abs(FlxMath.roundDecimal(FlxG.stage.context3D.totalGPUMemory / 1000000, 1));
@@ -131,13 +136,30 @@ class KadeEngineFPS extends TextField
 
 			if (memoryMegas > memoryTotal)
 				memoryTotal = memoryMegas;
+			if (FlxG.save.data.memoryDisplay)
+				if (memoryMegas >= 0x40000000)
+					memoryUsage += (Math.round(cast(memoryMegas, Float) / 0x400 / 0x400 / 0x400 * 1000) / 1000)
+						+ "GB / "
+						+ (Math.round(cast(memoryTotal, Float) / 0x400 / 0x400 / 0x400 * 1000) / 1000)
+						+ ' GB';
+				else if (memoryMegas >= 0x100000)
+					memoryUsage += (Math.round(cast(memoryMegas, Float) / 0x400 / 0x400 * 1000) / 1000)
+						+ "MB / "
+						+ (Math.round(cast(memoryTotal, Float) / 0x400 / 0x400 * 1000) / 1000)
+						+ ' MB';
+				else if (memoryMegas >= 0x400)
+					memoryUsage += (Math.round(cast(memoryMegas, Float) / 0x400 * 1000) / 1000)
+						+ "KB / "
+						+ (Math.round(cast(memoryMegas, Float) / 0x400 * 1000) / 1000)
+						+ ' KB';
+				else
+					memoryUsage += memoryMegas + "B / " + memoryTotal + " B";
 
 			/*if (FlxG.save.data.gpuRender)
 					memoryUsage = (FlxG.save.data.memoryDisplay?"Memory Usage: " + memoryMegas + " MB / " + memoryTotal + " MB" + "\nGPU Usage: " + gpuMemory
 						+ " MB" #if debug
 						+ gpuInfo #end : "");
 				else */
-			memoryUsage = (FlxG.save.data.memoryDisplay ? "Memory Usage: " + memoryMegas + " MB / " + memoryTotal + " MB" : "");
 
 			text = (FlxG.save.data.fps ? "FPS: "
 				+ '$currentFPS\n'

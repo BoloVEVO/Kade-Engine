@@ -1294,10 +1294,10 @@ class FPSCapOption extends Option
 		#if html5
 		return false;
 		#end
-		if (FlxG.save.data.fpsCap >= 800)
+		if (FlxG.save.data.fpsCap >= 300)
 		{
-			FlxG.save.data.fpsCap = 800;
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(800);
+			FlxG.save.data.fpsCap = 300;
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
 		}
 		else
 			FlxG.save.data.fpsCap = FlxG.save.data.fpsCap + 10;
@@ -1311,8 +1311,8 @@ class FPSCapOption extends Option
 		#if html5
 		return false;
 		#end
-		if (FlxG.save.data.fpsCap > 800)
-			FlxG.save.data.fpsCap = 800;
+		if (FlxG.save.data.fpsCap > 300)
+			FlxG.save.data.fpsCap = 300;
 		else if (FlxG.save.data.fpsCap < 60)
 			FlxG.save.data.fpsCap = Application.current.window.displayMode.refreshRate;
 		else
@@ -1443,7 +1443,7 @@ class ReplayOption extends Option
 	public override function press():Bool
 	{
 		trace("switch");
-		MusicBeatState.switchState(new LoadReplayState());
+		// MusicBeatState.switchState(new LoadReplayState());
 		return false;
 	}
 

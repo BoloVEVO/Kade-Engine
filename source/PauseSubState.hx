@@ -230,8 +230,7 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.scrollSpeed = (FlxG.save.data.scrollSpeed == 1 ? PlayState.SONG.speed * PlayState.songMultiplier : FlxG.save.data.scrollSpeed * PlayState.songMultiplier);
 				case "Restart Song":
 					PlayState.startTime = 0;
-					MusicBeatState.switchState(new PlayState());
-					PlayState.stageTesting = false;
+					MusicBeatState.resetState();
 				case "Options":
 					goToOptions = true;
 					close();
@@ -244,7 +243,6 @@ class PauseSubState extends MusicBeatSubstate
 						FlxG.save.data.downscroll = false;
 					}
 					PlayState.loadRep = false;
-					PlayState.stageTesting = false;
 					#if FEATURE_LUAMODCHART
 					if (PlayState.luaModchart != null)
 					{
@@ -252,8 +250,8 @@ class PauseSubState extends MusicBeatSubstate
 						PlayState.luaModchart = null;
 					}
 					#end
-					if (FlxG.save.data.fpsCap > 800)
-						(cast(Lib.current.getChildAt(0), Main)).setFPSCap(800);
+					if (FlxG.save.data.fpsCap > 300)
+						(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
 
 					if (PlayState.isStoryMode)
 					{

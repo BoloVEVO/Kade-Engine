@@ -274,8 +274,6 @@ class PlayState extends MusicBeatState
 
 	var usedTimeTravel:Bool = false;
 
-	public static var stageTesting:Bool = false;
-
 	var camPos:FlxPoint;
 
 	public var randomVar = false;
@@ -422,8 +420,8 @@ class PlayState extends MusicBeatState
 		if (previousRate < 1.00)
 			previousRate = 1;
 
-		if (FlxG.save.data.fpsCap > 800)
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(800);
+		if (FlxG.save.data.fpsCap > 300)
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
 
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
@@ -695,7 +693,7 @@ class PlayState extends MusicBeatState
 			gfCheck = SONG.gfVersion;
 		}
 
-		if (!stageTesting || FlxG.save.data.characters)
+		if (FlxG.save.data.characters)
 		{
 			gf = new Character(400, 130, gfCheck);
 
@@ -728,11 +726,10 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		if (!stageTesting)
-			Stage = new Stage(SONG.stage);
+		Stage = new Stage(SONG.stage);
 
 		var positions = Stage.positions[Stage.curStage];
-		if (positions != null && !stageTesting)
+		if (positions != null)
 		{
 			for (char => pos in positions)
 				for (person in [boyfriend, gf, dad])
@@ -854,8 +851,7 @@ class PlayState extends MusicBeatState
 
 		if (dad.replacesGF)
 		{
-			if (!stageTesting)
-				dad.setPosition(gf.x, gf.y);
+			dad.setPosition(gf.x, gf.y);
 			gf.visible = false;
 
 			camPos.x += 600;
@@ -1335,8 +1331,8 @@ class PlayState extends MusicBeatState
 				precacheThing('characters/bfHoldingGF-DEAD', 'image', 'shared');
 		}
 
-		if (!loadRep)
-			rep = new Replay("na");
+		/*if (!loadRep)
+			rep = new Replay("na"); */
 
 		// This allow arrow key to be detected by flixel. See https://github.com/HaxeFlixel/flixel/issues/2190
 		FlxG.keys.preventDefaultKeys = [];
@@ -1634,17 +1630,17 @@ class PlayState extends MusicBeatState
 			// this just based on beatHit stuff but compact
 			if (FlxG.save.data.characters)
 			{
-				if (allowedToHeadbang && swagCounter % gfSpeed == 0 && gf.curCharacter != 'pico-speaker')
+				if (allowedToHeadbang && swagCounter % Math.floor(gfSpeed * songMultiplier) == 0 && gf.curCharacter != 'pico-speaker')
 					gf.dance();
 
-				if (swagCounter % idleBeat == 0)
+				if (swagCounter % Math.floor(idleBeat * songMultiplier) == 0)
 				{
 					if (boyfriend != null && idleToBeat && !boyfriend.animation.curAnim.name.endsWith("miss"))
 						boyfriend.dance(forcedToIdle);
 					if (dad != null && idleToBeat)
 						dad.dance(forcedToIdle);
 				}
-				else if (swagCounter % idleBeat != 0)
+				else if (swagCounter % Math.floor(idleBeat * songMultiplier) != 0)
 				{
 					if (boyfriend != null && boyfriend.isDancing && !boyfriend.animation.curAnim.name.endsWith("miss"))
 						boyfriend.dance();
@@ -1885,9 +1881,7 @@ class PlayState extends MusicBeatState
 					{
 						trace('found a stacked/really close note ' + (note.strumTime - coolNote.strumTime));
 						// just fuckin remove it since it's a stacked note and shouldn't be there
-						note.kill();
-						notes.remove(note, true);
-						note.destroy();
+						destroyNote(note);
 					}
 				}
 			}
@@ -2990,7 +2984,7 @@ class PlayState extends MusicBeatState
 			if (FlxG.random.bool(0.1))
 			{
 				trace('GITAROO MAN EASTER EGG');
-				PsychTransition.nextCamera = mainCam;
+
 				MusicBeatState.switchState(new GitarooPause());
 			}
 			else
@@ -3001,7 +2995,7 @@ class PlayState extends MusicBeatState
 			cannotDie = true;
 			PsychTransition.nextCamera = mainCam;
 			MusicBeatState.switchState(new WaveformTestState());
-			PlayState.stageTesting = false;
+
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
 			#if FEATURE_LUAMODCHART
@@ -3020,11 +3014,9 @@ class PlayState extends MusicBeatState
 			executeModchart = false;
 
 			cannotDie = true;
-			PsychTransition.nextCamera = mainCam;
+
 			MusicBeatState.switchState(new ChartingState());
-			PlayState.stageTesting = false;
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
+
 			#if FEATURE_LUAMODCHART
 			if (luaModchart != null)
 			{
@@ -3077,11 +3069,8 @@ class PlayState extends MusicBeatState
 		#if debug
 		if (FlxG.keys.justPressed.SIX)
 		{
-			PsychTransition.nextCamera = mainCam;
 			MusicBeatState.switchState(new AnimationDebug(dad.curCharacter));
-			PlayState.stageTesting = false;
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
+
 			#if FEATURE_LUAMODCHART
 			if (luaModchart != null)
 			{
@@ -3094,30 +3083,9 @@ class PlayState extends MusicBeatState
 			if (FlxG.keys.justPressed.EIGHT && songStarted)
 			{
 				paused = true;
-				new FlxTimer().start(0.3, function(tmr:FlxTimer)
-				{
-					for (bg in Stage.toAdd)
-					{
-						remove(bg);
-					}
-					for (array in Stage.layInFront)
-					{
-						for (bg in array)
-							remove(bg);
-					}
-					for (group in Stage.swagGroup)
-					{
-						remove(group);
-					}
-					remove(boyfriend);
-					remove(dad);
-					remove(gf);
-				});
+				// Deleted State for complete rework.
+				// MusicBeatState.switchState(new StageDebugState());
 
-				PsychTransition.nextCamera = mainCam;
-				MusicBeatState.switchState(new StageDebugState(Stage.curStage, gf.curCharacter, boyfriend.curCharacter, dad.curCharacter));
-				FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
-				FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
 				#if FEATURE_LUAMODCHART
 				if (luaModchart != null)
 				{
@@ -3128,11 +3096,8 @@ class PlayState extends MusicBeatState
 			}
 		if (FlxG.keys.justPressed.ZERO)
 		{
-			PsychTransition.nextCamera = mainCam;
 			MusicBeatState.switchState(new AnimationDebug(boyfriend.curCharacter));
-			PlayState.stageTesting = false;
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
+
 			#if FEATURE_LUAMODCHART
 			if (luaModchart != null)
 			{
@@ -3143,11 +3108,8 @@ class PlayState extends MusicBeatState
 		}
 		if (FlxG.keys.justPressed.THREE)
 		{
-			PsychTransition.nextCamera = mainCam;
 			MusicBeatState.switchState(new AnimationDebug(gf.curCharacter));
-			PlayState.stageTesting = false;
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
+
 			#if FEATURE_LUAMODCHART
 			if (luaModchart != null)
 			{
@@ -3170,11 +3132,7 @@ class PlayState extends MusicBeatState
 					{
 						daNote.active = false;
 						daNote.visible = false;
-
-						daNote.kill();
-						notes.remove(daNote, true);
-						daNote.alive = false;
-						daNote.destroy();
+						destroyNote(daNote);
 					}
 				});
 
@@ -3666,18 +3624,12 @@ class PlayState extends MusicBeatState
 				if (daNote.noteData == -1)
 				{
 					Debug.logWarn('Weird Note detected! Note Data = "${daNote.rawNoteData}" is not valid, deleting...');
-					daNote.kill();
-					daNote.alive = false;
-					notes.remove(daNote, true);
-					daNote.destroy();
+					destroyNote(daNote);
 				}
 
 				if (!daNote.active)
 				{
-					daNote.kill();
-					daNote.alive = false;
-					notes.remove(daNote, true);
-					daNote.destroy();
+					destroyNote(daNote);
 					return;
 				}
 
@@ -3801,19 +3753,13 @@ class PlayState extends MusicBeatState
 				{
 					if (daNote.isSustainNote && daNote.wasGoodHit && Conductor.songPosition >= daNote.strumTime)
 					{
-						daNote.kill();
-						notes.remove(daNote, true);
-						daNote.alive = false;
-						daNote.destroy();
+						destroyNote(daNote);
 					}
 					if (daNote.mustPress && daNote.tooLate && !daNote.canBeHit && daNote.mustPress)
 					{
 						if (daNote.isSustainNote && daNote.wasGoodHit)
 						{
-							daNote.kill();
-							daNote.alive = false;
-							notes.remove(daNote, true);
-							daNote.destroy();
+							destroyNote(daNote);
 						}
 						else
 						{
@@ -3876,13 +3822,7 @@ class PlayState extends MusicBeatState
 								}
 							}
 
-							daNote.active = false;
-
-							daNote.visible = false;
-							daNote.kill();
-							notes.remove(daNote, true);
-							daNote.alive = false;
-							daNote.destroy();
+							destroyNote(daNote);
 						}
 					}
 				}
@@ -3989,8 +3929,8 @@ class PlayState extends MusicBeatState
 		PlayStateChangeables.botPlay = false;
 		scrollSpeed = 1 / songMultiplier;
 
-		if (FlxG.save.data.fpsCap > 800)
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(800);
+		if (FlxG.save.data.fpsCap > 300)
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
 
 		#if FEATURE_LUAMODCHART
 		if (luaModchart != null)
@@ -4031,26 +3971,6 @@ class PlayState extends MusicBeatState
 			PsychTransition.nextCamera = mainCam;
 			LoadingState.loadAndSwitchState(new OptionsMenu());
 			FlxG.save.data.offset = offsetTest;
-		}
-		else if (stageTesting)
-		{
-			new FlxTimer().start(0.3, function(tmr:FlxTimer)
-			{
-				for (bg in Stage.toAdd)
-				{
-					remove(bg);
-				}
-				for (array in Stage.layInFront)
-				{
-					for (bg in array)
-						remove(bg);
-				}
-				remove(boyfriend);
-				remove(dad);
-				remove(gf);
-			});
-			PsychTransition.nextCamera = mainCam;
-			MusicBeatState.switchState(new StageDebugState(Stage.curStage));
 		}
 		else
 		{
@@ -4556,14 +4476,14 @@ class PlayState extends MusicBeatState
 					onComplete: function(tween:FlxTween)
 					{
 						visibleCombos.remove(numScore);
-						numScore.destroy();
+						numScore.kill();
 					},
 					onUpdate: function(tween:FlxTween)
 					{
 						if (!visibleCombos.contains(numScore))
 						{
 							tween.cancel();
-							numScore.destroy();
+							numScore.kill();
 						}
 					},
 					startDelay: Conductor.crochet * 0.002 * Math.pow(songMultiplier, 2)
@@ -4600,14 +4520,14 @@ class PlayState extends MusicBeatState
 			createTween(comboSpr, {alpha: 0}, 0.2, {
 				onComplete: function(tween:FlxTween)
 				{
-					coolText.destroy();
-					comboSpr.destroy();
+					coolText.kill();
+					comboSpr.kill();
 					if (currentTimingShown != null && timeShown >= 20)
 					{
 						remove(currentTimingShown);
 						currentTimingShown = null;
 					}
-					rating.destroy();
+					rating.kill();
 				},
 				startDelay: (Conductor.crochet * Math.pow(songMultiplier, 2)) * 0.001
 			});
@@ -4747,9 +4667,7 @@ class PlayState extends MusicBeatState
 				for (note in dumbNotes)
 				{
 					FlxG.log.add("killing dumb ass note at " + note.strumTime);
-					note.kill();
-					notes.remove(note, true);
-					note.destroy();
+					destroyNote(note);
 				}
 
 				possibleNotes.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
@@ -5030,7 +4948,7 @@ class PlayState extends MusicBeatState
 						daNote.strumTime,
 						0,
 						direction,
-						-(Ratings.timingWindows[0] * Math.floor((PlayState.rep.replay.sf / 60) * 1000) / Ratings.timingWindows[0])
+						-(Ratings.timingWindows[0] * Math.floor((10 / 60) * 1000) / Ratings.timingWindows[0])
 					]);
 					saveJudge.push("miss");
 				}
@@ -5041,7 +4959,7 @@ class PlayState extends MusicBeatState
 					Conductor.songPosition,
 					0,
 					direction,
-					-(Ratings.timingWindows[0] * Math.floor((PlayState.rep.replay.sf / 60) * 1000) / Ratings.timingWindows[0])
+					-(Ratings.timingWindows[0] * Math.floor((10 / 60) * 1000) / Ratings.timingWindows[0])
 				]);
 				saveJudge.push("miss");
 			}
@@ -5210,6 +5128,8 @@ class PlayState extends MusicBeatState
 		var altAnim:String = "";
 		var curSection:Int = Math.floor((curStep / 16));
 
+		vocals.volume = 1;
+
 		if (daNote.isAlt)
 		{
 			altAnim = '-alt';
@@ -5359,10 +5279,7 @@ class PlayState extends MusicBeatState
 			if (SONG.needsVoices)
 				vocals.volume = 1;
 		}
-		daNote.active = false;
-		daNote.kill();
-		notes.remove(daNote, true);
-		daNote.destroy();
+		destroyNote(daNote);
 	}
 
 	function goodNoteHit(note:Note, resetMashViolation = true):Void
@@ -5475,9 +5392,7 @@ class PlayState extends MusicBeatState
 
 			if (!note.isSustainNote)
 			{
-				note.kill();
-				notes.remove(note, true);
-				note.destroy();
+				destroyNote(note);
 			}
 			else
 			{
@@ -5579,8 +5494,8 @@ class PlayState extends MusicBeatState
 				}
 			}
 
-			if (vocals.volume == 0 && !currentSection.mustHitSection)
-				vocals.volume = 1;
+			/*if (vocals.volume == 0 && !currentSection.mustHitSection)
+				vocals.volume = 1; */
 		}
 
 		// HARDCODING FOR MILF ZOOMS!
@@ -6410,6 +6325,9 @@ class PlayState extends MusicBeatState
 
 	override function switchTo(nextState:FlxState)
 	{
+		PsychTransition.nextCamera = mainCam;
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, handleInput);
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
 		funniKill();
 
 		return super.switchTo(nextState);
@@ -6428,6 +6346,15 @@ class PlayState extends MusicBeatState
 			case 'music':
 				Paths.music(target, library);
 		}
+	}
+
+	private function destroyNote(daNote:Note)
+	{
+		daNote.active = false;
+		daNote.alive = false;
+		daNote.kill();
+		notes.remove(daNote, true);
+		daNote = null;
 	}
 
 	private function addSongTiming()

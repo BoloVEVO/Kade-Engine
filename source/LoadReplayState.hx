@@ -1,4 +1,4 @@
-package;
+/*package;
 
 import haxe.Exception;
 import lime.app.Application;
@@ -294,4 +294,4 @@ class LoadReplayState extends MusicBeatState
 			}
 		}
 	}
-}
+}*/

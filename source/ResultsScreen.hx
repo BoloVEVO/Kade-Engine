@@ -277,7 +277,6 @@ class ResultsScreen extends FlxSubState
 				music.fadeOut(0.3);
 
 			PlayState.loadRep = false;
-			PlayState.stageTesting = false;
 			PlayState.rep = null;
 
 			if (PlayState.isStoryMode)
@@ -298,7 +297,6 @@ class ResultsScreen extends FlxSubState
 			PlayState.rep = null;
 
 			PlayState.loadRep = false;
-			PlayState.stageTesting = false;
 
 			if (music != null)
 				music.fadeOut(0.3);

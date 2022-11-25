@@ -261,8 +261,6 @@ class KadeEngineData
 
 		if (FlxG.save.data.watermark == null)
 			FlxG.save.data.watermark = true;
-
-		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
 	}
 
 	public static function resetModifiers():Void

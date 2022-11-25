@@ -82,11 +82,9 @@ class MusicBeatState extends FlxUIState
 
 		// Debug.logTrace(Object);
 		#if FEATURE_MULTITHREADING
-		if (!FlxG.save.data.optimize)
-			MasterObjectLoader.addObject(Object);
+		MasterObjectLoader.addObject(Object);
 		#else
-		if (!FlxG.save.data.optimize)
-			assets.push(Object);
+		assets.push(Object);
 		#end
 		var result = super.add(Object);
 		return result;

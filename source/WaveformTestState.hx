@@ -11,7 +11,7 @@ import lime.media.vorbis.VorbisFile;
 import openfl.geom.Rectangle;
 import openfl.media.Sound;
 
-class WaveformTestState extends FlxState
+class WaveformTestState extends MusicBeatState
 {
 	var waveform:Waveform;
 

@@ -58,14 +58,14 @@ class Stage extends MusicBeatState
 	public var camOffsets:Map<String, Array<Float>> = ['halloween' => [350, -50]];
 	public var stageCamZooms:Map<String, Float> = ['limo' => 0.90, 'mall' => 0.80, 'tank' => 0.90, 'void' => 0.9, 'stage' => 0.90];
 
-	public function new(daStage:String)
+	public function new(daStage:String, ?forceLoad:Bool = false)
 	{
 		super();
 
 		this.curStage = daStage;
 		// camZoom = 1.05; // Don't change zoom here, unless you want to change zoom of every stage that doesn't have custom one
 
-		if (!FlxG.save.data.background)
+		if (!FlxG.save.data.background && !forceLoad)
 			return;
 
 		switch (daStage)
