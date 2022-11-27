@@ -29,6 +29,8 @@ class Stage extends MusicBeatState
 	public var slowBacks:Map<Int,
 		Array<FlxSprite>> = []; // Change/add/remove backgrounds mid song! Format: "slowBacks[StepToBeActivated] = [Sprites,To,Be,Changed,Or,Added];"
 
+	public var staticCam:Bool = false;
+
 	// BGs still must be added by using toAdd Array for them to show in game after slowBacks take effect!!
 	// BGs still must be added by using toAdd Array for them to show in game after slowBacks take effect!!
 	// All of the above must be set or used in your stage case code block!!
@@ -63,6 +65,7 @@ class Stage extends MusicBeatState
 		super();
 
 		this.curStage = daStage;
+
 		// camZoom = 1.05; // Don't change zoom here, unless you want to change zoom of every stage that doesn't have custom one
 
 		if (!FlxG.save.data.background && !forceLoad)

@@ -13,6 +13,15 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import openfl.display3D.textures.Texture;
 import openfl.display.BitmapData;
+#if cpp
+import cpp.NativeGc;
+#elseif hl
+import hl.Gc;
+#elseif java
+import java.vm.Gc;
+#elseif neko
+import neko.vm.Gc;
+#end
 
 using StringTools;
 
@@ -343,14 +352,9 @@ class Paths
 		return OpenFlAssets.exists(path, AssetType.TEXT);
 	}
 
-	static public function video(key:String)
+	static public function video(key:String, type:String = VIDEO_EXT)
 	{
-		return 'assets/videos/$key.$VIDEO_EXT';
-	}
-
-	static public function webmVideo(key:String)
-	{
-		return 'assets/videos/$key.webm';
+		return 'assets/videos/$key.$type';
 	}
 
 	inline static public function image(key:String, ?library:String, ?gpuRender:Bool):FlxGraphic
@@ -414,6 +418,15 @@ class Paths
 		// run the garbage collector for good measure lmfao
 
 		System.gc();
+
+		#if cpp
+		NativeGc.compact();
+		NativeGc.run(true);
+		#elseif hl
+		Gc.major();
+		#elseif (java || neko)
+		Gc.run(true);
+		#end
 	}
 
 	public static var localTrackedAssets:Array<String> = [];
@@ -516,7 +529,7 @@ class Paths
 
 		return AtlasFrameMaker.construct(key, library, excludeArray);
 	}
-				
+
 	inline static public function getJSONAtlas(key:String, ?library:String, ?isCharacter:Bool = false, ?gpuRender:Bool)
 	{
 		gpuRender = gpuRender != null ? gpuRender : FlxG.save.data.gpuRender;
@@ -525,5 +538,4 @@ class Paths
 
 		return FlxAtlasFrames.fromTexturePackerJson(image(key, library), file('images/$key.json', library));
 	}
-
 }

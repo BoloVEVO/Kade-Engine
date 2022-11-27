@@ -39,8 +39,8 @@ class MusicBeatState extends FlxUIState
 	{
 		clean();
 
-		Application.current.window.onFocusIn.remove(onWindowFocusOut);
-		Application.current.window.onFocusIn.remove(onWindowFocusIn);
+		/*Application.current.window.onFocusIn.remove(onWindowFocusOut);
+			Application.current.window.onFocusIn.remove(onWindowFocusIn); */
 
 		super.destroy();
 	}
@@ -125,8 +125,8 @@ class MusicBeatState extends FlxUIState
 				FlxG.save.data.laneTransparency = 1;
 		}
 
-		Application.current.window.onFocusIn.add(onWindowFocusIn);
-		Application.current.window.onFocusOut.add(onWindowFocusOut);
+		/*Application.current.window.onFocusIn.add(onWindowFocusIn);
+			Application.current.window.onFocusOut.add(onWindowFocusOut); */
 		TimingStruct.clearTimings();
 
 		KeyBinds.keyCheck();
@@ -238,6 +238,7 @@ class MusicBeatState extends FlxUIState
 			}
 		}
 
+		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
 		super.update(elapsed);
 	}
 
@@ -320,36 +321,35 @@ class MusicBeatState extends FlxUIState
 		FlxG.openURL(schmancy);
 		#end
 	}
-
-	function onWindowFocusOut():Void
-	{
-		if (PlayState.inDaPlay)
+	/*function onWindowFocusOut():Void
 		{
-			if (PlayState.instance.vocals != null)
-				PlayState.instance.vocals.pause();
-			if (FlxG.sound.music != null)
-				FlxG.sound.music.pause();
-			if (!PlayState.instance.paused && !PlayState.instance.endingSong && PlayState.instance.songStarted)
+			if (PlayState.inDaPlay)
 			{
-				Debug.logTrace("Lost Focus");
-				PlayState.instance.openSubState(new PauseSubState());
-				PlayState.boyfriend.stunned = true;
+				if (PlayState.instance.vocals != null)
+					PlayState.instance.vocals.pause();
+				if (FlxG.sound.music != null)
+					FlxG.sound.music.pause();
+				if (!PlayState.instance.paused && !PlayState.instance.endingSong && PlayState.instance.songStarted)
+				{
+					Debug.logTrace("Lost Focus");
+					PlayState.instance.openSubState(new PauseSubState());
+					PlayState.boyfriend.stunned = true;
 
-				PlayState.instance.persistentUpdate = false;
-				PlayState.instance.persistentDraw = true;
-				PlayState.instance.paused = true;
+					PlayState.instance.persistentUpdate = false;
+					PlayState.instance.persistentDraw = true;
+					PlayState.instance.paused = true;
+				}
 			}
 		}
-	}
 
-	function onWindowFocusIn():Void
-	{
-		Debug.logTrace("IM BACK!!!");
-		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
-		if (PlayState.inDaPlay)
+		function onWindowFocusIn():Void
 		{
-			if (PlayState.boyfriend.stunned)
-				PlayState.boyfriend.stunned = false;
-		}
-	}
+			Debug.logTrace("IM BACK!!!");
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
+			if (PlayState.inDaPlay)
+			{
+				if (PlayState.boyfriend.stunned)
+					PlayState.boyfriend.stunned = false;
+			}
+	}*/
 }

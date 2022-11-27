@@ -18,8 +18,8 @@ class MusicBeatSubstate extends FlxSubState
 	override function destroy()
 	{
 		#if desktop
-		Application.current.window.onFocusIn.remove(onWindowFocusOut);
-		Application.current.window.onFocusIn.remove(onWindowFocusIn);
+		/*Application.current.window.onFocusIn.remove(onWindowFocusOut);
+			Application.current.window.onFocusIn.remove(onWindowFocusIn); */
 		#end
 		super.destroy();
 	}
@@ -28,8 +28,8 @@ class MusicBeatSubstate extends FlxSubState
 	{
 		super.create();
 		#if desktop
-		Application.current.window.onFocusIn.add(onWindowFocusIn);
-		Application.current.window.onFocusOut.add(onWindowFocusOut);
+		/*Application.current.window.onFocusIn.add(onWindowFocusIn);
+			Application.current.window.onFocusOut.add(onWindowFocusOut); */
 		#end
 	}
 
@@ -109,34 +109,32 @@ class MusicBeatSubstate extends FlxSubState
 	{
 		// do literally nothing dumbass
 	}
-
-	function onWindowFocusOut():Void
-	{
-		if (PlayState.inDaPlay)
+	/*function onWindowFocusOut():Void
 		{
-			PlayState.instance.vocals.pause();
-			FlxG.sound.music.pause();
-			if (!PlayState.instance.paused && !PlayState.instance.endingSong && PlayState.instance.songStarted)
+			if (PlayState.inDaPlay)
 			{
-				Debug.logTrace("Lost Focus");
-				PlayState.instance.openSubState(new PauseSubState());
-				PlayState.boyfriend.stunned = true;
+				PlayState.instance.vocals.pause();
+				FlxG.sound.music.pause();
+				if (!PlayState.instance.paused && !PlayState.instance.endingSong && PlayState.instance.songStarted)
+				{
+					Debug.logTrace("Lost Focus");
+					PlayState.instance.openSubState(new PauseSubState());
+					PlayState.boyfriend.stunned = true;
 
-				PlayState.instance.persistentUpdate = false;
-				PlayState.instance.persistentDraw = true;
-				PlayState.instance.paused = true;
+					PlayState.instance.persistentUpdate = false;
+					PlayState.instance.persistentDraw = true;
+					PlayState.instance.paused = true;
+				}
 			}
-		}
-	}
-
-	function onWindowFocusIn():Void
-	{
-		Debug.logTrace("IM BACK!!!");
-		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
-		if (PlayState.inDaPlay)
+	}*/
+	/*function onWindowFocusIn():Void
 		{
-			if (PlayState.boyfriend.stunned)
-				PlayState.boyfriend.stunned = false;
-		}
-	}
+			Debug.logTrace("IM BACK!!!");
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
+			if (PlayState.inDaPlay)
+			{
+				if (PlayState.boyfriend.stunned)
+					PlayState.boyfriend.stunned = false;
+			}
+	}*/
 }

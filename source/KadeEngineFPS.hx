@@ -41,7 +41,7 @@ class KadeEngineFPS extends TextField
 
 	public var memoryTotal:Int64 = 0;
 
-	public var memoryUsage:String;
+	public var memoryUsage:String = '';
 
 	public var gpuMemory:Float = 0;
 
@@ -126,6 +126,7 @@ class KadeEngineFPS extends TextField
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
+			#if !html5
 			memoryUsage = (FlxG.save.data.memoryDisplay ? "Memory Usage: " : "");
 
 			memoryMegas = Int64.make(0, System.totalMemory);
@@ -139,21 +140,22 @@ class KadeEngineFPS extends TextField
 			if (FlxG.save.data.memoryDisplay)
 				if (memoryMegas >= 0x40000000)
 					memoryUsage += (Math.round(cast(memoryMegas, Float) / 0x400 / 0x400 / 0x400 * 1000) / 1000)
-						+ "GB / "
+						+ " GB / "
 						+ (Math.round(cast(memoryTotal, Float) / 0x400 / 0x400 / 0x400 * 1000) / 1000)
 						+ ' GB';
 				else if (memoryMegas >= 0x100000)
 					memoryUsage += (Math.round(cast(memoryMegas, Float) / 0x400 / 0x400 * 1000) / 1000)
-						+ "MB / "
+						+ " MB / "
 						+ (Math.round(cast(memoryTotal, Float) / 0x400 / 0x400 * 1000) / 1000)
 						+ ' MB';
 				else if (memoryMegas >= 0x400)
 					memoryUsage += (Math.round(cast(memoryMegas, Float) / 0x400 * 1000) / 1000)
-						+ "KB / "
+						+ " KB / "
 						+ (Math.round(cast(memoryMegas, Float) / 0x400 * 1000) / 1000)
 						+ ' KB';
 				else
-					memoryUsage += memoryMegas + "B / " + memoryTotal + " B";
+					memoryUsage += memoryMegas + " B / " + memoryTotal + " B";
+			#end
 
 			/*if (FlxG.save.data.gpuRender)
 					memoryUsage = (FlxG.save.data.memoryDisplay?"Memory Usage: " + memoryMegas + " MB / " + memoryTotal + " MB" + "\nGPU Usage: " + gpuMemory

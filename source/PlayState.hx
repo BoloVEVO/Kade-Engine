@@ -420,8 +420,8 @@ class PlayState extends MusicBeatState
 		if (previousRate < 1.00)
 			previousRate = 1;
 
-		if (FlxG.save.data.fpsCap > 300)
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
+		/*if (FlxG.save.data.fpsCap > 300)
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300); */
 
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
@@ -693,37 +693,34 @@ class PlayState extends MusicBeatState
 			gfCheck = SONG.gfVersion;
 		}
 
-		if (FlxG.save.data.characters)
+		gf = new Character(400, 130, gfCheck);
+
+		if (FlxG.save.data.characters && gf.frames == null)
 		{
-			gf = new Character(400, 130, gfCheck);
+			#if debug
+			FlxG.log.warn(["Couldn't load gf: " + gfCheck + ". Loading default gf"]);
+			#end
+			gf = new Character(400, 130, 'gf');
+		}
 
-			if (FlxG.save.data.characters && gf.frames == null)
-			{
-				#if debug
-				FlxG.log.warn(["Couldn't load gf: " + gfCheck + ". Loading default gf"]);
-				#end
-				gf = new Character(400, 130, 'gf');
-			}
+		boyfriend = new Boyfriend(770, 450, SONG.player1);
 
-			boyfriend = new Boyfriend(770, 450, SONG.player1);
+		if (FlxG.save.data.characters && boyfriend.frames == null)
+		{
+			#if debug
+			FlxG.log.warn(["Couldn't load boyfriend: " + SONG.player1 + ". Loading default boyfriend"]);
+			#end
+			boyfriend = new Boyfriend(770, 450, 'bf');
+		}
 
-			if (FlxG.save.data.characters && boyfriend.frames == null)
-			{
-				#if debug
-				FlxG.log.warn(["Couldn't load boyfriend: " + SONG.player1 + ". Loading default boyfriend"]);
-				#end
-				boyfriend = new Boyfriend(770, 450, 'bf');
-			}
+		dad = new Character(100, 100, SONG.player2);
 
-			dad = new Character(100, 100, SONG.player2);
-
-			if (FlxG.save.data.characters && dad.frames == null)
-			{
-				#if debug
-				FlxG.log.warn(["Couldn't load opponent: " + SONG.player2 + ". Loading default opponent"]);
-				#end
-				dad = new Character(100, 100, 'dad');
-			}
+		if (FlxG.save.data.characters && dad.frames == null)
+		{
+			#if debug
+			FlxG.log.warn(["Couldn't load opponent: " + SONG.player2 + ". Loading default opponent"]);
+			#end
+			dad = new Character(100, 100, 'dad');
 		}
 
 		Stage = new Stage(SONG.stage);
@@ -772,6 +769,7 @@ class PlayState extends MusicBeatState
 					case 0:
 						add(gf);
 						gf.scrollFactor.set(0.95, 0.95);
+
 						for (bg in array)
 							add(bg);
 					case 1:
@@ -2051,17 +2049,6 @@ class PlayState extends MusicBeatState
 			createTween(skipText, {alpha: 1}, 0.2);
 			add(skipText);
 		}
-
-		#if (FEATURE_MP4VIDEOS && !html5)
-		if (daVideoGroup != null)
-		{
-			for (vid in daVideoGroup)
-			{
-				var perecentSupposed = (vid.bitmap.getTime() / songMultiplier) / (vid.bitmap.getDuration() / songMultiplier);
-				vid.bitmap.seek(perecentSupposed); // I laughed my ass off so hard when I found out this was a fuckin PERCENTAGE
-			}
-		}
-		#end
 	}
 
 	var debugNum:Int = 0;
@@ -2508,14 +2495,10 @@ class PlayState extends MusicBeatState
 			#if (FEATURE_MP4VIDEOS && !html5)
 			if (daVideoGroup != null)
 			{
-				for (vid in daVideoGroup.members)
+				for (vid in daVideoGroup)
 				{
-					if (vid.alive && vid.visible)
-					{
-						var perecentSupposed = (vid.bitmap.getTime() / songMultiplier) / (vid.bitmap.getDuration() / songMultiplier);
-						vid.bitmap.seek(perecentSupposed); // I laughed my ass off so hard when I found out this was a fuckin PERCENTAGE
+					if (vid.alive)
 						vid.bitmap.resume();
-					}
 				}
 			}
 			#end
@@ -2609,56 +2592,12 @@ class PlayState extends MusicBeatState
 	{
 		switch (type)
 		{
-			case 'webm':
-				#if FEATURE_WEBM
-				var vid = new WebmSprite();
-
-				vid.antialiasing = true;
-				if (!layInFront)
-				{
-					vid.scrollFactor.set(0, 0);
-					vid.scale.set(1 + (Stage.camZoom / 8), 1 + (Stage.camZoom / 8));
-				}
-				else
-					vid.scrollFactor.set();
-
-				vid.updateHitbox();
-				vid.visible = false;
-				reserveWebmVids.push(vid);
-				if (!layInFront)
-				{
-					remove(gf);
-					remove(dad);
-					remove(boyfriend);
-					daWebmGroup = new FlxTypedGroup<WebmSprite>();
-					add(daWebmGroup);
-					for (vid in reserveWebmVids)
-						daWebmGroup.add(vid);
-					add(gf);
-					add(boyfriend);
-					add(dad);
-				}
-				else
-				{
-					daWebmGroup = new FlxTypedGroup<WebmSprite>();
-					add(daWebmGroup);
-					for (vid in reserveWebmVids)
-					{
-						vid.camera = camGame;
-						daWebmGroup.add(vid);
-					}
-				}
-
-				reserveWebmVids = [];
-				daWebmGroup.members[vidIndex].loadVideo(Paths.webmVideo('${PlayState.SONG.songId}/${vidSource}'));
-				daWebmGroup.members[vidIndex].visible = true;
-				vidIndex++;
-				#end
-			case 'mp4':
+			default:
 				#if (FEATURE_MP4VIDEOS && !html5)
 				var vid = new VideoSprite(-320, -180);
 
 				vid.antialiasing = true;
+
 				if (!layInFront)
 				{
 					vid.scrollFactor.set(0, 0);
@@ -2669,6 +2608,7 @@ class PlayState extends MusicBeatState
 					vid.scale.set(2 / 3, 2 / 3);
 					vid.scrollFactor.set();
 				}
+
 				vid.updateHitbox();
 				vid.visible = false;
 				vid.bitmap.canSkip = false;
@@ -2689,7 +2629,7 @@ class PlayState extends MusicBeatState
 				else
 				{
 					daVideoGroup = new FlxTypedGroup<VideoSprite>();
-					add(daWebmGroup);
+					add(daVideoGroup);
 					for (vid in reserveVids)
 					{
 						vid.camera = camGame;
@@ -2698,11 +2638,7 @@ class PlayState extends MusicBeatState
 				}
 
 				reserveVids = [];
-				daVideoGroup.members[vidIndex].playVideo(Paths.video('${PlayState.SONG.songId}/${vidSource}'));
-				var perecentSupposed = (daVideoGroup.members[vidIndex].bitmap.getTime() / songMultiplier) / (daVideoGroup.members[vidIndex].bitmap.getDuration() / songMultiplier);
-
-				daVideoGroup.members[vidIndex].bitmap.seek(perecentSupposed);
-				daVideoGroup.members[vidIndex].bitmap.resume();
+				daVideoGroup.members[vidIndex].playVideo(Paths.video('${PlayState.SONG.songId}/${vidSource}', type));
 				daVideoGroup.members[vidIndex].visible = true;
 				vidIndex++;
 				#end
@@ -2972,7 +2908,7 @@ class PlayState extends MusicBeatState
 		var pauseBind = FlxKey.fromString(FlxG.save.data.pauseBind);
 		var gppauseBind = FlxKey.fromString(FlxG.save.data.gppauseBind);
 
-		if ((FlxG.keys.anyJustPressed([pauseBind]) || KeyBinds.gamepad && FlxG.keys.anyJustPressed([gppauseBind]))
+		if ((FlxG.keys.anyJustPressed([pauseBind]) || KeyBinds.gamepad && FlxG.keys.anyJustPressed([gppauseBind]) || !Main.focused)
 			&& startedCountdown
 			&& canPause
 			&& !cannotDie)
@@ -3393,70 +3329,73 @@ class PlayState extends MusicBeatState
 			#end
 			try
 			{
-				if (!SONG.notes[Std.int(curStep / 16)].mustHitSection)
+				if (!Stage.staticCam)
 				{
-					var offsetX = 0;
-					var offsetY = 0;
-
-					#if FEATURE_LUAMODCHART
-					if (luaModchart != null)
+					if (!SONG.notes[Std.int(curStep / 16)].mustHitSection)
 					{
-						offsetX = luaModchart.getVar("followXOffset", "float");
-						offsetY = luaModchart.getVar("followYOffset", "float");
-					}
-					#end
-					camFollow.set(dad.getMidpoint().x + 150 + offsetX, dad.getMidpoint().y - 100 + offsetY);
-					// camFollow.setPosition(dad.getMidpoint().x + 150 + offsetX, dad.getMidpoint().y - 100 + offsetY);
-					#if FEATURE_LUAMODCHART
-					if (luaModchart != null)
-						luaModchart.executeState('playerTwoTurn', []);
-					#end
+						var offsetX = 0;
+						var offsetY = 0;
 
-					// camFollow.setPosition(lucky.getMidpoint().x - 120, lucky.getMidpoint().y + 210);
-					#if !FEATURE_LUAMODCHART
-					if (SONG.songId == 'tutorial')
-						tweenCamZoom(true);
-					#end
+						#if FEATURE_LUAMODCHART
+						if (luaModchart != null)
+						{
+							offsetX = luaModchart.getVar("followXOffset", "float");
+							offsetY = luaModchart.getVar("followYOffset", "float");
+						}
+						#end
+						camFollow.set(dad.getMidpoint().x + 150 + offsetX, dad.getMidpoint().y - 100 + offsetY);
+						// camFollow.setPosition(dad.getMidpoint().x + 150 + offsetX, dad.getMidpoint().y - 100 + offsetY);
+						#if FEATURE_LUAMODCHART
+						if (luaModchart != null)
+							luaModchart.executeState('playerTwoTurn', []);
+						#end
 
-					camFollow.x += dad.camFollow[0];
-					camFollow.y += dad.camFollow[1];
-				}
+						// camFollow.setPosition(lucky.getMidpoint().x - 120, lucky.getMidpoint().y + 210);
+						#if !FEATURE_LUAMODCHART
+						if (SONG.songId == 'tutorial')
+							tweenCamZoom(true);
+						#end
 
-				if (SONG.notes[Std.int(curStep / 16)].mustHitSection)
-				{
-					var offsetX = 0;
-					var offsetY = 0;
-
-					#if FEATURE_LUAMODCHART
-					if (luaModchart != null)
-					{
-						offsetX = luaModchart.getVar("followXOffset", "float");
-						offsetY = luaModchart.getVar("followYOffset", "float");
-					}
-					#end
-					camFollow.set(boyfriend.getMidpoint().x - 100 + offsetX, boyfriend.getMidpoint().y - 100 + offsetY);
-					#if FEATURE_LUAMODCHART
-					if (luaModchart != null)
-						luaModchart.executeState('playerOneTurn', []);
-					#end
-					#if !FEATURE_LUAMODCHART
-					if (SONG.songId == 'tutorial')
-						tweenCamZoom(false);
-					#end
-
-					switch (Stage.curStage)
-					{
-						case 'limo':
-							camFollow.x = boyfriend.getMidpoint().x - 300;
-						case 'mall':
-							camFollow.y = boyfriend.getMidpoint().y - 200;
-						case 'school' | 'schoolEvil':
-							camFollow.x = boyfriend.getMidpoint().x - 300;
-							camFollow.y = boyfriend.getMidpoint().y - 300;
+						camFollow.x += dad.camFollow[0];
+						camFollow.y += dad.camFollow[1];
 					}
 
-					camFollow.x += boyfriend.camFollow[0];
-					camFollow.y += boyfriend.camFollow[1];
+					if (SONG.notes[Std.int(curStep / 16)].mustHitSection)
+					{
+						var offsetX = 0;
+						var offsetY = 0;
+
+						#if FEATURE_LUAMODCHART
+						if (luaModchart != null)
+						{
+							offsetX = luaModchart.getVar("followXOffset", "float");
+							offsetY = luaModchart.getVar("followYOffset", "float");
+						}
+						#end
+						camFollow.set(boyfriend.getMidpoint().x - 100 + offsetX, boyfriend.getMidpoint().y - 100 + offsetY);
+						#if FEATURE_LUAMODCHART
+						if (luaModchart != null)
+							luaModchart.executeState('playerOneTurn', []);
+						#end
+						#if !FEATURE_LUAMODCHART
+						if (SONG.songId == 'tutorial')
+							tweenCamZoom(false);
+						#end
+
+						switch (Stage.curStage)
+						{
+							case 'limo':
+								camFollow.x = boyfriend.getMidpoint().x - 300;
+							case 'mall':
+								camFollow.y = boyfriend.getMidpoint().y - 200;
+							case 'school' | 'schoolEvil':
+								camFollow.x = boyfriend.getMidpoint().x - 300;
+								camFollow.y = boyfriend.getMidpoint().y - 300;
+						}
+
+						camFollow.x += boyfriend.camFollow[0];
+						camFollow.y += boyfriend.camFollow[1];
+					}
 				}
 			}
 			catch (e)
@@ -3929,8 +3868,8 @@ class PlayState extends MusicBeatState
 		PlayStateChangeables.botPlay = false;
 		scrollSpeed = 1 / songMultiplier;
 
-		if (FlxG.save.data.fpsCap > 300)
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300);
+		/*if (FlxG.save.data.fpsCap > 300)
+			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300); */
 
 		#if FEATURE_LUAMODCHART
 		if (luaModchart != null)
@@ -6264,7 +6203,7 @@ class PlayState extends MusicBeatState
 			bg.cameras = [camHUD];
 			add(bg);
 
-			#if (!html5)
+			#if (FEATURE_MP4VIDEOS && !html5)
 			var daVid:VideoHandler = new VideoHandler();
 			daVid.playVideo(fileName);
 			(daVid).finishCallback = function()
@@ -6354,7 +6293,7 @@ class PlayState extends MusicBeatState
 		daNote.alive = false;
 		daNote.kill();
 		notes.remove(daNote, true);
-		daNote = null;
+		daNote.graphic = null;
 	}
 
 	private function addSongTiming()

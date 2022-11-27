@@ -34,6 +34,9 @@ class Main extends Sprite
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var initialState:Class<FlxState> = TitleState; // The FlxState the game starts with.
+
+	public static var focused:Bool = true; // Whether the game is currently focused or not.
+
 	var zoom:Float = -1; // If -1, zoom is automatically calculated to fit the window dimensions.
 	var framerate:Int = 120; // How many frames per second the game should run at.
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
@@ -116,8 +119,22 @@ class Main extends Sprite
 		bitmapFPS.smoothing = true;
 		#end
 
+		#if (flixel >= "5.0.0")
+		game = new FlxGame(gameWidth, gameHeight, initialState, framerate, framerate, skipSplash, startFullscreen);
+		#else
 		game = new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen);
+		#end
 		addChild(game);
+
+		FlxG.signals.focusGained.add(function()
+		{
+			focused = true;
+			setFPSCap(FlxG.save.data.fpsCap);
+		});
+		FlxG.signals.focusLost.add(function()
+		{
+			focused = false;
+		});
 
 		#if !mobile
 		addChild(fpsCounter);
@@ -165,30 +182,20 @@ class Main extends Sprite
 		fpsCounter.textColor = color;
 	}
 
-	public function setFPSCap(cap:Float)
+	public function setFPSCap(cap:Int)
 	{
-		var framerate = Std.int(cap);
-		openfl.Lib.current.stage.frameRate = cap;
-		if (framerate > FlxG.drawFramerate)
+		/*var framerate = Std.int(cap);
+			openfl.Lib.current.stage.frameRate = cap; */
+		if (cap > FlxG.drawFramerate)
 		{
-			FlxG.updateFramerate = framerate;
-			FlxG.drawFramerate = framerate;
+			FlxG.updateFramerate = cap;
+			FlxG.drawFramerate = cap;
 		}
 		else
 		{
-			FlxG.drawFramerate = framerate;
-			FlxG.updateFramerate = framerate;
+			FlxG.drawFramerate = cap;
+			FlxG.updateFramerate = cap;
 		}
-	}
-
-	public static function getFPSCap():Float
-	{
-		return openfl.Lib.current.stage.frameRate;
-	}
-
-	public function getFPS():Float
-	{
-		return fpsCounter.currentFPS;
 	}
 
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
