@@ -246,7 +246,7 @@ class Note extends FlxSprite
 		}
 
 		stepHeight = (((0.45 * PlayState.fakeNoteStepCrochet)) * FlxMath.roundDecimal(PlayState.instance.scrollSpeed == 1 ? PlayState.SONG.speed : PlayState.instance.scrollSpeed,
-			2)) * PlayState.songMultiplier;
+			2));
 
 		if (isSustainNote && prevNote != null)
 		{
@@ -302,7 +302,7 @@ class Note extends FlxSprite
 		super.update(elapsed);
 
 		var newStepHeight = (((0.45 * PlayState.fakeNoteStepCrochet)) * FlxMath.roundDecimal(PlayState.instance.scrollSpeed == 1 ? PlayState.SONG.speed : PlayState.instance.scrollSpeed,
-			2)) * PlayState.songMultiplier;
+			2));
 
 		if (stepHeight != newStepHeight)
 		{

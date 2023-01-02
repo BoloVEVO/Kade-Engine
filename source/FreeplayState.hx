@@ -792,11 +792,12 @@ class FreeplayState extends MusicBeatState
 			case 'M.I.L.F':
 				songHighscore = 'Milf';
 		}
+		var abDiff = CoolUtil.difficultyArray.indexOf(songs[curSelected].diffs[curDifficulty]);
 		#if !switch
-		intendedScore = Highscore.getScore(songHighscore, curDifficulty, rate);
-		combo = Highscore.getCombo(songHighscore, curDifficulty, rate);
-		letter = Highscore.getLetter(songHighscore, curDifficulty, rate);
-		intendedaccuracy = Highscore.getAcc(songHighscore, curDifficulty, rate);
+		intendedScore = Highscore.getScore(songHighscore, abDiff, rate);
+		combo = Highscore.getCombo(songHighscore, abDiff, rate);
+		letter = Highscore.getLetter(songHighscore, abDiff, rate);
+		intendedaccuracy = Highscore.getAcc(songHighscore, abDiff, rate);
 		#end
 	}
 

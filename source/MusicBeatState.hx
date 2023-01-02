@@ -127,7 +127,7 @@ class MusicBeatState extends FlxUIState
 
 		/*Application.current.window.onFocusIn.add(onWindowFocusIn);
 			Application.current.window.onFocusOut.add(onWindowFocusOut); */
-		TimingStruct.clearTimings();
+		// TimingStruct.clearTimings();
 
 		KeyBinds.keyCheck();
 
@@ -145,6 +145,9 @@ class MusicBeatState extends FlxUIState
 		FlxTransitionableState.skipNextTransOut = false;
 
 		Paths.clearUnusedMemory();
+
+		super.create();
+		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
 	}
 
 	override function update(elapsed:Float)
@@ -176,13 +179,13 @@ class MusicBeatState extends FlxUIState
 			curDecimalBeat = 0;
 		else
 		{
-			var data = TimingStruct.getTimingAtTimestamp(Conductor.songPosition);
+			var data = null;
+
+			data = TimingStruct.getTimingAtTimestamp(Conductor.songPosition);
 
 			if (data != null)
 			{
 				FlxG.watch.addQuick("Current Conductor Timing Seg", data.bpm);
-
-				Conductor.crochet = ((60 / data.bpm) * 1000) / PlayState.songMultiplier;
 
 				var step = ((60 / data.bpm) * 1000) / 4;
 				var startInMS = (data.startTime * 1000);
@@ -209,6 +212,8 @@ class MusicBeatState extends FlxUIState
 						stepHit();
 					}
 				}
+
+				Conductor.crochet = ((60 / data.bpm) * 1000) / PlayState.songMultiplier;
 			}
 			else
 			{
@@ -238,7 +243,7 @@ class MusicBeatState extends FlxUIState
 			}
 		}
 
-		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
+		// (cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
 		super.update(elapsed);
 	}
 

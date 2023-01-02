@@ -57,10 +57,10 @@ class KadeEngineData
 			FlxG.save.data.fpsRain = false;
 
 		if (FlxG.save.data.fpsCap == null)
-			FlxG.save.data.fpsCap = 120;
+			FlxG.save.data.fpsCap = 60;
 
 		if (FlxG.save.data.fpsCap < 60)
-			FlxG.save.data.fpsCap = 120; // baby proof so you can't hard lock ur copy of kade engine
+			FlxG.save.data.fpsCap = 60; // baby proof so you can't hard lock ur copy of kade engine
 
 		if (FlxG.save.data.scrollSpeed == null)
 			FlxG.save.data.scrollSpeed = 1;
@@ -234,10 +234,16 @@ class KadeEngineData
 			#end
 		}
 
+		if (FlxG.save.data.characters == null)
+			FlxG.save.data.characters = true;
+
 		if (FlxG.save.data.postProcessNotes == null)
 		{
 			FlxG.save.data.postProcessNotes = true;
 		}
+
+		if (FlxG.save.data.strumOffset == null)
+			FlxG.save.data.strumOffset = ['downscroll' => 0, 'upscroll' => 0];
 
 		if (FlxG.save.data.volume == null)
 			FlxG.save.data.volume = 1;

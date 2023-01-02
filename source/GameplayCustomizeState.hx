@@ -24,6 +24,7 @@ import flixel.addons.ui.FlxUINumericStepper;
 import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.plugin.FlxMouseControl;
 import flixel.addons.display.FlxExtendedSprite;
+import flixel.math.FlxRect;
 
 using StringTools;
 
@@ -83,6 +84,12 @@ class GameplayCustomizeState extends MusicBeatState
 
 	var timeShown = 0;
 
+	var strumYRef:FlxExtendedSprite;
+
+	var arrowHeight:Float = 0;
+
+	var strumYBounds:FlxSprite;
+
 	public override function create()
 	{
 		Paths.clearStoredMemory();
@@ -118,10 +125,10 @@ class GameplayCustomizeState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		// defaults if no stage was found in chart
-
-		// If the stage isn't specified in the chart, we use the story week value.
-		var opt_tabs = [{name: "Appeareance", label: 'Appeareance'}, {name: "WIP", label: 'wip'}];
+		var opt_tabs = [
+			{name: "Appeareance", label: 'Appeareance'},
+			{name: "Gameplay Modules", label: 'Gameplay Modules'}
+		];
 
 		UI_options = new FlxUITabMenu(null, opt_tabs, true);
 
@@ -226,14 +233,27 @@ class GameplayCustomizeState extends MusicBeatState
 
 		strumLine = new FlxSprite(0, 0).makeGraphic(FlxG.width, 14);
 		strumLine.scrollFactor.set();
-		strumLine.alpha = 0.4;
+		strumLine.alpha = 0;
+
+		strumYBounds = new FlxSprite(0, 0).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.YELLOW);
+		strumYBounds.screenCenter(X);
+		strumYBounds.scrollFactor.set();
+		strumYBounds.alpha = 0;
+
+		strumYBounds.camera = camHUD;
 
 		add(strumLine);
 
 		if (FlxG.save.data.downscroll)
+		{
+			strumYBounds.y = FlxG.height - 250;
 			strumLine.y = FlxG.height - 165;
+		}
 		else
+		{
+			strumYBounds.y = FlxG.height - 1925;
 			strumLine.y = FlxG.height - 670;
+		}
 
 		laneunderlayOpponent = new FlxSprite(0, 0).makeGraphic(110 * 4 + 50, FlxG.height * 2);
 		laneunderlayOpponent.alpha = FlxG.save.data.laneTransparency;
@@ -284,7 +304,7 @@ class GameplayCustomizeState extends MusicBeatState
 		else
 			sick.setGraphicSize(Std.int(sick.width * CoolUtil.daPixelZoom * 0.7));
 
-		sick.enableMouseDrag(false, false, 255);
+		// sick.enableMouseDrag(false, false, 255);
 
 		sick.updateHitbox();
 		add(sick);
@@ -295,6 +315,20 @@ class GameplayCustomizeState extends MusicBeatState
 
 		generateStaticArrows(0);
 		generateStaticArrows(1);
+
+		strumYRef = new FlxExtendedSprite(0, strumLine.y + FlxG.save.data.strumOffset.get(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll'));
+
+		strumYRef.makeGraphic(FlxG.width * 2, Std.int(arrowHeight), FlxColor.WHITE);
+		strumYRef.screenCenter(X);
+		strumYRef.alpha = 0.5;
+		strumYRef.scrollFactor.set();
+		// strumYRef.enableMouseDrag(false, false, 255);
+
+		strumYRef.cameras = [camHUD];
+
+		add(strumYBounds);
+
+		add(strumYRef);
 
 		laneunderlay.x = playerStrums.members[0].x - 25;
 		laneunderlayOpponent.x = cpuStrums.members[0].x - 25;
@@ -339,13 +373,13 @@ class GameplayCustomizeState extends MusicBeatState
 		super.update(elapsed);
 		// sick.update(elapsed);
 
-		if (FlxG.save.data.zoom >= 0.8 && FlxG.save.data.zoom <= 1.2)
-		{
-			if (FlxG.save.data.downscroll)
-				strumLine.y = FlxG.height - 165
-			else
-				strumLine.y = FlxG.height - 670;
-		}
+		/*if (FlxG.save.data.zoom >= 0.8 && FlxG.save.data.zoom <= 1.2)
+			{
+				if (FlxG.save.data.downscroll)
+					strumLine.y = FlxG.height - 165
+				else
+					strumLine.y = FlxG.height - 670;
+		}*/
 
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
@@ -388,9 +422,11 @@ class GameplayCustomizeState extends MusicBeatState
 		}
 
 		for (i in playerStrums)
-			i.y = strumLine.y;
+			i.y = strumYRef.y;
 		for (i in strumLineNotes)
-			i.y = strumLine.y;
+			i.y = strumYRef.y;
+
+		FlxG.save.data.strumOffset.set(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll', strumYRef.y - strumLine.y);
 
 		if (FlxG.keys.justPressed.Q)
 		{
@@ -567,9 +603,14 @@ class GameplayCustomizeState extends MusicBeatState
 			sick.y = defaultY;
 			FlxG.save.data.zoom = 1;
 			camHUD.zoom = FlxG.save.data.zoom;
+			camRatings.zoom = camHUD.zoom;
 			FlxG.save.data.changedHitX = sick.x;
 			FlxG.save.data.changedHitY = sick.y;
 			FlxG.save.data.changedHit = false;
+
+			FlxG.save.data.strumOffset.set(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll', 0);
+
+			strumYRef.y = strumLine.y + FlxG.save.data.strumOffset.get(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll');
 		}
 
 		if (controls.BACK)
@@ -610,7 +651,8 @@ class GameplayCustomizeState extends MusicBeatState
 	{
 		for (i in 0...4)
 		{
-			var babyArrow:StaticArrow = new StaticArrow(-10, strumLine.y);
+			var babyArrow:StaticArrow = new StaticArrow(-10,
+				strumLine.y + FlxG.save.data.strumOffset.get(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll'));
 
 			// defaults if no noteStyle was found in chart
 			var noteTypeCheck:String = 'normal';
@@ -684,6 +726,7 @@ class GameplayCustomizeState extends MusicBeatState
 					playerStrums.add(babyArrow);
 			}
 
+			arrowHeight = babyArrow.height;
 			babyArrow.playAnim('static');
 			babyArrow.x += 110;
 			babyArrow.x += ((FlxG.width / 2) * player);
@@ -731,7 +774,29 @@ class GameplayCustomizeState extends MusicBeatState
 		tab_app.add(msTiming);
 		UI_options.addGroup(tab_app);
 
-		var tab_wip = new FlxUI(null, UI_options);
-		UI_options.addGroup(tab_wip);
+		var tab_modules = new FlxUI(null, UI_options);
+		tab_modules.name = "Gameplay Modules";
+
+		var gameplayModules = ['Rating', 'Receptors', 'Health Bar'];
+		var modulesDropDown = new FlxUIDropDownMenu(10, 15, FlxUIDropDownMenu.makeStrIdLabelArray(gameplayModules, true), function(gameplayModule:String)
+		{
+			sick.disableMouseDrag();
+			strumYRef.disableMouseDrag();
+			strumYBounds.alpha = 0;
+
+			var leModuleString = gameplayModules[Std.parseInt(gameplayModule)];
+			switch (leModuleString)
+			{
+				case 'Rating':
+					sick.enableMouseDrag();
+				case 'Receptors':
+					strumYBounds.alpha = 0.5;
+					strumYRef.enableMouseDrag(false, false, 255, null, strumYBounds);
+					strumYRef.setDragLock(false, true);
+			}
+		});
+		tab_modules.add(modulesDropDown);
+
+		UI_options.addGroup(tab_modules);
 	}
 }

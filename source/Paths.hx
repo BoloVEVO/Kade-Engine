@@ -163,6 +163,7 @@ class Paths
 		}
 		catch (e)
 		{
+			Debug.logInfo('Error parsing JSON or JSON does not exit');
 			rawJson = null;
 		}
 

@@ -2453,6 +2453,8 @@ class ResetSettings extends Option
 		FlxG.save.data.changedHitX = null;
 		FlxG.save.data.changedHitY = null;
 
+		FlxG.save.data.strumOffsets = null;
+
 		KadeEngineData.initSave();
 		confirm = false;
 		trace('All settings have been reset');
