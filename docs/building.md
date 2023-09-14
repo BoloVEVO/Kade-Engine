@@ -38,7 +38,7 @@
 	 - `haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit.git`
 	 - `haxelib git hxvm-luajit https://github.com/nebulazorua/hxvm-luajit`
 	 - `haxelib git faxe https://github.com/uhrobots/faxe`
-	 - `haxelib install polymod
+	 - `haxelib install polymod`
 	 - `haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc`
 	 - `haxelib git extension-webm https://github.com/KadeDev/extension-webm`
 	 - `lime rebuild extension-webm <ie. windows, macos, linux>`
