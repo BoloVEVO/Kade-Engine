@@ -2690,15 +2690,9 @@ class PlayState extends MusicBeatState
 				@:privateAccess
 			{
 				#if lime_howlerjs
-				#if (lime >= "8.0.0")
-				inst._channel.__alSource.__backend.setPitch(songMultiplier);
+				inst.pitch = songMultiplier;
 				if (vocals.playing)
-					vocals._channel.__alSource.__backend.setPitch(songMultiplier);
-				#else
-				inst._channel.__alSource.__backend.parent.buffer.__srcHowl.rate(songMultiplier);
-				if (vocals.playing)
-					vocals._channel.__alSource.__backend.parent.buffer.__srcHowl.rate(songMultiplier);
-				#end
+					vocals.pitch = songMultiplier;
 				#end
 			}
 			#end
@@ -2906,15 +2900,9 @@ class PlayState extends MusicBeatState
 			@:privateAccess
 		{
 			#if lime_howlerjs
-			#if (lime >= "8.0.0")
-			inst._channel.__alSource.__backend.setPitch(songMultiplier);
+			inst.pitch = songMultiplier;
 			if (vocals.playing)
-				vocals._channel.__alSource.__backend.setPitch(songMultiplier);
-			#else
-			inst._channel.__alSource.__backend.parent.buffer.__srcHowl.rate(songMultiplier);
-			if (vocals.playing)
-				vocals._channel.__alSource.__backend.parent.buffer.__srcHowl.rate(songMultiplier);
-			#end
+				vocals.pitch = songMultiplier;
 			#end
 		}
 		#end
@@ -6151,15 +6139,9 @@ class PlayState extends MusicBeatState
 			@:privateAccess
 		{
 			#if lime_howlerjs
-			#if (lime >= "8.0.0")
-			inst._channel.__alSource.__backend.setPitch(value);
+			inst.pitch = songMultiplier;
 			if (vocals.playing)
-				vocals._channel.__alSource.__backend.setPitch(value);
-			#else
-			inst._channel.__alSource.__backend.parent.buffer.__srcHowl.rate(value);
-			if (vocals.playing)
-				vocals._channel.__alSource.__backend.parent.buffer.__srcHowl.rate(value);
-			#end
+				vocals.pitch = songMultiplier;
 			#end
 		}
 		#end
