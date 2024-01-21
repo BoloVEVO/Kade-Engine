@@ -35,12 +35,13 @@
 	 - `haxelib run lime setup`
 	 - `haxelib run lime setup flixel`
 	 - `haxelib run flixel-tools setup`
-	 - `haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit.git`
+	 - `haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit`
 	 - `haxelib git hxvm-luajit https://github.com/nebulazorua/hxvm-luajit`
-	 - `haxelib git faxe https://github.com/uhrobots/faxe`
-	 - `haxelib install polymod
+	 - `haxelib git faxe https://github.com/ashea-code/faxe`
+	 - `haxelib install polymod`
 	 - `haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc`
-	 - `haxelib git extension-webm https://github.com/KadeDev/extension-webm`
+         - `haxelib install openfl-webm`
+	 - `haxelib git extension-webm https://github.com/Kade-github/extension-webm`
 	 - `lime rebuild extension-webm <ie. windows, macos, linux>`
 
 ### Windows-only dependencies (only for building *to* Windows. Building html5 on Windows does not require this)
