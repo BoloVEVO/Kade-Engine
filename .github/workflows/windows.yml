@@ -40,8 +40,6 @@ jobs:
           RefreshEnv
           haxelib install openfl
           haxelib install flixel
-          haxelib run lime setup flixel
-          haxelib run lime setup
           haxelib install hxcpp-debug-server 1.2.4 
           haxelib install flixel-tools
           haxelib install flixel-addons 3.2.0
